@@ -19,7 +19,7 @@ export default function PaymentPage() {
   )}`
 
   return (
-    <PhotoboothScreenShell>
+    <PhotoboothScreenShell backgroundVariant="museum">
       <div className="flex h-full flex-col">
         <PhotoboothPageHeader
           title={screen.title}

@@ -13,7 +13,7 @@ export default function PackagesPage() {
   const selectedPackageId = PHOTOBOOTH_DEFAULT_SESSION.selectedPackageId
 
   return (
-    <PhotoboothScreenShell>
+    <PhotoboothScreenShell backgroundVariant="museum">
       <div className="flex h-full flex-col">
         <PhotoboothPageHeader
           title={screen.title}

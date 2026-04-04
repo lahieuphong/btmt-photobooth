@@ -7,7 +7,7 @@ export default function WelcomePage() {
   const screen = PHOTOBOOTH_SCREEN_STATE_MAP.welcome
 
   return (
-    <PhotoboothScreenShell>
+    <PhotoboothScreenShell backgroundVariant="museum">
       <div className="flex h-full flex-col">
         <div className="flex flex-1 items-center justify-center px-[12%]">
           <div className="w-full max-w-[46%]">
