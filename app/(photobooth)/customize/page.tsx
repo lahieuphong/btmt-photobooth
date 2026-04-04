@@ -1,3 +1,4 @@
+import PhotoboothCaptureRoundHint from '@/src/features/photobooth/components/PhotoboothCaptureRoundHint'
 import PhotoboothScreenShell from '@/src/features/photobooth/components/PhotoboothScreenShell'
 import PhotoboothPageHeader from '@/src/features/photobooth/components/PhotoboothPageHeader'
 import PhotoboothPageBody from '@/src/features/photobooth/components/PhotoboothPageBody'
@@ -22,6 +23,7 @@ export default function CustomizePage() {
           backHref={screen.backHref}
           showBackButton={screen.showBackButton}
           languageLabel="VI"
+          titleBottomSlot={<PhotoboothCaptureRoundHint />}
         />
 
         <PhotoboothPageBody className="flex flex-1 flex-col">

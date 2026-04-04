@@ -8,6 +8,7 @@ type PhotoboothPageHeaderProps = {
   showBackButton?: boolean
   languageLabel?: string
   rightSlot?: ReactNode
+  titleBottomSlot?: ReactNode
 }
 
 export default function PhotoboothPageHeader({
@@ -16,6 +17,7 @@ export default function PhotoboothPageHeader({
   showBackButton = true,
   languageLabel = 'VI',
   rightSlot,
+  titleBottomSlot,
 }: PhotoboothPageHeaderProps) {
   return (
     <div className="w-full px-[3.704%] pt-[4.259%]">
@@ -40,6 +42,8 @@ export default function PhotoboothPageHeader({
         <h1 className="text-center font-serif text-[clamp(12px,1.8vw,18px)] font-medium uppercase tracking-[0.02em] text-[#2E2A26]">
           {title}
         </h1>
+
+        {titleBottomSlot ? titleBottomSlot : null}
       </div>
     </div>
   )

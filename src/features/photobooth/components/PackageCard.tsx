@@ -24,40 +24,41 @@ export default function PackageCard({
       onClick={onClick}
       aria-pressed={selected}
       className={[
-        'w-full rounded-[14px] border px-4 py-3 text-left transition-all duration-200',
+        'relative w-full rounded-[16px] border text-left transition-all duration-200',
+        'px-[14px] pt-[12px] pb-[10px]',
         selected
-          ? 'border-[#F15A29] bg-[#171717] shadow-[0_8px_22px_rgba(0,0,0,0.18)]'
-          : 'border-[#F2B39B] bg-white/95 shadow-[0_4px_12px_rgba(0,0,0,0.04)]',
+          ? 'border-[#FF5A2A] bg-[#101010] shadow-[0_6px_18px_rgba(0,0,0,0.12)]'
+          : 'border-[#F3C6B8] bg-white/95',
         className,
       ].join(' ')}
     >
       <div className="flex items-start justify-between gap-3">
         <span
           className={[
-            'mt-0.5 inline-flex h-4 w-4 items-center justify-center rounded-full border',
-            selected ? 'border-[#F15A29]' : 'border-[#8E8E8E]',
+            'mt-[2px] inline-flex h-[14px] w-[14px] items-center justify-center rounded-full border',
+            selected ? 'border-[#FF5A2A]' : 'border-[#B7B7B7]',
           ].join(' ')}
         >
-          {selected ? <span className="h-2 w-2 rounded-full bg-[#FF5A2A]" /> : null}
+          {selected ? <span className="h-[6px] w-[6px] rounded-full bg-[#FF5A2A]" /> : null}
         </span>
 
         <span
           className={[
-            'inline-flex rounded-md px-2 py-[2px] text-[9px] font-semibold uppercase leading-none',
-            selected ? 'bg-white text-[#171717]' : 'bg-[#171717] text-white',
+            'inline-flex min-h-[16px] items-center rounded-[999px] px-[6px] text-[8px] font-bold uppercase leading-none',
+            selected ? 'bg-white text-[#111111]' : 'bg-[#1A1A1A] text-white',
           ].join(' ')}
         >
           {badge}
         </span>
       </div>
 
-      <div className="mt-3 space-y-1">
+      <div className="mt-[10px] space-y-[4px]">
         {lines.map((line) => (
           <p
             key={line}
             className={[
               'text-[11px] leading-[1.35]',
-              selected ? 'text-white/90' : 'text-[#7B7B7B]',
+              selected ? 'text-white/85' : 'text-[#9A9A9A]',
             ].join(' ')}
           >
             {line}
@@ -67,7 +68,7 @@ export default function PackageCard({
 
       <div
         className={[
-          'mt-3 text-[16px] font-semibold leading-none',
+          'mt-[10px] text-[16px] font-semibold leading-none',
           selected ? 'text-[#FF5A2A]' : 'text-[#2E2A26]',
         ].join(' ')}
       >
