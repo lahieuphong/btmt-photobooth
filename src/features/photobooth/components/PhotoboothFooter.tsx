@@ -1,4 +1,5 @@
 import Image from 'next/image'
+import { getAssetPath } from '@/src/features/photobooth/utils/assetPath'
 
 type PhotoboothFooterProps = {
   imageSrc?: string
@@ -17,7 +18,7 @@ export default function PhotoboothFooter({
         <div className="absolute inset-0 flex items-center justify-center">
           <div className="relative w-[61.111%] aspect-[660/110]">
             <Image
-              src={imageSrc}
+              src={getAssetPath(imageSrc)}
               alt={alt}
               fill
               sizes="(max-width: 390px) 61vw, 238px"

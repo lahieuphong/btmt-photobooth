@@ -2,6 +2,7 @@
 
 import Image from 'next/image'
 import { useEffect, useRef, useState } from 'react'
+import { getAssetPath } from '@/src/features/photobooth/utils/assetPath'
 
 type LanguageCode = 'VI' | 'EN' | 'CH'
 
@@ -75,7 +76,7 @@ export default function LanguageDropdown({
       >
         <div className="relative aspect-square h-[52.941%] shrink-0 overflow-hidden rounded-full">
           <Image
-            src={selectedOption.flagSrc}
+            src={getAssetPath(selectedOption.flagSrc)}
             alt={selectedOption.label}
             fill
             sizes="(max-width: 768px) 24px, 36px"
@@ -121,7 +122,7 @@ export default function LanguageDropdown({
               >
                 <div className="relative aspect-square h-[52.941%] shrink-0 overflow-hidden rounded-full">
                   <Image
-                    src={item.flagSrc}
+                    src={getAssetPath(item.flagSrc)}
                     alt={item.label}
                     fill
                     sizes="(max-width: 768px) 24px, 36px"

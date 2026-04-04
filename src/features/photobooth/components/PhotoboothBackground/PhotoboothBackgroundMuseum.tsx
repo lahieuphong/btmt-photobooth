@@ -1,5 +1,6 @@
 import Image from 'next/image'
 import React from 'react'
+import { getAssetPath } from '@/src/features/photobooth/utils/assetPath'
 
 type PhotoboothBackgroundMuseumProps = {
   children?: React.ReactNode
@@ -51,7 +52,7 @@ function LayerImage({
       aria-hidden="true"
     >
       <Image
-        src={src}
+        src={getAssetPath(src)}
         alt=""
         fill
         priority={priority}
