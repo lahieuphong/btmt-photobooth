@@ -133,3 +133,7 @@ export function getPhotoboothCaptureRoundLabel(session: PhotoboothRuntimeSession
 
   return `Lần ${currentRound}`
 }
+
+export function getPhotoboothFrameImageCount(session: PhotoboothRuntimeSession) {
+  return Math.max(1, session.captureRoundsRequired)
+}

@@ -1,3 +1,6 @@
+'use client'
+
+import { useEffect, useState } from 'react'
 import PhotoboothScreenShell from '@/src/features/photobooth/components/PhotoboothScreenShell'
 import PhotoboothPageHeader from '@/src/features/photobooth/components/PhotoboothPageHeader'
 import PhotoboothPageBody from '@/src/features/photobooth/components/PhotoboothPageBody'
@@ -5,10 +8,36 @@ import PrimaryButton from '@/src/features/photobooth/components/PrimaryButton'
 import { PHOTOBOOTH_FRAME_OPTIONS } from '@/src/features/photobooth/constants/frames'
 import { PHOTOBOOTH_DEFAULT_SESSION } from '@/src/features/photobooth/constants/session'
 import { PHOTOBOOTH_SCREEN_STATE_MAP } from '@/src/features/photobooth/config/screenState'
+import {
+  getPhotoboothFrameImageCount,
+  readPhotoboothRuntimeSession,
+} from '@/src/features/photobooth/utils/runtimeSession'
 
 export default function FramePage() {
   const screen = PHOTOBOOTH_SCREEN_STATE_MAP.frame
   const selectedFrameId = PHOTOBOOTH_DEFAULT_SESSION.selectedFrameId
+
+  const [totalImages, setTotalImages] = useState(1)
+  const [currentImageIndex, setCurrentImageIndex] = useState(0)
+
+  useEffect(() => {
+    const session = readPhotoboothRuntimeSession()
+    const nextTotalImages = getPhotoboothFrameImageCount(session)
+
+    setTotalImages(nextTotalImages)
+    setCurrentImageIndex((prev) => Math.min(prev, nextTotalImages - 1))
+  }, [])
+
+  function handlePreviousImage() {
+    setCurrentImageIndex((prev) => Math.max(prev - 1, 0))
+  }
+
+  function handleNextImage() {
+    setCurrentImageIndex((prev) => Math.min(prev + 1, totalImages - 1))
+  }
+
+  const canGoPrevious = currentImageIndex > 0
+  const canGoNext = currentImageIndex < totalImages - 1
 
   return (
     <PhotoboothScreenShell>
@@ -23,10 +52,13 @@ export default function FramePage() {
         <PhotoboothPageBody className="flex flex-1 flex-col">
           <div className="flex gap-4">
             <div className="relative flex-1 rounded-[6px] bg-[#E8E1C7] px-4 py-5 shadow-[0_8px_18px_rgba(0,0,0,0.08)]">
-              <div className="grid grid-cols-2 gap-3">
+              <div
+                key={currentImageIndex}
+                className="grid grid-cols-2 gap-3"
+              >
                 {Array.from({ length: 4 }).map((_, index) => (
                   <div
-                    key={index}
+                    key={`${currentImageIndex}-${index}`}
                     className="aspect-[0.76] rounded-[2px] bg-[linear-gradient(180deg,#D6B39D_0%,#F1D7B4_20%,#D4A74B_100%)]"
                   />
                 ))}
@@ -70,11 +102,33 @@ export default function FramePage() {
           </div>
 
           <div className="mt-6 flex items-center justify-center gap-8 text-[#364152]">
-            <button type="button" className="text-[28px] leading-none">
+            <button
+              type="button"
+              onClick={handlePreviousImage}
+              disabled={!canGoPrevious}
+              aria-label="Xem hình trước"
+              className={[
+                'text-[28px] leading-none transition-opacity',
+                canGoPrevious ? 'opacity-100' : 'cursor-not-allowed opacity-35',
+              ].join(' ')}
+            >
               ‹
             </button>
-            <div className="text-[16px] font-medium text-[#2E2A26]">Hình 1</div>
-            <button type="button" className="text-[28px] leading-none">
+
+            <div className="min-w-[72px] text-center text-[16px] font-medium text-[#2E2A26]">
+              {`Hình ${currentImageIndex + 1}`}
+            </div>
+
+            <button
+              type="button"
+              onClick={handleNextImage}
+              disabled={!canGoNext}
+              aria-label="Xem hình tiếp theo"
+              className={[
+                'text-[28px] leading-none transition-opacity',
+                canGoNext ? 'opacity-100' : 'cursor-not-allowed opacity-35',
+              ].join(' ')}
+            >
               ›
             </button>
           </div>
