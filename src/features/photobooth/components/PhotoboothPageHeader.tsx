@@ -18,17 +18,17 @@ export default function PhotoboothPageHeader({
   rightSlot,
 }: PhotoboothPageHeaderProps) {
   return (
-    <div className="relative min-h-[148px] px-[7.5%] pt-[56px]">
+    <div className="w-full px-[3.704%] pt-[4.259%]">
       <div className="flex items-start justify-between">
         {showBackButton ? (
           <Link
             href={backHref}
-            className="inline-flex h-[48px] items-center rounded-full bg-[#8E8E8E] px-4 text-[14px] font-medium text-white"
+            className="inline-flex w-[19.5%] min-w-0 aspect-[195/88] items-center justify-center rounded-full bg-[rgba(26,26,26,0.50)] text-[clamp(8px,0.95vw,18px)] font-medium leading-none text-white shadow-[0_0_15px_rgba(39,39,39,0.15)]"
           >
             Quay lại
           </Link>
         ) : (
-          <div className="h-[68px] w-[120px]" />
+          <div className="w-[19.5%] min-w-0 aspect-[195/88]" />
         )}
 
         {rightSlot ?? (
@@ -36,8 +36,8 @@ export default function PhotoboothPageHeader({
         )}
       </div>
 
-      <div className="absolute inset-x-0 top-[150px] px-[18%]">
-        <h1 className="text-center font-serif text-[18px] font-medium uppercase tracking-[0.02em] text-[#2E2A26]">
+      <div className="mt-[4.6%]">
+        <h1 className="text-center font-serif text-[clamp(12px,1.8vw,18px)] font-medium uppercase tracking-[0.02em] text-[#2E2A26]">
           {title}
         </h1>
       </div>

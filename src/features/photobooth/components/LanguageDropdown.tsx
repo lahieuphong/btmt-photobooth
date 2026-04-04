@@ -67,28 +67,28 @@ export default function LanguageDropdown({
   }
 
   return (
-    <div ref={rootRef} className="relative z-30">
+    <div ref={rootRef} className="relative z-30 w-[19.5%] min-w-0">
       <button
         type="button"
         onClick={() => setIsOpen((prev) => !prev)}
-        className="flex h-[68px] w-[195px] items-center gap-[16px] rounded-[12px] border-[2px] border-[#FF4D27] bg-white px-[14px] py-[8px]"
+        className="flex w-full aspect-[195/68] items-center gap-[8.205%] rounded-[12px] border-[2px] border-[#FF4D27] bg-white px-[7.179%]"
       >
-        <div className="relative h-8 w-8 shrink-0 overflow-hidden rounded-full">
+        <div className="relative aspect-square h-[52.941%] shrink-0 overflow-hidden rounded-full">
           <Image
             src={selectedOption.flagSrc}
             alt={selectedOption.label}
             fill
-            sizes="32px"
+            sizes="(max-width: 768px) 24px, 36px"
             className="object-cover"
           />
         </div>
 
-        <span className="text-[18px] font-medium leading-none text-[#2E2A26]">
+        <span className="text-[clamp(8px,0.95vw,18px)] font-medium leading-none text-[#2E2A26]">
           {selectedOption.label}
         </span>
 
         <svg
-          className={`ml-auto h-6 w-6 shrink-0 text-[#6B6B6B] transition-transform duration-200 ${
+          className={`ml-auto h-[35.294%] w-auto shrink-0 text-[#666666] transition-transform duration-200 ${
             isOpen ? 'rotate-180' : ''
           }`}
           viewBox="0 0 20 20"
@@ -96,7 +96,7 @@ export default function LanguageDropdown({
           aria-hidden="true"
         >
           <path
-            d="M5 7.5L10 12.5L15 7.5"
+            d="M4.75 7.25L10 12.5L15.25 7.25"
             stroke="currentColor"
             strokeWidth="1.8"
             strokeLinecap="round"
@@ -106,7 +106,7 @@ export default function LanguageDropdown({
       </button>
 
       {isOpen ? (
-        <div className="absolute right-0 top-[calc(100%+8px)] w-[195px] overflow-hidden rounded-[12px] border border-[#E6DED7] bg-white shadow-[0_12px_24px_rgba(0,0,0,0.14)]">
+        <div className="absolute right-0 top-[calc(100%+8px)] w-full overflow-hidden rounded-[12px] border border-[#E6DED7] bg-white shadow-[0_12px_24px_rgba(0,0,0,0.14)]">
           {LANGUAGE_OPTIONS.map((item) => {
             const isSelected = item.code === selected
 
@@ -115,21 +115,21 @@ export default function LanguageDropdown({
                 key={item.code}
                 type="button"
                 onClick={() => handleSelect(item.code)}
-                className={`flex h-[64px] w-full items-center gap-[16px] px-[14px] py-[8px] text-left ${
-                  isSelected ? 'bg-[#EFCFBD]' : 'bg-white hover:bg-[#F8F3EE]'
+                className={`flex w-full aspect-[195/68] items-center gap-[8.205%] px-[7.179%] text-left ${
+                  isSelected ? 'bg-[#FFF3EE]' : 'bg-white hover:bg-[#F8F3EE]'
                 }`}
               >
-                <div className="relative h-8 w-8 shrink-0 overflow-hidden rounded-full">
+                <div className="relative aspect-square h-[52.941%] shrink-0 overflow-hidden rounded-full">
                   <Image
                     src={item.flagSrc}
                     alt={item.label}
                     fill
-                    sizes="32px"
+                    sizes="(max-width: 768px) 24px, 36px"
                     className="object-cover"
                   />
                 </div>
 
-                <span className="text-[18px] font-medium leading-none text-[#2E2A26]">
+                <span className="text-[clamp(8px,0.95vw,18px)] font-medium leading-none text-[#2E2A26]">
                   {item.label}
                 </span>
               </button>

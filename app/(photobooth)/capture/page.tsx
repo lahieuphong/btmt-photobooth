@@ -15,7 +15,7 @@ export default function CapturePage() {
 
   return (
     <PhotoboothScreenShell>
-      <div className="flex min-h-[844px] flex-col">
+      <div className="flex min-h-211 flex-col">
         <PhotoboothPageHeader
           title={screen.title}
           backHref={screen.backHref}
@@ -60,7 +60,7 @@ export default function CapturePage() {
           <div className="mt-4 flex justify-center">
             <Link
               href={screen.nextHref}
-              className="flex h-[88px] w-[88px] flex-col items-center justify-center rounded-full bg-[#FF5A2A] text-white shadow-[0_10px_24px_rgba(255,90,42,0.25)]"
+              className="flex h-22 w-22 flex-col items-center justify-center rounded-full bg-[#FF5A2A] text-white shadow-[0_10px_24px_rgba(255,90,42,0.25)]"
             >
               <span className="text-[20px] leading-none">📸</span>
               <span className="mt-1 text-[16px] font-medium">{screen.primaryActionLabel}</span>
