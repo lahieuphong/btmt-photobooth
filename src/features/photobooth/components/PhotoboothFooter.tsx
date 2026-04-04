@@ -7,7 +7,7 @@ type PhotoboothFooterProps = {
 }
 
 export default function PhotoboothFooter({
-  imageSrc = '/images/photobooth/footer-btmt.png',
+  imageSrc = '/images/photobooth/footer/text-btmt.png',
   alt = 'Bảo tàng Mỹ thuật Thành phố Hồ Chí Minh',
   className = '',
 }: PhotoboothFooterProps) {
