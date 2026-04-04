@@ -1,6 +1,7 @@
 import PhotoboothScreenShell from '@/src/features/photobooth/components/PhotoboothScreenShell'
 import PhotoboothPageHeader from '@/src/features/photobooth/components/PhotoboothPageHeader'
 import PhotoboothPageBody from '@/src/features/photobooth/components/PhotoboothPageBody'
+import PhotoboothFooter from '@/src/features/photobooth/components/PhotoboothFooter'
 import PrimaryButton from '@/src/features/photobooth/components/PrimaryButton'
 import { PHOTOBOOTH_PAYMENT_MOCK } from '@/src/features/photobooth/constants/payment'
 import { PHOTOBOOTH_SCREEN_STATE_MAP } from '@/src/features/photobooth/config/screenState'
@@ -19,7 +20,7 @@ export default function PaymentPage() {
 
   return (
     <PhotoboothScreenShell>
-      <div className="flex min-h-[844px] flex-col">
+      <div className="flex h-full flex-col">
         <PhotoboothPageHeader
           title={screen.title}
           backHref={screen.backHref}
@@ -52,6 +53,8 @@ export default function PaymentPage() {
             </PrimaryButton>
           </div>
         </PhotoboothPageBody>
+
+        <PhotoboothFooter />
       </div>
     </PhotoboothScreenShell>
   )

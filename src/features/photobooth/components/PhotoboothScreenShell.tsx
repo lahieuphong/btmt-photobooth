@@ -11,9 +11,9 @@ export default function PhotoboothScreenShell({
   backgroundImage,
 }: PhotoboothScreenShellProps) {
   return (
-    <main className="flex min-h-screen items-center justify-center bg-[#111111] px-4 py-6">
-      <section className="w-full max-w-[390px] overflow-hidden rounded-[24px] border border-black/10 shadow-[0_20px_60px_rgba(0,0,0,0.35)]">
-        <div className="min-h-[844px]">
+    <main className="flex min-h-screen items-center justify-center bg-[#111111] p-4">
+      <section className="relative h-[92vh] aspect-[1080/1920] overflow-hidden bg-white shadow-[0_20px_60px_rgba(0,0,0,0.35)]">
+        <div className="h-full w-full">
           <PhotoboothBackground backgroundImage={backgroundImage}>
             {children}
           </PhotoboothBackground>

@@ -1,6 +1,7 @@
 import PhotoboothScreenShell from '@/src/features/photobooth/components/PhotoboothScreenShell'
 import PhotoboothPageHeader from '@/src/features/photobooth/components/PhotoboothPageHeader'
 import PhotoboothPageBody from '@/src/features/photobooth/components/PhotoboothPageBody'
+import PhotoboothFooter from '@/src/features/photobooth/components/PhotoboothFooter'
 import PackageCard from '@/src/features/photobooth/components/PackageCard'
 import PrimaryButton from '@/src/features/photobooth/components/PrimaryButton'
 import { PHOTOBOOTH_PACKAGE_OPTIONS } from '@/src/features/photobooth/constants/packages'
@@ -13,7 +14,7 @@ export default function PackagesPage() {
 
   return (
     <PhotoboothScreenShell>
-      <div className="flex min-h-[844px] flex-col">
+      <div className="flex h-full flex-col">
         <PhotoboothPageHeader
           title={screen.title}
           backHref={screen.backHref}
@@ -40,6 +41,8 @@ export default function PackagesPage() {
             </PrimaryButton>
           </div>
         </PhotoboothPageBody>
+
+        <PhotoboothFooter />
       </div>
     </PhotoboothScreenShell>
   )
