@@ -1,7 +1,7 @@
 'use client'
 
 import Image from 'next/image'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import PhotoboothCaptureRoundHint from '@/src/features/photobooth/components/PhotoboothCaptureRoundHint'
 import PhotoboothScreenShell from '@/src/features/photobooth/components/PhotoboothScreenShell'
 import PhotoboothPageHeader from '@/src/features/photobooth/components/PhotoboothPageHeader'
@@ -11,6 +11,10 @@ import { PHOTOBOOTH_LAYOUT_OPTIONS } from '@/src/features/photobooth/constants/l
 import { PHOTOBOOTH_DEFAULT_SESSION } from '@/src/features/photobooth/constants/session'
 import { PHOTOBOOTH_SCREEN_STATE_MAP } from '@/src/features/photobooth/config/screenState'
 import { getAssetPath } from '@/src/features/photobooth/utils/assetPath'
+import {
+  readPhotoboothRuntimeSession,
+  setPhotoboothSelectedLayoutId,
+} from '@/src/features/photobooth/utils/runtimeSession'
 
 type LayoutPreviewMode = 'grid-4' | 'vertical-4' | 'grid-6'
 
@@ -150,15 +154,21 @@ export default function LayoutPage() {
   const screen = PHOTOBOOTH_SCREEN_STATE_MAP.layout
   const defaultLayoutId = PHOTOBOOTH_DEFAULT_SESSION.selectedLayoutId
 
-  const initialLayout =
-    PHOTOBOOTH_LAYOUT_OPTIONS.find((item) => item.id === defaultLayoutId) ??
-    PHOTOBOOTH_LAYOUT_OPTIONS[0]
+  const [activeLayoutId, setActiveLayoutId] = useState(defaultLayoutId)
 
-  const [activeLayoutId, setActiveLayoutId] = useState(initialLayout.id)
+  useEffect(() => {
+    const session = readPhotoboothRuntimeSession()
+    setActiveLayoutId(session.selectedLayoutId)
+  }, [])
 
   const activeLayout =
     PHOTOBOOTH_LAYOUT_OPTIONS.find((item) => item.id === activeLayoutId) ??
-    initialLayout
+    PHOTOBOOTH_LAYOUT_OPTIONS[0]
+
+  function handleSelectLayout(layoutId: string) {
+    setActiveLayoutId(layoutId)
+    setPhotoboothSelectedLayoutId(layoutId)
+  }
 
   return (
     <PhotoboothScreenShell>
@@ -184,7 +194,7 @@ export default function LayoutPage() {
                       key={item.id}
                       type="button"
                       aria-pressed={isSelected}
-                      onClick={() => setActiveLayoutId(item.id)}
+                      onClick={() => handleSelectLayout(item.id)}
                       className={[
                         'flex w-[31.677%] shrink-0 aspect-[306/80] items-center justify-center rounded-[6px] border transition-all duration-200',
                         isSelected
