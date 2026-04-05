@@ -7,6 +7,7 @@ export type PhotoboothRuntimeSession = {
   selectedLayoutId: string
   captureRoundsRequired: number
   captureRoundsCompleted: number
+  completedRoundLayoutIds: string[]
 }
 
 const PHOTOBOOTH_RUNTIME_SESSION_KEY = 'photobooth_runtime_session'
@@ -21,6 +22,16 @@ function getPackageCaptureRounds(packageId: string) {
   )
 }
 
+function sanitizeCompletedRoundLayoutIds(value: unknown, maxLength: number) {
+  if (!Array.isArray(value)) {
+    return []
+  }
+
+  return value
+    .filter((item): item is string => typeof item === 'string' && item.length > 0)
+    .slice(0, maxLength)
+}
+
 export function getDefaultPhotoboothRuntimeSession(): PhotoboothRuntimeSession {
   const selectedPackageId = PHOTOBOOTH_DEFAULT_SESSION.selectedPackageId
   const selectedLayoutId = PHOTOBOOTH_DEFAULT_SESSION.selectedLayoutId
@@ -30,6 +41,7 @@ export function getDefaultPhotoboothRuntimeSession(): PhotoboothRuntimeSession {
     selectedLayoutId,
     captureRoundsRequired: getPackageCaptureRounds(selectedPackageId),
     captureRoundsCompleted: 0,
+    completedRoundLayoutIds: [],
   }
 }
 
@@ -68,14 +80,20 @@ export function readPhotoboothRuntimeSession(): PhotoboothRuntimeSession {
     const captureRoundsCompleted =
       typeof parsedValue.captureRoundsCompleted === 'number' &&
       parsedValue.captureRoundsCompleted >= 0
-        ? parsedValue.captureRoundsCompleted
+        ? Math.min(parsedValue.captureRoundsCompleted, captureRoundsRequired)
         : 0
+
+    const completedRoundLayoutIds = sanitizeCompletedRoundLayoutIds(
+      parsedValue.completedRoundLayoutIds,
+      captureRoundsRequired
+    )
 
     return {
       selectedPackageId,
       selectedLayoutId,
       captureRoundsRequired,
       captureRoundsCompleted,
+      completedRoundLayoutIds,
     }
   } catch {
     return fallback
@@ -99,6 +117,7 @@ export function startPhotoboothRuntimeSession(selectedPackageId: string) {
     selectedLayoutId: PHOTOBOOTH_DEFAULT_SESSION.selectedLayoutId,
     captureRoundsRequired: getPackageCaptureRounds(selectedPackageId),
     captureRoundsCompleted: 0,
+    completedRoundLayoutIds: [],
   }
 
   writePhotoboothRuntimeSession(nextValue)
@@ -122,10 +141,22 @@ export function setPhotoboothSelectedLayoutId(selectedLayoutId: string) {
 export function completePhotoboothCaptureRound() {
   const currentValue = readPhotoboothRuntimeSession()
 
+  const currentRoundIndex = Math.min(
+    currentValue.captureRoundsCompleted,
+    Math.max(currentValue.captureRoundsRequired - 1, 0)
+  )
+
+  const nextCompletedRoundLayoutIds = [...currentValue.completedRoundLayoutIds]
+  nextCompletedRoundLayoutIds[currentRoundIndex] = currentValue.selectedLayoutId
+
   const nextValue: PhotoboothRuntimeSession = {
     ...currentValue,
     captureRoundsCompleted: Math.min(
       currentValue.captureRoundsCompleted + 1,
+      currentValue.captureRoundsRequired
+    ),
+    completedRoundLayoutIds: nextCompletedRoundLayoutIds.slice(
+      0,
       currentValue.captureRoundsRequired
     ),
   }
@@ -159,4 +190,14 @@ export function getPhotoboothCaptureRoundLabel(session: PhotoboothRuntimeSession
 
 export function getPhotoboothFrameImageCount(session: PhotoboothRuntimeSession) {
   return Math.max(1, session.captureRoundsRequired)
+}
+
+export function getPhotoboothRoundLayoutIds(session: PhotoboothRuntimeSession) {
+  const totalRounds = Math.max(1, session.captureRoundsRequired)
+  const fallbackLayoutId =
+    session.selectedLayoutId || PHOTOBOOTH_DEFAULT_SESSION.selectedLayoutId
+
+  return Array.from({ length: totalRounds }, (_, index) => {
+    return session.completedRoundLayoutIds[index] ?? fallbackLayoutId
+  })
 }

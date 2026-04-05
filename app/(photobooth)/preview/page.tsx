@@ -14,14 +14,10 @@ import {
   getPreviewNextRoute,
   readPhotoboothRuntimeSession,
 } from '@/src/features/photobooth/utils/runtimeSession'
-
-type LayoutPreviewMode = 'grid-4' | 'vertical-4' | 'grid-6'
-
-function getPreviewModeFromLayoutId(layoutId: string): LayoutPreviewMode {
-  if (layoutId === 'layout-vertical-4') return 'vertical-4'
-  if (layoutId === 'layout-grid-6') return 'grid-6'
-  return 'grid-4'
-}
+import {
+  getPhotoboothLayoutPreviewMode,
+  type PhotoboothLayoutPreviewMode,
+} from '@/src/features/photobooth/utils/layoutPreview'
 
 function PreviewPhotoCard({
   className = '',
@@ -44,7 +40,7 @@ function PreviewPhotoCard({
 function PreviewLayoutBlock({
   mode,
 }: {
-  mode: LayoutPreviewMode
+  mode: PhotoboothLayoutPreviewMode
 }) {
   if (mode === 'vertical-4') {
     return (
@@ -95,7 +91,7 @@ export default function PreviewPage() {
   }, [])
 
   const previewMode = useMemo(
-    () => getPreviewModeFromLayoutId(selectedLayoutId),
+    () => getPhotoboothLayoutPreviewMode(selectedLayoutId),
     [selectedLayoutId]
   )
 
