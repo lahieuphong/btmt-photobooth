@@ -80,6 +80,7 @@ export const PHOTOBOOTH_SCREEN_STATE_MAP = {
     backHref: PHOTOBOOTH_ROUTES.CAPTURE,
     nextHref: PHOTOBOOTH_ROUTES.FRAME,
     primaryActionLabel: 'Chọn khung',
+    primaryActionContinueLabel: 'Chụp hình tiếp theo',
     secondaryActionLabel: 'Chụp lại tất cả',
     secondaryActionHref: PHOTOBOOTH_ROUTES.CAPTURE,
   },

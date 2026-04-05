@@ -84,16 +84,33 @@ export default function PreviewPage() {
   const [selectedLayoutId, setSelectedLayoutId] = useState(
     PHOTOBOOTH_DEFAULT_SESSION.selectedLayoutId
   )
+  const [captureRoundsRequired, setCaptureRoundsRequired] = useState(1)
+  const [captureRoundsCompleted, setCaptureRoundsCompleted] = useState(0)
 
   useEffect(() => {
     const session = readPhotoboothRuntimeSession()
+
     setSelectedLayoutId(session.selectedLayoutId)
+    setCaptureRoundsRequired(session.captureRoundsRequired)
+    setCaptureRoundsCompleted(session.captureRoundsCompleted)
   }, [])
 
   const previewMode = useMemo(
     () => getPhotoboothLayoutPreviewMode(selectedLayoutId),
     [selectedLayoutId]
   )
+
+  const currentRound = useMemo(() => {
+    return Math.min(captureRoundsCompleted + 1, captureRoundsRequired)
+  }, [captureRoundsCompleted, captureRoundsRequired])
+
+  const isLastPreviewRound = useMemo(() => {
+    return currentRound >= captureRoundsRequired
+  }, [currentRound, captureRoundsRequired])
+
+  const primaryActionLabel = isLastPreviewRound
+    ? screen.primaryActionLabel
+    : screen.primaryActionContinueLabel
 
   function handleConfirmPreview() {
     const updatedSession = completePhotoboothCaptureRound()
@@ -128,7 +145,7 @@ export default function PreviewPage() {
               </PrimaryButton>
 
               <PrimaryButton fullWidth onClick={handleConfirmPreview}>
-                {screen.primaryActionLabel}
+                {primaryActionLabel}
               </PrimaryButton>
             </div>
           </div>
