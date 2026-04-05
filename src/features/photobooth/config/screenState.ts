@@ -101,6 +101,7 @@ export const PHOTOBOOTH_SCREEN_STATE_MAP = {
     showBackButton: true,
     backHref: PHOTOBOOTH_ROUTES.FRAME,
     nextHref: PHOTOBOOTH_ROUTES.CAPTURED,
+    primaryActionLabel: 'Tiếp tục',
   },
 
   captured: {

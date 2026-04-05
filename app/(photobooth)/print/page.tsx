@@ -1,7 +1,7 @@
 import PhotoboothScreenShell from '@/src/features/photobooth/components/PhotoboothScreenShell'
 import PhotoboothPageHeader from '@/src/features/photobooth/components/PhotoboothPageHeader'
 import PhotoboothPageBody from '@/src/features/photobooth/components/PhotoboothPageBody'
-import PrintAutoRedirect from '@/src/features/photobooth/components/PrintAutoRedirect'
+import PrimaryButton from '@/src/features/photobooth/components/PrimaryButton'
 import { PHOTOBOOTH_PAYMENT_MOCK } from '@/src/features/photobooth/constants/payment'
 import { PHOTOBOOTH_SCREEN_STATE_MAP } from '@/src/features/photobooth/config/screenState'
 
@@ -11,8 +11,6 @@ export default function PrintPage() {
 
   return (
     <PhotoboothScreenShell>
-      <PrintAutoRedirect href={screen.nextHref} delayMs={3000} />
-
       <div className="flex min-h-[844px] flex-col">
         <PhotoboothPageHeader
           title={screen.title}
@@ -60,6 +58,12 @@ export default function PrintPage() {
 
           <div className="mt-2 text-center text-[11px] text-[#7B7B7B]">
             {paymentInfo.qrText}
+          </div>
+
+          <div className="mt-6 w-full max-w-[220px]">
+            <PrimaryButton href={screen.nextHref} fullWidth>
+              {screen.primaryActionLabel}
+            </PrimaryButton>
           </div>
         </PhotoboothPageBody>
       </div>
