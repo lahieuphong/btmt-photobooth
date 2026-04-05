@@ -9,6 +9,7 @@ type PhotoboothPageHeaderProps = {
   languageLabel?: string
   rightSlot?: ReactNode
   titleBottomSlot?: ReactNode
+  titleClassName?: string
 }
 
 export default function PhotoboothPageHeader({
@@ -18,9 +19,13 @@ export default function PhotoboothPageHeader({
   languageLabel = 'VI',
   rightSlot,
   titleBottomSlot,
+  titleClassName = '',
 }: PhotoboothPageHeaderProps) {
   return (
-    <div className="w-full px-[3.704%] pt-[4.259%]">
+    <div
+      className="w-full px-[3.704%] pt-[4.259%]"
+      style={{ containerType: 'inline-size' }}
+    >
       <div className="flex items-start justify-between">
         {showBackButton ? (
           <Link
@@ -39,7 +44,13 @@ export default function PhotoboothPageHeader({
       </div>
 
       <div className="mt-[4.6%]">
-        <h1 className="text-center font-serif text-[clamp(12px,1.8vw,18px)] font-medium uppercase tracking-[0.02em] text-[#2E2A26]">
+        <h1
+          className={[
+            'text-center font-serif font-medium uppercase text-[#212121]',
+            'text-[clamp(20px,5.93cqw,64px)] leading-[1.546875] tracking-[0.03em]',
+            titleClassName,
+          ].join(' ')}
+        >
           {title}
         </h1>
 

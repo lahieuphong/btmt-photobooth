@@ -9,5 +9,5 @@ export default function PhotoboothPageBody({
   children,
   className = '',
 }: PhotoboothPageBodyProps) {
-  return <div className={`px-6 pt-[72px] pb-6 ${className}`}>{children}</div>
+  return <div className={`px-6 pt-[30px] pb-6 ${className}`}>{children}</div>
 }
