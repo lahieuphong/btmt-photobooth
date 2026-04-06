@@ -43,7 +43,7 @@ function FramePhotoSlot({
   return (
     <div
       className={[
-        'relative overflow-hidden rounded-[clamp(6px,0.95cqw,10px)]',
+        'relative overflow-hidden rounded-[clamp(3px,0.55cqw,6px)] border border-[#C4BCA3]',
         slotBackground === 'gradient'
           ? 'bg-[linear-gradient(180deg,#EAE5D0_0%,#E7E1C9_100%)]'
           : 'bg-[#E7E1C9]',
@@ -63,19 +63,21 @@ function FramePhotoLayout({
   slotBackground?: 'solid' | 'gradient'
 }) {
   if (mode === 'vertical-4') {
+    const containerClass = compact
+      ? 'h-[82%] gap-[clamp(2px,0.4cqw,4px)]'
+      : 'h-[86%] gap-[clamp(8px,1.1cqw,14px)]'
+
     return (
       <div
         className={[
-          'mx-auto grid h-full content-start grid-cols-1',
-          compact
-            ? 'w-[56%] gap-[clamp(5px,0.7cqw,9px)]'
-            : 'w-[54%] gap-[clamp(8px,1.1cqw,14px)]',
+          'grid w-full grid-cols-1 grid-rows-4',
+          containerClass,
         ].join(' ')}
       >
         {Array.from({ length: 4 }).map((_, index) => (
           <FramePhotoSlot
             key={index}
-            className="aspect-[185/98]"
+            className="h-full"
             slotBackground={slotBackground}
           />
         ))}
@@ -89,7 +91,7 @@ function FramePhotoLayout({
         className={[
           'grid h-full grid-cols-2 content-start',
           compact
-            ? 'gap-x-[clamp(6px,0.9cqw,10px)] gap-y-[clamp(6px,0.9cqw,10px)]'
+            ? 'gap-x-[clamp(2px,0.4cqw,4px)] gap-y-[clamp(2px,0.4cqw,4px)]'
             : 'gap-x-[clamp(8px,1.1cqw,14px)] gap-y-[clamp(8px,1.1cqw,14px)]',
         ].join(' ')}
       >
@@ -109,7 +111,7 @@ function FramePhotoLayout({
       className={[
         'grid h-full grid-cols-2 content-start',
         compact
-          ? 'gap-x-[clamp(7px,1cqw,12px)] gap-y-[clamp(9px,1.2cqw,14px)]'
+          ? 'gap-x-[clamp(2px,0.4cqw,4px)] gap-y-[clamp(2px,0.4cqw,4px)]'
           : 'gap-x-[clamp(10px,1.2cqw,16px)] gap-y-[clamp(12px,1.5cqw,18px)]',
       ].join(' ')}
     >

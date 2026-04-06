@@ -7,6 +7,7 @@ import PhotoboothPageHeader from '@/src/features/photobooth/components/Photoboot
 import PhotoboothPageBody from '@/src/features/photobooth/components/PhotoboothPageBody'
 import PrimaryButton from '@/src/features/photobooth/components/PrimaryButton'
 import PhotoboothFrameArtwork from '@/src/features/photobooth/components/PhotoboothFrameArtwork'
+import PhotoboothFrameStack from '@/src/features/photobooth/components/PhotoboothFrameStack'
 import { PHOTOBOOTH_SCREEN_STATE_MAP } from '@/src/features/photobooth/config/screenState'
 import {
   getDefaultPhotoboothRuntimeSession,
@@ -22,16 +23,6 @@ import {
   PHOTOBOOTH_FRAME_ARROW_SRC,
 } from '@/src/features/photobooth/constants/framePreview'
 const FALLBACK_CAPTURED_MODES: PhotoboothLayoutPreviewMode[] = ['grid-4']
-
-type StackCardItem = {
-  key: string
-  mode: PhotoboothLayoutPreviewMode
-  left: string
-  top: string
-  rotate: string
-  width: string
-  zIndex: number
-}
 
 function buildCapturedModesFromSession(): PhotoboothLayoutPreviewMode[] {
   return buildPhotoboothPreviewModesFromSession()
@@ -59,93 +50,10 @@ function CapturedFrameCard({
   mode: PhotoboothLayoutPreviewMode
 }) {
   return (
-    <div className="relative h-full w-full overflow-hidden rounded-[12px] bg-[#E1DCC8] shadow-[0_10px_24px_rgba(34,30,4,0.10)]">
+    <div className="relative h-full w-full overflow-hidden rounded-[clamp(6px,1cqw,9px)] border border-[#CFC8B3] bg-[#E1DCC8] shadow-[0_10px_24px_rgba(34,30,4,0.10)]">
       <CapturedFrameArtwork mode={mode} />
     </div>
   )
-}
-
-function buildCapturedStackItems(
-  modes: PhotoboothLayoutPreviewMode[],
-  currentIndex: number
-): StackCardItem[] {
-  const safeModes = modes.length > 0 ? modes : FALLBACK_CAPTURED_MODES
-  const clampedIndex = Math.min(currentIndex, Math.max(safeModes.length - 1, 0))
-  const activeMode = safeModes[clampedIndex]
-
-  if (safeModes.length === 1) {
-    return [
-      {
-        key: `active-${clampedIndex}`,
-        mode: activeMode,
-        left: '10%',
-        top: '4%',
-        rotate: '0deg',
-        width: '80%',
-        zIndex: 30,
-      },
-    ]
-  }
-
-  if (safeModes.length === 2) {
-    const otherIndex = clampedIndex === 0 ? 1 : 0
-    const otherMode = safeModes[otherIndex]
-
-    return [
-      {
-        key: `back-${otherIndex}`,
-        mode: otherMode,
-        left: clampedIndex === 0 ? '20%' : '2%',
-        top: clampedIndex === 0 ? '2%' : '7%',
-        rotate: clampedIndex === 0 ? '7deg' : '-7deg',
-        width: '78%',
-        zIndex: 20,
-      },
-      {
-        key: `active-${clampedIndex}`,
-        mode: activeMode,
-        left: '10%',
-        top: '5%',
-        rotate: '0deg',
-        width: '80%',
-        zIndex: 30,
-      },
-    ]
-  }
-
-  const otherIndices = safeModes
-    .map((_, index) => index)
-    .filter((index) => index !== clampedIndex)
-
-  return [
-    {
-      key: `back-left-${otherIndices[0]}`,
-      mode: safeModes[otherIndices[0]],
-      left: '0%',
-      top: '8%',
-      rotate: '-6deg',
-      width: '78%',
-      zIndex: 10,
-    },
-    {
-      key: `back-right-${otherIndices[1]}`,
-      mode: safeModes[otherIndices[1]],
-      left: '21%',
-      top: '1%',
-      rotate: '7deg',
-      width: '78%',
-      zIndex: 20,
-    },
-    {
-      key: `active-${clampedIndex}`,
-      mode: activeMode,
-      left: '10%',
-      top: '4%',
-      rotate: '0deg',
-      width: '80%',
-      zIndex: 30,
-    },
-  ]
 }
 
 function CapturedFrameStack({
@@ -155,26 +63,12 @@ function CapturedFrameStack({
   modes: PhotoboothLayoutPreviewMode[]
   currentIndex: number
 }) {
-  const stackItems = buildCapturedStackItems(modes, currentIndex)
-
   return (
-    <div className="relative mx-auto h-[clamp(320px,54vh,430px)] w-[clamp(250px,84vw,360px)] max-w-full">
-      {stackItems.map((item) => (
-        <div
-          key={item.key}
-          className="absolute aspect-[678/1018]"
-          style={{
-            left: item.left,
-            top: item.top,
-            width: item.width,
-            transform: `rotate(${item.rotate})`,
-            zIndex: item.zIndex,
-          }}
-        >
-          <CapturedFrameCard mode={item.mode} />
-        </div>
-      ))}
-    </div>
+    <PhotoboothFrameStack
+      modes={modes}
+      selectedIndex={currentIndex}
+      renderCard={(mode) => <CapturedFrameCard mode={mode} />}
+    />
   )
 }
 
@@ -281,7 +175,7 @@ export default function CapturedPage() {
 
   return (
     <PhotoboothScreenShell>
-      <div className="flex min-h-[844px] flex-col">
+      <div className="flex h-full min-h-0 flex-col">
         <PhotoboothPageHeader
           title={screen.title}
           backHref={screen.backHref}
@@ -289,13 +183,13 @@ export default function CapturedPage() {
           languageLabel="VI"
         />
 
-        <PhotoboothPageBody className="flex min-h-0 flex-1 flex-col overflow-y-auto px-[5%] pt-[2%] pb-[3%]">
+        <PhotoboothPageBody className="flex min-h-0 flex-1 flex-col overflow-hidden px-[5%] pt-[2%] pb-[calc(16px+env(safe-area-inset-bottom))]">
           <div
-            className="mx-auto flex w-full max-w-[920px] flex-1 flex-col"
+            className="mx-auto grid h-full min-h-0 w-full max-w-[920px] flex-1 grid-rows-[minmax(0,1fr)_auto]"
             style={{ containerType: 'inline-size' }}
           >
-            <div className="flex flex-1 flex-col items-center">
-              <div className="w-full max-w-[430px]">
+            <div className="flex min-h-0 flex-1 flex-col items-center overflow-y-auto overflow-x-visible">
+              <div className="w-full max-w-[min(430px,92vw)] px-[clamp(6px,1.2cqw,12px)] pt-[clamp(8px,1.6cqw,16px)]">
                 <CapturedFrameStack
                   modes={visibleCapturedModes}
                   currentIndex={currentImageIndex}
@@ -313,7 +207,8 @@ export default function CapturedPage() {
               </div>
             </div>
 
-            <div className="mt-auto grid grid-cols-2 gap-[clamp(12px,2cqw,16px)] pt-[clamp(24px,4cqw,36px)]">
+            <div className="z-10 mt-2 shrink-0 pt-3 pb-[calc(4px+env(safe-area-inset-bottom))]">
+              <div className="grid grid-cols-2 gap-[clamp(12px,2cqw,16px)]">
               <PrimaryButton
                 href={screen.secondaryActionHref}
                 variant="secondary"
@@ -325,6 +220,7 @@ export default function CapturedPage() {
               <PrimaryButton href={screen.nextHref} fullWidth>
                 {screen.primaryActionLabel}
               </PrimaryButton>
+              </div>
             </div>
           </div>
         </PhotoboothPageBody>

@@ -7,6 +7,7 @@ import PhotoboothPageHeader from '@/src/features/photobooth/components/Photoboot
 import PhotoboothPageBody from '@/src/features/photobooth/components/PhotoboothPageBody'
 import PrimaryButton from '@/src/features/photobooth/components/PrimaryButton'
 import PhotoboothFrameArtwork from '@/src/features/photobooth/components/PhotoboothFrameArtwork'
+import PhotoboothFrameStack from '@/src/features/photobooth/components/PhotoboothFrameStack'
 import { PHOTOBOOTH_FRAME_OPTIONS } from '@/src/features/photobooth/constants/frames'
 import { PHOTOBOOTH_DEFAULT_SESSION } from '@/src/features/photobooth/constants/session'
 import { PHOTOBOOTH_SCREEN_STATE_MAP } from '@/src/features/photobooth/config/screenState'
@@ -58,19 +59,25 @@ function FrameArtwork({
 }
 
 function FrameStagePreview({
-  mode,
+  modes,
+  currentIndex,
 }: {
-  mode: PhotoboothLayoutPreviewMode
+  modes: PhotoboothLayoutPreviewMode[]
+  currentIndex: number
 }) {
   return (
-    <div className="relative mx-auto aspect-[678/1018] w-full max-w-[678px]">
-      <div className="absolute left-[2.1%] top-[1.9%] h-[96%] w-[96%] rotate-[1.65deg] rounded-[clamp(18px,2.7cqw,28px)] bg-[#E8E3D1] shadow-[0_10px_24px_rgba(34,30,4,0.10)]" />
-      <div className="absolute left-[0.6%] top-[1.2%] h-[96%] w-[96%] -rotate-[2.13deg] rounded-[clamp(18px,2.7cqw,28px)] bg-[#DDD6C0] shadow-[0_10px_24px_rgba(34,30,4,0.10)]" />
-
-      <div className="absolute inset-0 z-10 rounded-[clamp(18px,2.7cqw,28px)]">
-        <FrameArtwork mode={mode} />
-      </div>
-    </div>
+    <PhotoboothFrameStack
+      modes={modes}
+      selectedIndex={currentIndex}
+      rootClassName="relative mr-auto -ml-[6%]"
+      containerClassName="w-full max-w-[min(100%,500px)] aspect-[74/100]"
+      itemClassName="aspect-[678/1018] w-[62%]"
+      renderCard={(mode) => (
+        <div className="relative h-full w-full overflow-hidden rounded-[clamp(6px,1cqw,9px)] border border-[#CFC8B3] bg-[#E1DCC8] shadow-[0_10px_24px_rgba(34,30,4,0.10)]">
+          <FrameArtwork mode={mode} />
+        </div>
+      )}
+    />
   )
 }
 
@@ -175,6 +182,11 @@ export default function FramePage() {
 
   const activeImage = frameImages[selectedImageIndex] ?? frameImages[0]
   const activePreviewMode = activeImage?.previewMode ?? 'grid-4'
+  const stagePreviewModes = useMemo<PhotoboothLayoutPreviewMode[]>(() => {
+    return frameImages.length > 0
+      ? frameImages.map((item) => item.previewMode)
+      : ['grid-4']
+  }, [frameImages])
 
   const canGoPrev = selectedImageIndex > 0
   const canGoNext = selectedImageIndex < frameImages.length - 1
@@ -236,7 +248,7 @@ export default function FramePage() {
 
   return (
     <PhotoboothScreenShell>
-      <div className="flex min-h-[844px] flex-col">
+      <div className="flex h-full min-h-0 flex-col">
         <PhotoboothPageHeader
           title={screen.title}
           backHref={screen.backHref}
@@ -245,13 +257,13 @@ export default function FramePage() {
           titleClassName="text-[clamp(20px,5.93cqw,64px)] leading-[1.546875] tracking-[0.03em] text-[#212121]"
         />
 
-        <PhotoboothPageBody className="flex min-h-0 flex-1 flex-col overflow-y-auto px-[3.704%] pt-[1.45%] pb-[2.6%]">
+        <PhotoboothPageBody className="relative flex min-h-0 flex-1 flex-col overflow-hidden px-[3.704%] pt-[1.45%] pb-[calc(16px+env(safe-area-inset-bottom))]">
           <div
-            className="mx-auto flex w-full max-w-[920px] flex-col gap-[clamp(16px,2.4cqw,24px)]"
+            className="mx-auto grid h-full min-h-0 w-full max-w-[920px] flex-1 grid-rows-[minmax(0,1fr)_auto]"
             style={{ containerType: 'inline-size' }}
           >
-            <div className="grid grid-cols-[minmax(0,1fr)_clamp(84px,21.57%,169px)] items-start gap-[clamp(12px,2.6cqw,28px)]">
-              <div className="min-w-0 flex flex-col items-center">
+            <div className="grid min-h-0 flex-1 grid-cols-[minmax(0,1fr)_clamp(64px,15%,112px)] items-stretch gap-[clamp(12px,2.6cqw,28px)] overflow-hidden">
+              <div className="min-w-0 flex min-h-0 flex-col items-center">
                 <div
                   className="w-full max-w-[678px] touch-pan-y"
                   onTouchStart={handleStageTouchStart}
@@ -260,10 +272,13 @@ export default function FramePage() {
                   onMouseUp={handleStageMouseUp}
                   onMouseLeave={handleStageMouseLeave}
                 >
-                  <FrameStagePreview mode={activePreviewMode} />
+                  <FrameStagePreview
+                    modes={stagePreviewModes}
+                    currentIndex={selectedImageIndex}
+                  />
                 </div>
 
-                <div className="mt-[clamp(16px,3cqw,30px)] w-full">
+                <div className="mt-[clamp(12px,2cqw,20px)] w-full">
                   <FrameNavigation
                     label={activeImage?.label ?? 'Hình 1'}
                     canGoPrev={canGoPrev}
@@ -274,8 +289,8 @@ export default function FramePage() {
                 </div>
               </div>
 
-              <div className="min-w-0">
-                <div className="max-h-[clamp(420px,95cqw,980px)] overflow-y-scroll pr-[8px] [scrollbar-gutter:stable] [scrollbar-width:auto] [scrollbar-color:#CFC8B8_#ECE8DE] [&::-webkit-scrollbar]:w-[8px] [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:border-[2px] [&::-webkit-scrollbar-thumb]:border-[#ECE8DE] [&::-webkit-scrollbar-thumb]:bg-[#CFC8B8] [&::-webkit-scrollbar-track]:rounded-full [&::-webkit-scrollbar-track]:bg-[#ECE8DE]">
+              <div className="min-w-0 min-h-0 h-full">
+                <div className="h-full max-h-[clamp(320px,58vh,680px)] overflow-y-scroll overscroll-contain pr-[8px] [scrollbar-gutter:stable] [scrollbar-width:auto] [scrollbar-color:#CFC8B8_#ECE8DE] [&::-webkit-scrollbar]:w-[8px] [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:border-[2px] [&::-webkit-scrollbar-thumb]:border-[#ECE8DE] [&::-webkit-scrollbar-thumb]:bg-[#CFC8B8] [&::-webkit-scrollbar-track]:rounded-full [&::-webkit-scrollbar-track]:bg-[#ECE8DE]">
                   <div className="space-y-[clamp(14px,2.2cqw,22px)] pb-[8px]">
                     {frameOptions.map((item) => {
                       const isSelected = item.id === selectedFrameId
@@ -285,14 +300,14 @@ export default function FramePage() {
                           key={item.id}
                           type="button"
                           onClick={() => setSelectedFrameId(item.id)}
-                          className="flex w-full flex-col items-center text-center"
+                          className="group flex w-full flex-col items-center text-center transition-transform duration-200 ease-out hover:-translate-y-[1px] active:translate-y-[1px] active:scale-[0.985]"
                         >
                           <div
                             className={[
-                              'w-full rounded-[clamp(12px,1.8cqw,20px)] border bg-white/70 p-[3px] transition-all duration-200',
+                              'w-full rounded-[clamp(5px,0.9cqw,8px)] border bg-white/70 p-[3px] transition-all duration-200 ease-out',
                               isSelected
                                 ? 'border-[#F15A29] shadow-[0_0_0_1px_rgba(241,90,41,0.14),0_6px_14px_rgba(0,0,0,0.06)]'
-                                : 'border-transparent',
+                                : 'border-[#E4DDCB] group-hover:border-[#D2C9AF] group-hover:shadow-[0_4px_10px_rgba(34,30,4,0.08)]',
                             ].join(' ')}
                           >
                             <FrameOptionPreview mode={activePreviewMode} />
@@ -300,7 +315,7 @@ export default function FramePage() {
 
                           <div
                             className={[
-                              'mt-[6px] text-[clamp(12px,1.3cqw,14px)] leading-none',
+                              'mt-[6px] text-[clamp(12px,1.3cqw,14px)] leading-none transition-colors duration-200',
                               isSelected ? 'text-[#F15A29]' : 'text-[#2E2A26]',
                             ].join(' ')}
                           >
@@ -314,13 +329,15 @@ export default function FramePage() {
               </div>
             </div>
 
-            <div className="flex justify-center pb-[4px]">
-              <PrimaryButton
-                href={screen.nextHref}
-                className="h-[clamp(56px,7.2cqw,78px)] min-w-[clamp(220px,44.35cqw,479px)] rounded-[999px] px-[clamp(28px,7.4cqw,80px)] text-[clamp(18px,2.35cqw,22px)] font-semibold shadow-[0_7px_18px_rgba(34,30,4,0.16)]"
-              >
-                {screen.primaryActionLabel}
-              </PrimaryButton>
+            <div className="z-10 mt-2 shrink-0 pt-3 pb-[calc(4px+env(safe-area-inset-bottom))]">
+              <div className="flex justify-center">
+                <PrimaryButton
+                  href={screen.nextHref}
+                  className="h-[48px] rounded-full px-8 sm:h-[52px] sm:px-10 text-[13px] sm:text-[16px] font-semibold shadow-[0_7px_18px_rgba(34,30,4,0.16)]"
+                >
+                  {screen.primaryActionLabel}
+                </PrimaryButton>
+              </div>
             </div>
           </div>
         </PhotoboothPageBody>

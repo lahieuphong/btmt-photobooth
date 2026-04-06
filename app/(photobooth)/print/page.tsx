@@ -13,6 +13,7 @@ import PhotoboothPageHeader from '@/src/features/photobooth/components/Photoboot
 import PhotoboothPageBody from '@/src/features/photobooth/components/PhotoboothPageBody'
 import PrimaryButton from '@/src/features/photobooth/components/PrimaryButton'
 import PhotoboothFrameArtwork from '@/src/features/photobooth/components/PhotoboothFrameArtwork'
+import PhotoboothFrameStack from '@/src/features/photobooth/components/PhotoboothFrameStack'
 import { PHOTOBOOTH_SCREEN_STATE_MAP } from '@/src/features/photobooth/config/screenState'
 import {
   getDefaultPhotoboothRuntimeSession,
@@ -27,13 +28,6 @@ import { buildPhotoboothPreviewModesFromSession } from '@/src/features/photoboot
 
 const PRINT_QR_CODE_SRC = '/images/photobooth/print/qr_code.png'
 const FALLBACK_PRINT_MODES: PhotoboothLayoutPreviewMode[] = ['grid-4']
-
-type StackPosition = {
-  left: string
-  top: string
-  rotate: string
-  zIndex: number
-}
 
 const STACK_DRAG_LIMIT = 10
 const STACK_SWIPE_DISTANCE = 14
@@ -69,7 +63,7 @@ function PrintFrameCard({
   priority?: boolean
 }) {
   return (
-    <div className="relative h-full w-full overflow-hidden rounded-[14px] bg-[#E1DCC8] shadow-[0_10px_24px_rgba(34,30,4,0.10)]">
+    <div className="relative h-full w-full overflow-hidden rounded-[clamp(6px,1cqw,9px)] border border-[#CFC8B3] bg-[#E1DCC8] shadow-[0_10px_24px_rgba(34,30,4,0.10)]">
       <PrintFrameArtwork mode={mode} priority={priority} />
     </div>
   )
@@ -80,44 +74,13 @@ function PrintFrameStack({
 }: {
   modes: PhotoboothLayoutPreviewMode[]
 }) {
-  const visibleModes = modes.slice(0, 3)
-
-  const positionsByCount: Record<number, StackPosition[]> = {
-    1: [{ left: '12%', top: '8%', rotate: '0deg', zIndex: 30 }],
-    2: [
-      { left: '8%', top: '11%', rotate: '0deg', zIndex: 30 },
-      { left: '20%', top: '4%', rotate: '7deg', zIndex: 20 },
-    ],
-    3: [
-      { left: '8%', top: '12%', rotate: '0deg', zIndex: 30 },
-      { left: '20%', top: '7%', rotate: '6deg', zIndex: 20 },
-      { left: '32%', top: '3%', rotate: '10deg', zIndex: 10 },
-    ],
-  }
-
-  const positions = positionsByCount[visibleModes.length] ?? positionsByCount[1]
-
   return (
-    <div className="relative mx-auto w-[clamp(150px,min(56vw,30svh),270px)] aspect-[74/100] max-w-full">
-      {visibleModes.map((mode, index) => {
-        const position = positions[index]
-
-        return (
-          <div
-            key={`${mode}-${index}`}
-            className="absolute aspect-[678/1018] w-[76%]"
-            style={{
-              left: position.left,
-              top: position.top,
-              transform: `rotate(${position.rotate})`,
-              zIndex: position.zIndex,
-            }}
-          >
-            <PrintFrameCard mode={mode} priority={index === 0} />
-          </div>
-        )
-      })}
-    </div>
+    <PhotoboothFrameStack
+      modes={modes}
+      renderCard={(mode, { isFront }) => (
+        <PrintFrameCard mode={mode} priority={isFront} />
+      )}
+    />
   )
 }
 
@@ -364,8 +327,11 @@ export default function PrintPage() {
               </div>
             </div>
 
-            <div className="mt-auto w-full max-w-[260px] shrink-0 pb-0.5 pt-[clamp(6px,1svh,14px)]">
-              <PrimaryButton href={screen.nextHref} fullWidth>
+            <div className="mt-auto flex w-full shrink-0 justify-center pb-0.5 pt-[clamp(6px,1svh,14px)]">
+              <PrimaryButton
+                href={screen.nextHref}
+                className="h-[48px] rounded-full px-8 sm:h-[52px] sm:px-10 text-[13px] sm:text-[16px] font-semibold"
+              >
                 {screen.primaryActionLabel}
               </PrimaryButton>
             </div>
