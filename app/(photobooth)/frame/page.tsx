@@ -1,7 +1,7 @@
 'use client'
 
 import Image from 'next/image'
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import PhotoboothScreenShell from '@/src/features/photobooth/components/PhotoboothScreenShell'
 import PhotoboothPageHeader from '@/src/features/photobooth/components/PhotoboothPageHeader'
 import PhotoboothPageBody from '@/src/features/photobooth/components/PhotoboothPageBody'
@@ -152,6 +152,7 @@ function FrameNavigation({
 
 export default function FramePage() {
   const screen = PHOTOBOOTH_SCREEN_STATE_MAP.frame
+  const swipeStartXRef = useRef<number | null>(null)
 
   const [selectedFrameId, setSelectedFrameId] = useState(
     PHOTOBOOTH_DEFAULT_SESSION.selectedFrameId
@@ -194,6 +195,45 @@ export default function FramePage() {
     setSelectedImageIndex((prev) => prev + 1)
   }
 
+  function handleSwipeEnd(endX: number | null) {
+    const startX = swipeStartXRef.current
+    swipeStartXRef.current = null
+
+    if (startX === null || typeof endX !== 'number') return
+
+    const deltaX = endX - startX
+    const SWIPE_THRESHOLD = 42
+
+    if (Math.abs(deltaX) < SWIPE_THRESHOLD) return
+
+    if (deltaX < 0) {
+      handleNextImage()
+      return
+    }
+
+    handlePrevImage()
+  }
+
+  function handleStageTouchStart(event: React.TouchEvent<HTMLDivElement>) {
+    swipeStartXRef.current = event.touches[0]?.clientX ?? null
+  }
+
+  function handleStageTouchEnd(event: React.TouchEvent<HTMLDivElement>) {
+    handleSwipeEnd(event.changedTouches[0]?.clientX ?? null)
+  }
+
+  function handleStageMouseDown(event: React.MouseEvent<HTMLDivElement>) {
+    swipeStartXRef.current = event.clientX
+  }
+
+  function handleStageMouseUp(event: React.MouseEvent<HTMLDivElement>) {
+    handleSwipeEnd(event.clientX)
+  }
+
+  function handleStageMouseLeave() {
+    swipeStartXRef.current = null
+  }
+
   return (
     <PhotoboothScreenShell>
       <div className="flex min-h-[844px] flex-col">
@@ -212,7 +252,14 @@ export default function FramePage() {
           >
             <div className="grid grid-cols-[minmax(0,1fr)_clamp(84px,21.57%,169px)] items-start gap-[clamp(12px,2.6cqw,28px)]">
               <div className="min-w-0 flex flex-col items-center">
-                <div className="w-full max-w-[678px]">
+                <div
+                  className="w-full max-w-[678px] touch-pan-y"
+                  onTouchStart={handleStageTouchStart}
+                  onTouchEnd={handleStageTouchEnd}
+                  onMouseDown={handleStageMouseDown}
+                  onMouseUp={handleStageMouseUp}
+                  onMouseLeave={handleStageMouseLeave}
+                >
                   <FrameStagePreview mode={activePreviewMode} />
                 </div>
 
