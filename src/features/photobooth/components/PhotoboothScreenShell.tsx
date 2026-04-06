@@ -21,8 +21,8 @@ export default function PhotoboothScreenShell({
       : PhotoboothBackgroundPlain
 
   return (
-    <main className="flex min-h-screen items-center justify-center bg-[#111111] p-4">
-      <section className="relative h-[92vh] aspect-[1080/1920] overflow-hidden bg-white shadow-[0_20px_60px_rgba(0,0,0,0.35)]">
+    <main className="relative isolate flex h-[100svh] h-[100dvh] w-full max-w-full items-center justify-center overflow-hidden bg-white">
+      <section className="absolute inset-0 overflow-hidden bg-white">
         <div className="h-full w-full">
           <BackgroundComponent backgroundImage={backgroundImage}>
             {children}
