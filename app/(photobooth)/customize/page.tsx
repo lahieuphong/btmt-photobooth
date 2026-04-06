@@ -199,7 +199,7 @@ export default function CustomizePage() {
           <div className="mx-auto flex min-h-full w-full max-w-[900px] flex-col">
             <div className="mx-auto w-full max-w-[820px] overflow-hidden rounded-[8px]">
               <div
-                className={`relative aspect-[900/620] w-full overflow-hidden ${selectedBackgroundClassName} [@media(min-height:980px)]:aspect-[900/680]`}
+                className={`relative aspect-[900/655] w-full overflow-hidden ${selectedBackgroundClassName} [@media(min-height:980px)]:aspect-[900/715]`}
                 style={{
                   filter: selectedFilterStyle,
                   transition: 'filter 260ms ease-out, transform 260ms ease-out, opacity 260ms ease-out',
@@ -216,7 +216,7 @@ export default function CustomizePage() {
                     width={1046}
                     height={1569}
                     priority
-                    className="h-[clamp(530px,118%,900px)] w-auto max-w-[68%] translate-y-[28%] object-contain drop-shadow-[0_12px_28px_rgba(0,0,0,0.22)]"
+                    className="h-[clamp(585px,126%,980px)] w-auto max-w-[75%] translate-y-[28%] object-contain drop-shadow-[0_12px_28px_rgba(0,0,0,0.22)]"
                   />
                 </div>
               </div>
