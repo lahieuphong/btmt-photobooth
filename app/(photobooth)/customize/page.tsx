@@ -1,7 +1,7 @@
 'use client'
 
 import Image from 'next/image'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import PhotoboothCaptureRoundHint from '@/src/features/photobooth/components/PhotoboothCaptureRoundHint'
 import PhotoboothScreenShell from '@/src/features/photobooth/components/PhotoboothScreenShell'
 import PhotoboothPageHeader from '@/src/features/photobooth/components/PhotoboothPageHeader'
@@ -24,6 +24,8 @@ const CUSTOMIZE_LAYOUT_PREVIEW_IMAGES: Record<string, string> = {
   'layout-vertical-4': '/images/photobooth/customize/photo-stack-4.png',
   'layout-grid-6': '/images/photobooth/customize/photo-grid-2x3.png',
 }
+const CUSTOMIZE_PREVIEW_CHARACTER_IMAGE =
+  '/images/photobooth/customize/bg_removed.png'
 
 function getCustomizePreviewImage(selectedLayoutId: string) {
   return (
@@ -36,29 +38,35 @@ function CustomizeOptionCard({
   name,
   previewClassName,
   isSelected,
+  onClick,
 }: {
   name: string
   previewClassName: string
   isSelected: boolean
+  onClick?: () => void
 }) {
   return (
     <button
       type="button"
       aria-pressed={isSelected}
-      className="flex flex-col items-center text-center transition-all duration-200"
+      onClick={onClick}
+      className="group flex w-[56px] flex-col items-center text-center transition-transform duration-200 ease-out active:scale-[0.97] sm:w-[62px]"
     >
       <div
         className={[
-          'w-full overflow-hidden rounded-[10px] border bg-white aspect-[76/46]',
-          isSelected ? 'border-[#F15A29]' : 'border-transparent',
+          'w-full overflow-hidden rounded-[6px] border bg-white aspect-[76/46]',
+          'transition-[border-color,transform,box-shadow] duration-200 ease-out',
+          isSelected
+            ? 'border-[#F15A29] shadow-[0_5px_12px_rgba(241,90,41,0.16)]'
+            : 'border-transparent group-hover:scale-[1.02]',
         ].join(' ')}
       >
-        <div className={`h-full w-full rounded-[8px] ${previewClassName}`} />
+        <div className={`h-full w-full rounded-[4px] ${previewClassName}`} />
       </div>
 
       <div
         className={[
-          'mt-1 text-[clamp(9px,1vw,10px)] leading-[1.2]',
+          'mt-1 w-full text-[clamp(7px,0.75vw,9px)] leading-[1.15] transition-colors duration-200',
           isSelected ? 'text-[#F15A29]' : 'text-[#5B5B5B]',
         ].join(' ')}
       >
@@ -119,14 +127,38 @@ function CustomizeLayoutStackPreview({
   )
 }
 
+const FILTER_STYLE_MAP: Record<string, string> = {
+  original: 'none',
+  bright: 'brightness(1.08) saturate(1.2) contrast(1.04)',
+  classic: 'sepia(0.28) contrast(0.95) saturate(0.82)',
+  nature: 'saturate(1.18) hue-rotate(-8deg) contrast(1.02)',
+  bw: 'grayscale(1) contrast(1.06)',
+  sunset: 'saturate(1.2) hue-rotate(-12deg) brightness(1.02)',
+  cool: 'saturate(1.08) hue-rotate(14deg) contrast(1.02)',
+}
+const FALLBACK_BACKGROUND_CLASS_NAME =
+  'bg-[linear-gradient(180deg,#9CC0E9_0%,#D5D2B2_28%,#E7C95F_62%,#D9B54D_100%)]'
+
 export default function CustomizePage() {
   const screen = PHOTOBOOTH_SCREEN_STATE_MAP.customize
-  const [selectedFilterId] = useState(PHOTOBOOTH_DEFAULT_SESSION.selectedFilterId)
-  const [selectedBackgroundId] = useState(PHOTOBOOTH_DEFAULT_SESSION.selectedBackgroundId)
+  const [selectedFilterId, setSelectedFilterId] = useState(
+    PHOTOBOOTH_DEFAULT_SESSION.selectedFilterId
+  )
+  const [selectedBackgroundId, setSelectedBackgroundId] = useState(
+    PHOTOBOOTH_DEFAULT_SESSION.selectedBackgroundId
+  )
   const [selectedLayoutId, setSelectedLayoutId] = useState(
     PHOTOBOOTH_DEFAULT_SESSION.selectedLayoutId
   )
   const [currentRound, setCurrentRound] = useState(1)
+  const [isPreviewTransitioning, setIsPreviewTransitioning] = useState(false)
+  const hasPreviewInteractedRef = useRef(false)
+
+  const selectedBackgroundClassName =
+    PHOTOBOOTH_BACKGROUND_OPTIONS.find((item) => item.id === selectedBackgroundId)
+      ?.previewClassName ?? FALLBACK_BACKGROUND_CLASS_NAME
+
+  const selectedFilterStyle = FILTER_STYLE_MAP[selectedFilterId] ?? 'none'
 
   useEffect(() => {
     const session = readPhotoboothRuntimeSession()
@@ -134,9 +166,26 @@ export default function CustomizePage() {
     setCurrentRound(getCurrentPhotoboothCaptureRound(session))
   }, [])
 
+  useEffect(() => {
+    if (!hasPreviewInteractedRef.current) {
+      hasPreviewInteractedRef.current = true
+      return
+    }
+
+    setIsPreviewTransitioning(true)
+
+    const timeoutId = window.setTimeout(() => {
+      setIsPreviewTransitioning(false)
+    }, 180)
+
+    return () => {
+      window.clearTimeout(timeoutId)
+    }
+  }, [selectedFilterId, selectedBackgroundId])
+
   return (
     <PhotoboothScreenShell>
-      <div className="flex min-h-[844px] flex-col">
+      <div className="flex h-full min-h-0 flex-col">
         <PhotoboothPageHeader
           title={screen.title}
           backHref={screen.backHref}
@@ -146,10 +195,31 @@ export default function CustomizePage() {
           titleClassName="text-[clamp(20px,5.93cqw,64px)] leading-[1.546875] tracking-[0.03em] text-[#212121]"
         />
 
-        <PhotoboothPageBody className="flex min-h-0 flex-1 flex-col overflow-y-auto px-[5.278%] pt-[2.2%] pb-[2.8%]">
-          <div className="mx-auto w-full max-w-[900px] origin-top [@media(max-height:920px)]:scale-[0.93] [@media(max-height:860px)]:scale-[0.88]">
-            <div className="mx-auto w-full max-w-[820px] overflow-hidden rounded-[24px] bg-[linear-gradient(180deg,#9CC0E9_0%,#D5D2B2_28%,#E7C95F_62%,#D9B54D_100%)]">
-              <div className="aspect-[900/620] w-full bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.12),transparent_46%)] [@media(min-height:980px)]:aspect-[900/680]"></div>
+        <PhotoboothPageBody className="flex min-h-0 flex-1 flex-col overflow-y-auto px-[5.278%] pt-[2.2%] pb-[calc(10px+env(safe-area-inset-bottom))]">
+          <div className="mx-auto flex min-h-full w-full max-w-[900px] flex-col">
+            <div className="mx-auto w-full max-w-[820px] overflow-hidden rounded-[8px]">
+              <div
+                className={`relative aspect-[900/620] w-full overflow-hidden ${selectedBackgroundClassName} [@media(min-height:980px)]:aspect-[900/680]`}
+                style={{
+                  filter: selectedFilterStyle,
+                  transition: 'filter 260ms ease-out, transform 260ms ease-out, opacity 260ms ease-out',
+                  transform: isPreviewTransitioning ? 'scale(0.993)' : 'scale(1)',
+                  opacity: isPreviewTransitioning ? 0.94 : 1,
+                }}
+              >
+                <div className="h-full w-full bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.12),transparent_46%)]" />
+
+                <div className="pointer-events-none absolute inset-0 z-[2] flex items-end justify-center">
+                  <Image
+                    src={getAssetPath(CUSTOMIZE_PREVIEW_CHARACTER_IMAGE)}
+                    alt="Nhân vật xem trước"
+                    width={1046}
+                    height={1569}
+                    priority
+                    className="h-[clamp(530px,118%,900px)] w-auto max-w-[68%] translate-y-[28%] object-contain drop-shadow-[0_12px_28px_rgba(0,0,0,0.22)]"
+                  />
+                </div>
+              </div>
             </div>
 
             <div className="mt-[clamp(10px,1.5vw,16px)]">
@@ -157,15 +227,19 @@ export default function CustomizePage() {
                 Bộ lọc màu
               </div>
 
-              <div className="mt-2 grid grid-cols-5 gap-[clamp(8px,1.2vw,12px)]">
-                {PHOTOBOOTH_FILTER_OPTIONS.map((item) => (
-                  <CustomizeOptionCard
-                    key={item.id}
-                    name={item.name}
-                    previewClassName={item.previewClassName}
-                    isSelected={item.id === selectedFilterId}
-                  />
-                ))}
+              <div className="mt-2 overflow-x-auto overflow-y-hidden pb-2 [scrollbar-width:thin] [&::-webkit-scrollbar]:h-[6px] [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-[#C8C8C8]">
+                <div className="grid min-w-max grid-flow-col auto-cols-[56px] gap-2 pr-1 sm:auto-cols-[62px] sm:gap-2.5">
+                  {PHOTOBOOTH_FILTER_OPTIONS.map((item) => (
+                    <div key={item.id} className="shrink-0">
+                      <CustomizeOptionCard
+                        name={item.name}
+                        previewClassName={item.previewClassName}
+                        isSelected={item.id === selectedFilterId}
+                        onClick={() => setSelectedFilterId(item.id)}
+                      />
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
 
@@ -174,19 +248,23 @@ export default function CustomizePage() {
                 Phông nền
               </div>
 
-              <div className="mt-2 grid grid-cols-5 gap-[clamp(8px,1.2vw,12px)]">
-                {PHOTOBOOTH_BACKGROUND_OPTIONS.map((item) => (
-                  <CustomizeOptionCard
-                    key={item.id}
-                    name={item.name}
-                    previewClassName={item.previewClassName}
-                    isSelected={item.id === selectedBackgroundId}
-                  />
-                ))}
+              <div className="mt-2 overflow-x-auto overflow-y-hidden pb-2 [scrollbar-width:thin] [&::-webkit-scrollbar]:h-[6px] [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-[#C8C8C8]">
+                <div className="grid min-w-max grid-flow-col auto-cols-[56px] gap-2 pr-1 sm:auto-cols-[62px] sm:gap-2.5">
+                  {PHOTOBOOTH_BACKGROUND_OPTIONS.map((item) => (
+                    <div key={item.id} className="shrink-0">
+                      <CustomizeOptionCard
+                        name={item.name}
+                        previewClassName={item.previewClassName}
+                        isSelected={item.id === selectedBackgroundId}
+                        onClick={() => setSelectedBackgroundId(item.id)}
+                      />
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
 
-            <div className="mt-[clamp(12px,1.6vw,18px)] grid grid-cols-[auto_1fr_auto] items-center gap-[16px]">
+            <div className="mt-auto pt-[clamp(12px,1.6vw,18px)] grid grid-cols-[auto_1fr] items-center gap-[12px] sm:grid-cols-[auto_1fr_auto] sm:gap-[16px]">
               <CustomizeLayoutStackPreview
                 selectedLayoutId={selectedLayoutId}
                 currentRound={currentRound}
@@ -198,7 +276,7 @@ export default function CustomizePage() {
                 </PrimaryButton>
               </div>
 
-              <div className="h-[1px] w-[82px]" aria-hidden="true" />
+              <div className="hidden h-[1px] w-[82px] sm:block" aria-hidden="true" />
             </div>
           </div>
         </PhotoboothPageBody>

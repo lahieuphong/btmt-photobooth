@@ -36,6 +36,16 @@ export const PHOTOBOOTH_FILTER_OPTIONS: PhotoboothFilterOption[] = [
     name: 'Đen trắng',
     previewClassName: 'bg-[linear-gradient(135deg,#898989,#2E2E2E)]',
   },
+  {
+    id: 'sunset',
+    name: 'Hoàng hôn',
+    previewClassName: 'bg-[linear-gradient(135deg,#FF9A6A,#FF6A88)]',
+  },
+  {
+    id: 'cool',
+    name: 'Mát lạnh',
+    previewClassName: 'bg-[linear-gradient(135deg,#7FD1FF,#4F7CFF)]',
+  },
 ]
 
 export const PHOTOBOOTH_BACKGROUND_OPTIONS: PhotoboothBackgroundOption[] = [
@@ -63,5 +73,15 @@ export const PHOTOBOOTH_BACKGROUND_OPTIONS: PhotoboothBackgroundOption[] = [
     id: 'museum',
     name: 'Bảo tàng',
     previewClassName: 'bg-[linear-gradient(135deg,#87C8FF,#E8E0D5)]',
+  },
+  {
+    id: 'city',
+    name: 'Đô thị',
+    previewClassName: 'bg-[linear-gradient(135deg,#8FA0C6,#D5D9E5)]',
+  },
+  {
+    id: 'studio',
+    name: 'Studio',
+    previewClassName: 'bg-[linear-gradient(135deg,#DCDCDC,#F4F4F4)]',
   },
 ]
