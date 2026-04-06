@@ -24,10 +24,12 @@ function LayoutPreviewCard({
   className = '',
   mode,
   isDisabled = false,
+  loading = 'lazy',
 }: {
   className?: string
   mode: LayoutPreviewMode
   isDisabled?: boolean
+  loading?: 'lazy' | 'eager'
 }) {
   const iconWrapperClass =
     mode === 'grid-4'
@@ -61,6 +63,7 @@ function LayoutPreviewCard({
             src={getAssetPath(LAYOUT_PLACEHOLDER_IMAGE)}
             alt=""
             fill
+            loading={loading}
             sizes="(max-width: 768px) 96px, 205px"
             className="object-contain"
           />
@@ -80,9 +83,9 @@ function LayoutPreviewFrame({
   children: React.ReactNode
 }) {
   return (
-    <div className="mx-auto mt-[3.2%] w-[900px] max-w-full aspect-[900/1196]">
+    <div className="mx-auto h-full w-auto max-w-full aspect-[900/1196]">
       <div className="flex h-full w-full items-center justify-center">
-        <div className="w-[880px] max-w-full">{children}</div>
+        <div className="w-[97.7778%] max-w-full">{children}</div>
       </div>
     </div>
   )
@@ -93,19 +96,22 @@ function LayoutPreviewGrid({
   count,
   cardAspectClassName,
   disabledIndices = [],
+  gapClassName = 'gap-[14px]',
 }: {
   mode: LayoutPreviewMode
   count: number
   cardAspectClassName: string
   disabledIndices?: number[]
+  gapClassName?: string
 }) {
   return (
-    <div className="grid grid-cols-2 gap-[20px]">
+    <div className={`grid grid-cols-2 ${gapClassName}`}>
       {Array.from({ length: count }).map((_, index) => (
         <LayoutPreviewCard
           key={index}
           mode={mode}
           isDisabled={disabledIndices.includes(index)}
+          loading={index === 0 ? 'eager' : 'lazy'}
           className={cardAspectClassName}
         />
       ))}
@@ -172,7 +178,7 @@ export default function LayoutPage() {
 
   return (
     <PhotoboothScreenShell>
-      <div className="flex min-h-[844px] flex-col">
+      <div className="flex h-full min-h-0 flex-col">
         <PhotoboothPageHeader
           title={screen.title}
           backHref={screen.backHref}
@@ -182,9 +188,9 @@ export default function LayoutPage() {
           titleClassName="text-[clamp(20px,5.93cqw,64px)] leading-[1.546875] tracking-[0.03em] text-[#212121]"
         />
 
-        <PhotoboothPageBody className="flex flex-1 flex-col px-[5.278%] pt-[4.2%] pb-[5.2%]">
-          <div className="flex flex-1 flex-col">
-            <div className="mx-auto w-[89.444%]" style={{ containerType: 'inline-size' }}>
+        <PhotoboothPageBody className="flex min-h-0 flex-1 flex-col overflow-hidden px-[5.278%] pt-[2.8%] pb-[calc(10px+env(safe-area-inset-bottom))]">
+          <div className="flex min-h-0 flex-1 flex-col">
+            <div className="mx-auto w-[89.444%] shrink-0" style={{ containerType: 'inline-size' }}>
               <div className="flex w-full items-center gap-[2.484%]">
                 {PHOTOBOOTH_LAYOUT_OPTIONS.map((item) => {
                   const isSelected = item.id === activeLayoutId
@@ -214,9 +220,11 @@ export default function LayoutPage() {
               </div>
             </div>
 
-            <LayoutPreview mode={activeLayout.previewMode} />
+            <div className="mt-4 min-h-0 flex-1 overflow-hidden">
+              <LayoutPreview mode={activeLayout.previewMode} />
+            </div>
 
-            <div className="mt-[4.2%] flex justify-center">
+            <div className="mt-2 shrink-0 flex justify-center pb-[calc(2px+env(safe-area-inset-bottom))]">
               <PrimaryButton href={screen.nextHref} className="min-w-[142px]">
                 {screen.primaryActionLabel}
               </PrimaryButton>

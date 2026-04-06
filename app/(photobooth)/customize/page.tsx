@@ -82,7 +82,7 @@ function CustomizeLayoutStackPreview({
   const layerRotations = [0, 1.2, 2.4]
 
   return (
-    <div className="relative h-[96px] w-[82px] shrink-0 overflow-visible">
+    <div className="relative h-[88px] w-[74px] shrink-0 overflow-visible">
       {Array.from({ length: stackCount }).map((_, renderIndex) => {
         const depth = stackCount - 1 - renderIndex
         const offset = layerOffsets[depth] ?? 0
@@ -95,8 +95,8 @@ function CustomizeLayoutStackPreview({
             style={{
               left: `${offset}px`,
               bottom: `${offset}px`,
-              width: '66px',
-              height: '88px',
+              width: '60px',
+              height: '80px',
               transform: `rotate(${rotation}deg)`,
               zIndex: renderIndex + 1,
             }}
@@ -105,14 +105,14 @@ function CustomizeLayoutStackPreview({
               src={getAssetPath(previewImage)}
               alt="Bố cục đã chọn"
               fill
-              sizes="66px"
+              sizes="60px"
               className="object-contain drop-shadow-[0_3px_8px_rgba(0,0,0,0.12)]"
             />
           </div>
         )
       })}
 
-      <div className="absolute right-0 top-0 z-[40] flex h-7 w-7 items-center justify-center rounded-full bg-[#171717] text-[12px] font-semibold text-white shadow-[0_4px_10px_rgba(0,0,0,0.18)]">
+      <div className="absolute right-0 top-0 z-[40] flex h-6 w-6 items-center justify-center rounded-full bg-[#171717] text-[11px] font-semibold text-white shadow-[0_4px_10px_rgba(0,0,0,0.18)]">
         {currentRound}
       </div>
     </div>
@@ -147,12 +147,12 @@ export default function CustomizePage() {
         />
 
         <PhotoboothPageBody className="flex min-h-0 flex-1 flex-col overflow-y-auto px-[5.278%] pt-[2.2%] pb-[2.8%]">
-          <div className="mx-auto w-full max-w-[900px]">
-            <div className="overflow-hidden rounded-[24px] bg-[linear-gradient(180deg,#9CC0E9_0%,#D5D2B2_28%,#E7C95F_62%,#D9B54D_100%)]">
-              <div className="aspect-[900/680] w-full bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.12),transparent_46%)]"></div>
+          <div className="mx-auto w-full max-w-[900px] origin-top [@media(max-height:920px)]:scale-[0.93] [@media(max-height:860px)]:scale-[0.88]">
+            <div className="mx-auto w-full max-w-[820px] overflow-hidden rounded-[24px] bg-[linear-gradient(180deg,#9CC0E9_0%,#D5D2B2_28%,#E7C95F_62%,#D9B54D_100%)]">
+              <div className="aspect-[900/620] w-full bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.12),transparent_46%)] [@media(min-height:980px)]:aspect-[900/680]"></div>
             </div>
 
-            <div className="mt-[clamp(12px,1.8vw,18px)]">
+            <div className="mt-[clamp(10px,1.5vw,16px)]">
               <div className="text-[clamp(13px,1.4vw,14px)] font-semibold text-[#2E2A26]">
                 Bộ lọc màu
               </div>
@@ -169,7 +169,7 @@ export default function CustomizePage() {
               </div>
             </div>
 
-            <div className="mt-[clamp(12px,1.8vw,18px)]">
+            <div className="mt-[clamp(10px,1.5vw,16px)]">
               <div className="text-[clamp(13px,1.4vw,14px)] font-semibold text-[#2E2A26]">
                 Phông nền
               </div>
@@ -186,15 +186,19 @@ export default function CustomizePage() {
               </div>
             </div>
 
-            <div className="mt-[clamp(16px,2vw,22px)] flex items-end justify-between gap-[16px]">
+            <div className="mt-[clamp(12px,1.6vw,18px)] grid grid-cols-[auto_1fr_auto] items-center gap-[16px]">
               <CustomizeLayoutStackPreview
                 selectedLayoutId={selectedLayoutId}
                 currentRound={currentRound}
               />
 
-              <PrimaryButton href={screen.nextHref} className="min-w-[142px] shrink-0">
-                {screen.primaryActionLabel}
-              </PrimaryButton>
+              <div className="flex justify-center">
+                <PrimaryButton href={screen.nextHref} className="min-w-[142px] shrink-0">
+                  {screen.primaryActionLabel}
+                </PrimaryButton>
+              </div>
+
+              <div className="h-[1px] w-[82px]" aria-hidden="true" />
             </div>
           </div>
         </PhotoboothPageBody>

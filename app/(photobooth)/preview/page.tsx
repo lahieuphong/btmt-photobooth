@@ -6,7 +6,7 @@ import PhotoboothCaptureRoundHint from '@/src/features/photobooth/components/Pho
 import PhotoboothScreenShell from '@/src/features/photobooth/components/PhotoboothScreenShell'
 import PhotoboothPageHeader from '@/src/features/photobooth/components/PhotoboothPageHeader'
 import PhotoboothPageBody from '@/src/features/photobooth/components/PhotoboothPageBody'
-import PrimaryButton from '@/src/features/photobooth/components/PrimaryButton'
+import PhotoboothDualActionBar from '@/src/features/photobooth/components/PhotoboothDualActionBar'
 import { PHOTOBOOTH_DEFAULT_SESSION } from '@/src/features/photobooth/constants/session'
 import { PHOTOBOOTH_SCREEN_STATE_MAP } from '@/src/features/photobooth/config/screenState'
 import {
@@ -42,12 +42,15 @@ function PreviewLayoutBlock({
 }: {
   mode: PhotoboothLayoutPreviewMode
 }) {
+  const frameClassName =
+    'mx-auto h-full w-auto max-w-full aspect-[368/489]'
+
   if (mode === 'vertical-4') {
     return (
-      <div className="mx-auto w-full max-w-[280px] sm:max-w-[340px] md:max-w-[430px]">
-        <div className="grid grid-cols-1 gap-3 sm:gap-4 md:gap-5">
+      <div className={frameClassName}>
+        <div className="mx-auto grid h-full w-[48%] grid-cols-1 grid-rows-4 gap-[14px]">
           {Array.from({ length: 4 }).map((_, index) => (
-            <PreviewPhotoCard key={index} className="aspect-[430/260]" />
+            <PreviewPhotoCard key={index} className="h-full" />
           ))}
         </div>
       </div>
@@ -56,10 +59,10 @@ function PreviewLayoutBlock({
 
   if (mode === 'grid-6') {
     return (
-      <div className="mx-auto w-full max-w-[340px] sm:max-w-[430px] md:max-w-[760px]">
-        <div className="grid grid-cols-2 gap-3 sm:gap-4 md:gap-5">
+      <div className={frameClassName}>
+        <div className="grid h-full grid-cols-2 grid-rows-3 gap-[14px]">
           {Array.from({ length: 6 }).map((_, index) => (
-            <PreviewPhotoCard key={index} className="aspect-[430/372]" />
+            <PreviewPhotoCard key={index} className="h-full" />
           ))}
         </div>
       </div>
@@ -67,10 +70,10 @@ function PreviewLayoutBlock({
   }
 
   return (
-    <div className="mx-auto w-full max-w-[340px] sm:max-w-[430px] md:max-w-[760px]">
-      <div className="grid grid-cols-2 gap-3 sm:gap-4 md:gap-5">
+    <div className={frameClassName}>
+      <div className="grid h-full grid-cols-2 grid-rows-2 gap-[14px]">
         {Array.from({ length: 4 }).map((_, index) => (
-          <PreviewPhotoCard key={index} className="aspect-[430/578]" />
+          <PreviewPhotoCard key={index} className="h-full" />
         ))}
       </div>
     </div>
@@ -125,7 +128,7 @@ export default function PreviewPage() {
 
   return (
     <PhotoboothScreenShell>
-      <div className="flex min-h-[844px] flex-col">
+      <div className="flex h-full min-h-0 flex-col">
         <PhotoboothPageHeader
           title={screen.title}
           backHref={screen.backHref}
@@ -135,36 +138,22 @@ export default function PreviewPage() {
           titleClassName="text-[clamp(20px,5.93cqw,64px)] leading-[1.546875] tracking-[0.03em] text-[#212121]"
         />
 
-        <PhotoboothPageBody className="flex min-h-0 flex-1 flex-col overflow-y-auto px-[4.8%] pt-[1.8%] pb-[calc(16px+env(safe-area-inset-bottom))]">
+        <PhotoboothPageBody className="flex min-h-0 flex-1 flex-col overflow-hidden px-[4.8%] pt-[1.8%] pb-[calc(16px+env(safe-area-inset-bottom))]">
           <div
-            className="mx-auto flex w-full max-w-[900px] flex-1 flex-col"
+            className="mx-auto flex min-h-0 w-full max-w-[900px] flex-1 flex-col"
             style={{ containerType: 'inline-size' }}
           >
-            <div className="flex flex-1 flex-col">
-              <div className="flex-1 pt-1 sm:pt-2">
+            <div className="flex min-h-0 flex-1 flex-col">
+              <div className="mt-3 min-h-0 flex-1 overflow-hidden pt-1 sm:pt-2 pb-2">
                 <PreviewLayoutBlock mode={previewMode} />
               </div>
 
-              <div className="sticky bottom-0 z-10 mt-4 bg-[#F4F4F4]/95 pt-4 pb-[calc(4px+env(safe-area-inset-bottom))] backdrop-blur-[2px]">
-                <div className="grid grid-cols-2 gap-3 sm:gap-4 md:gap-5">
-                  <PrimaryButton
-                    variant="secondary"
-                    fullWidth
-                    onClick={handleRetakeAll}
-                    className="h-[48px] sm:h-[52px] text-[14px] sm:text-[15px]"
-                  >
-                    {screen.secondaryActionLabel}
-                  </PrimaryButton>
-
-                  <PrimaryButton
-                    fullWidth
-                    onClick={handleConfirmPreview}
-                    className="h-[48px] sm:h-[52px] text-[14px] sm:text-[15px]"
-                  >
-                    {primaryActionLabel}
-                  </PrimaryButton>
-                </div>
-              </div>
+              <PhotoboothDualActionBar
+                secondaryLabel={screen.secondaryActionLabel}
+                primaryLabel={primaryActionLabel}
+                onSecondaryClick={handleRetakeAll}
+                onPrimaryClick={handleConfirmPreview}
+              />
             </div>
           </div>
         </PhotoboothPageBody>
