@@ -83,7 +83,7 @@ function PrintFrameStack({
   const visibleModes = modes.slice(0, 3)
 
   const positionsByCount: Record<number, StackPosition[]> = {
-    1: [{ left: '7%', top: '8%', rotate: '0deg', zIndex: 30 }],
+    1: [{ left: '12%', top: '8%', rotate: '0deg', zIndex: 30 }],
     2: [
       { left: '8%', top: '11%', rotate: '0deg', zIndex: 30 },
       { left: '20%', top: '4%', rotate: '7deg', zIndex: 20 },
@@ -98,7 +98,7 @@ function PrintFrameStack({
   const positions = positionsByCount[visibleModes.length] ?? positionsByCount[1]
 
   return (
-    <div className="relative mx-auto h-[clamp(220px,38svh,372px)] w-[clamp(160px,58vw,280px)] max-w-full">
+    <div className="relative mx-auto w-[clamp(150px,min(56vw,30svh),270px)] aspect-[74/100] max-w-full">
       {visibleModes.map((mode, index) => {
         const position = positions[index]
 
@@ -349,7 +349,7 @@ export default function PrintPage() {
                 </div>
               </div>
 
-              <div className="relative mt-[clamp(8px,1.6svh,18px)] h-[clamp(70px,10svh,104px)] w-[clamp(70px,10svh,104px)] shrink-0 overflow-hidden rounded-[12px] bg-white">
+              <div className="relative mt-[clamp(12px,2svh,22px)] h-[clamp(70px,10svh,104px)] w-[clamp(70px,10svh,104px)] shrink-0 overflow-hidden rounded-[12px] bg-white">
                 <Image
                   src={getAssetPath(PRINT_QR_CODE_SRC)}
                   alt="QR code nhận file online"
