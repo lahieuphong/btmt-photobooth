@@ -6,24 +6,19 @@ import PhotoboothScreenShell from '@/src/features/photobooth/components/Photoboo
 import PhotoboothPageHeader from '@/src/features/photobooth/components/PhotoboothPageHeader'
 import PhotoboothPageBody from '@/src/features/photobooth/components/PhotoboothPageBody'
 import PrimaryButton from '@/src/features/photobooth/components/PrimaryButton'
+import PhotoboothFrameArtwork from '@/src/features/photobooth/components/PhotoboothFrameArtwork'
 import { PHOTOBOOTH_PAYMENT_MOCK } from '@/src/features/photobooth/constants/payment'
 import { PHOTOBOOTH_SCREEN_STATE_MAP } from '@/src/features/photobooth/config/screenState'
 import {
   getDefaultPhotoboothRuntimeSession,
   getPhotoboothRoundLayoutIds,
-  readPhotoboothRuntimeSession,
 } from '@/src/features/photobooth/utils/runtimeSession'
 import {
   getPhotoboothLayoutPreviewMode,
   type PhotoboothLayoutPreviewMode,
 } from '@/src/features/photobooth/utils/layoutPreview'
 import { getAssetPath } from '@/src/features/photobooth/utils/assetPath'
-
-const FRAME_OVERLAY_BY_MODE: Record<PhotoboothLayoutPreviewMode, string> = {
-  'grid-4': '/images/photobooth/frame/frame_1.png',
-  'vertical-4': '/images/photobooth/frame/frame_2.png',
-  'grid-6': '/images/photobooth/frame/frame_3.png',
-}
+import { buildPhotoboothPreviewModesFromSession } from '@/src/features/photobooth/constants/framePreview'
 
 const PRINT_QR_CODE_SRC = '/images/photobooth/print/qr_code.png'
 const FALLBACK_PRINT_MODES: PhotoboothLayoutPreviewMode[] = ['grid-4']
@@ -35,105 +30,8 @@ type StackPosition = {
   zIndex: number
 }
 
-function getFrameOverlaySrc(mode: PhotoboothLayoutPreviewMode) {
-  return FRAME_OVERLAY_BY_MODE[mode] ?? FRAME_OVERLAY_BY_MODE['grid-4']
-}
-
 function buildPrintModesFromSession(): PhotoboothLayoutPreviewMode[] {
-  const session = readPhotoboothRuntimeSession()
-  return getPhotoboothRoundLayoutIds(session).map((layoutId) =>
-    getPhotoboothLayoutPreviewMode(layoutId)
-  )
-}
-
-function FramePhotoSlot({ className = '' }: { className?: string }) {
-  return (
-    <div
-      className={[
-        'relative overflow-hidden rounded-[clamp(6px,0.95cqw,10px)]',
-        'bg-[#E7E1C9]',
-        className,
-      ].join(' ')}
-    />
-  )
-}
-
-function getFramePhotoBounds(
-  mode: PhotoboothLayoutPreviewMode,
-  compact: boolean
-) {
-  if (mode === 'vertical-4') {
-    return compact
-      ? 'absolute left-[26%] right-[26%] top-[11%] bottom-[16%]'
-      : 'absolute left-[23%] right-[23%] top-[8.8%] bottom-[12.2%]'
-  }
-
-  if (mode === 'grid-6') {
-    return compact
-      ? 'absolute left-[12%] right-[12%] top-[11.5%] bottom-[15.5%]'
-      : 'absolute left-[9.5%] right-[9.5%] top-[9.2%] bottom-[11.8%]'
-  }
-
-  return compact
-    ? 'absolute left-[12%] right-[12%] top-[11%] bottom-[16%]'
-    : 'absolute left-[9%] right-[9%] top-[8%] bottom-[12%]'
-}
-
-function FramePhotoLayout({
-  mode,
-  compact = false,
-}: {
-  mode: PhotoboothLayoutPreviewMode
-  compact?: boolean
-}) {
-  if (mode === 'vertical-4') {
-    return (
-      <div
-        className={[
-          'mx-auto grid h-full content-start grid-cols-1',
-          compact
-            ? 'w-[56%] gap-[clamp(5px,0.7cqw,9px)]'
-            : 'w-[54%] gap-[clamp(8px,1.1cqw,14px)]',
-        ].join(' ')}
-      >
-        {Array.from({ length: 4 }).map((_, index) => (
-          <FramePhotoSlot key={index} className="aspect-[185/98]" />
-        ))}
-      </div>
-    )
-  }
-
-  if (mode === 'grid-6') {
-    return (
-      <div
-        className={[
-          'grid h-full grid-cols-2 content-start',
-          compact
-            ? 'gap-x-[clamp(6px,0.9cqw,10px)] gap-y-[clamp(6px,0.9cqw,10px)]'
-            : 'gap-x-[clamp(8px,1.1cqw,14px)] gap-y-[clamp(8px,1.1cqw,14px)]',
-        ].join(' ')}
-      >
-        {Array.from({ length: 6 }).map((_, index) => (
-          <FramePhotoSlot key={index} className="aspect-[175/150]" />
-        ))}
-      </div>
-    )
-  }
-
-  return (
-    <div
-      className={[
-        'grid h-full grid-cols-2 content-start',
-        compact
-          ? 'gap-x-[clamp(7px,1cqw,12px)] gap-y-[clamp(9px,1.2cqw,14px)]'
-          : 'gap-x-[clamp(10px,1.2cqw,16px)] gap-y-[clamp(12px,1.5cqw,18px)]',
-      ].join(' ')}
-    >
-      {Array.from({ length: 4 }).map((_, index) => (
-        <FramePhotoSlot key={index} className="aspect-[182/240]" />
-      ))}
-    </div>
-  )
+  return buildPhotoboothPreviewModesFromSession()
 }
 
 function PrintFrameArtwork({
@@ -143,26 +41,14 @@ function PrintFrameArtwork({
   mode: PhotoboothLayoutPreviewMode
   priority?: boolean
 }) {
-  const overlaySrc = getFrameOverlaySrc(mode)
-  const photoBoundsClass = getFramePhotoBounds(mode, false)
-
   return (
-    <div className="relative h-full w-full overflow-hidden rounded-[inherit]">
-      <div className={`${photoBoundsClass} z-0`}>
-        <FramePhotoLayout mode={mode} />
-      </div>
-
-      <div className="pointer-events-none absolute inset-0 z-10">
-        <Image
-          src={getAssetPath(overlaySrc)}
-          alt="Khung ảnh in"
-          fill
-          sizes="(max-width: 480px) 72vw, (max-width: 768px) 300px, 320px"
-          className="object-contain"
-          priority={priority}
-        />
-      </div>
-    </div>
+    <PhotoboothFrameArtwork
+      mode={mode}
+      overlayAlt="Khung ảnh in"
+      imageSizes="(max-width: 480px) 72vw, (max-width: 768px) 300px, 320px"
+      imagePriority={priority}
+      slotBackground="solid"
+    />
   )
 }
 
