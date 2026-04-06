@@ -27,7 +27,7 @@ function PreviewPhotoCard({
   return (
     <div
       className={[
-        'overflow-hidden rounded-[18px] sm:rounded-[22px] md:rounded-[24px]',
+        'overflow-hidden rounded-[12px]',
         'bg-[linear-gradient(180deg,#9CC0E9_0%,#D5D2B2_28%,#E7C95F_62%,#D9B54D_100%)]',
         className,
       ].join(' ')}
@@ -42,16 +42,23 @@ function PreviewLayoutBlock({
 }: {
   mode: PhotoboothLayoutPreviewMode
 }) {
-  const frameClassName =
-    'mx-auto h-full w-auto max-w-full aspect-[368/489]'
+  const frameClassName = 'mx-auto h-full w-auto max-w-full aspect-[900/1196]'
+
+  const frameContentClassName = 'flex h-full w-full items-center justify-center'
+
+  const frameInnerClassName = 'w-[97.7778%] max-w-full'
 
   if (mode === 'vertical-4') {
     return (
       <div className={frameClassName}>
-        <div className="mx-auto grid h-full w-[48%] grid-cols-1 grid-rows-4 gap-[14px]">
-          {Array.from({ length: 4 }).map((_, index) => (
-            <PreviewPhotoCard key={index} className="h-full" />
-          ))}
+        <div className={frameContentClassName}>
+          <div className={frameInnerClassName}>
+            <div className="mx-auto grid w-[48%] grid-cols-1 gap-[14px]">
+              {Array.from({ length: 4 }).map((_, index) => (
+                <PreviewPhotoCard key={index} className="aspect-[430/260]" />
+              ))}
+            </div>
+          </div>
         </div>
       </div>
     )
@@ -60,10 +67,14 @@ function PreviewLayoutBlock({
   if (mode === 'grid-6') {
     return (
       <div className={frameClassName}>
-        <div className="grid h-full grid-cols-2 grid-rows-3 gap-[14px]">
-          {Array.from({ length: 6 }).map((_, index) => (
-            <PreviewPhotoCard key={index} className="h-full" />
-          ))}
+        <div className={frameContentClassName}>
+          <div className={frameInnerClassName}>
+            <div className="grid grid-cols-2 gap-[14px]">
+              {Array.from({ length: 6 }).map((_, index) => (
+                <PreviewPhotoCard key={index} className="aspect-[430/372]" />
+              ))}
+            </div>
+          </div>
         </div>
       </div>
     )
@@ -71,10 +82,14 @@ function PreviewLayoutBlock({
 
   return (
     <div className={frameClassName}>
-      <div className="grid h-full grid-cols-2 grid-rows-2 gap-[14px]">
-        {Array.from({ length: 4 }).map((_, index) => (
-          <PreviewPhotoCard key={index} className="h-full" />
-        ))}
+      <div className={frameContentClassName}>
+        <div className={frameInnerClassName}>
+          <div className="grid grid-cols-2 gap-[14px]">
+            {Array.from({ length: 4 }).map((_, index) => (
+              <PreviewPhotoCard key={index} className="aspect-[430/578]" />
+            ))}
+          </div>
+        </div>
       </div>
     </div>
   )
@@ -153,6 +168,8 @@ export default function PreviewPage() {
                 primaryLabel={primaryActionLabel}
                 onSecondaryClick={handleRetakeAll}
                 onPrimaryClick={handleConfirmPreview}
+                secondaryIconSrc="/images/photobooth/preview/arrow-rotate-left.svg"
+                primaryIconSrc="/images/photobooth/preview/arrow-right.svg"
               />
             </div>
           </div>
