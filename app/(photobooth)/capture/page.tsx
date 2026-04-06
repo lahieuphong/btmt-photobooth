@@ -14,6 +14,7 @@ import {
 } from '@/src/features/photobooth/constants/capture'
 import { PHOTOBOOTH_DEFAULT_SESSION } from '@/src/features/photobooth/constants/session'
 import { PHOTOBOOTH_SCREEN_STATE_MAP } from '@/src/features/photobooth/config/screenState'
+import { getAssetPath } from '@/src/features/photobooth/utils/assetPath'
 
 export default function CapturePage() {
   const screen = PHOTOBOOTH_SCREEN_STATE_MAP.capture
@@ -56,22 +57,35 @@ export default function CapturePage() {
                       key={value}
                       type="button"
                       onClick={() => setSelectedCountdown(value)}
+                      aria-pressed={isSelected}
                       className={[
-                        'flex h-[30px] min-w-[58px] items-center justify-center gap-1 rounded-[9px] px-2 text-[10px] font-medium leading-none text-white transition-all duration-150 sm:h-[32px] sm:min-w-[64px] sm:text-[11px]',
+                        'flex h-[30px] min-w-[58px] transform-gpu items-center justify-center gap-1 rounded-[9px] px-2 text-[10px] font-medium leading-none text-white transition-[transform,background-color,border-color,box-shadow,opacity] duration-220 ease-out active:scale-95 sm:h-[32px] sm:min-w-[64px] sm:text-[11px]',
                         isSelected
                           ? 'scale-105 border-2 border-[#FF5A2A] bg-[#15181F] shadow-[0_0_10px_rgba(255,90,42,0.28)]'
                           : 'scale-90 bg-[#75777B]',
                       ].join(' ')}
                     >
                       <Image
-                        src="/images/photobooth/capture/stopwatch.svg"
+                        src={getAssetPath('/images/photobooth/capture/stopwatch.svg')}
                         alt=""
                         aria-hidden="true"
-                        width={8}
-                        height={8}
-                        className="h-[8px] w-[8px] sm:h-[9px] sm:w-[9px]"
+                        width={11}
+                        height={11}
+                        className={[
+                          'shrink-0 transition-all duration-150',
+                          isSelected
+                            ? 'h-[12px] w-[12px] opacity-100 drop-shadow-[0_0_0.25px_rgba(255,255,255,0.95)] sm:h-[13px] sm:w-[13px]'
+                            : 'h-[11px] w-[11px] opacity-85 sm:h-[12px] sm:w-[12px]',
+                        ].join(' ')}
                       />
-                      <span>{value}s</span>
+                      <span
+                        className={[
+                          'text-[13px] sm:text-[14px]',
+                          isSelected ? 'font-semibold' : 'font-medium',
+                        ].join(' ')}
+                      >
+                        {value}s
+                      </span>
                     </button>
                   )
                 })}
@@ -82,12 +96,12 @@ export default function CapturePage() {
                   href={screen.nextHref}
                   className="flex h-[84px] w-[84px] flex-col items-center justify-center rounded-full bg-[#FD856E] text-white shadow-[0_10px_24px_rgba(253,133,110,0.25)] sm:h-[92px] sm:w-[92px]"
                 >
-                  <Image
-                    src="/images/photobooth/capture/camera-sparkles.svg"
-                    alt=""
-                    aria-hidden="true"
-                    width={22}
-                    height={22}
+              <Image
+                src={getAssetPath('/images/photobooth/capture/camera-sparkles.svg')}
+                alt=""
+                aria-hidden="true"
+                width={22}
+                height={22}
                     className="h-[22px] w-[22px] sm:h-[24px] sm:w-[24px]"
                   />
                   <span className="mt-1 text-[14px] font-medium leading-none text-white sm:text-[16px]">

@@ -18,6 +18,7 @@ import {
   getPhotoboothLayoutPreviewMode,
   type PhotoboothLayoutPreviewMode,
 } from '@/src/features/photobooth/utils/layoutPreview'
+import { getAssetPath } from '@/src/features/photobooth/utils/assetPath'
 
 function PreviewPhotoCard({
   className = '',
@@ -168,8 +169,10 @@ export default function PreviewPage() {
                 primaryLabel={primaryActionLabel}
                 onSecondaryClick={handleRetakeAll}
                 onPrimaryClick={handleConfirmPreview}
-                secondaryIconSrc="/images/photobooth/preview/arrow-rotate-left.svg"
-                primaryIconSrc="/images/photobooth/preview/arrow-right.svg"
+                secondaryIconSrc={getAssetPath(
+                  '/images/photobooth/preview/arrow-rotate-left.svg'
+                )}
+                primaryIconSrc={getAssetPath('/images/photobooth/preview/arrow-right.svg')}
               />
             </div>
           </div>
