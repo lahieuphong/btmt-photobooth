@@ -9,12 +9,10 @@ function LayoutPreviewCard({
   className = '',
   mode,
   isDisabled = false,
-  loading = 'lazy',
 }: {
   className?: string
   mode: PhotoboothLayoutPreviewMode
   isDisabled?: boolean
-  loading?: 'lazy' | 'eager'
 }) {
   const iconWrapperClass =
     mode === 'grid-4'
@@ -48,7 +46,7 @@ function LayoutPreviewCard({
             src={getAssetPath(LAYOUT_PLACEHOLDER_IMAGE)}
             alt=""
             fill
-            loading={loading}
+            loading="eager"
             sizes="(max-width: 768px) 96px, 205px"
             className="object-contain"
           />
@@ -96,7 +94,6 @@ function LayoutPreviewGrid({
           key={index}
           mode={mode}
           isDisabled={disabledIndices.includes(index)}
-          loading={index === 0 ? 'eager' : 'lazy'}
           className={cardAspectClassName}
         />
       ))}

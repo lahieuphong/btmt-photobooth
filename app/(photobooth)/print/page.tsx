@@ -9,28 +9,29 @@ import PhotoboothPageBody from '@/src/features/photobooth/components/shared/layo
 import PhotoboothPageHeader from '@/src/features/photobooth/components/shared/layout/PageHeader'
 import PhotoboothScreenShell from '@/src/features/photobooth/components/shared/layout/ScreenShell'
 import { PHOTOBOOTH_SCREEN_STATE_MAP } from '@/src/features/photobooth/config/screenState'
-import { buildPhotoboothPreviewModesFromSession } from '@/src/features/photobooth/constants/framePreview'
+import {
+  buildPhotoboothPreviewRoundItemsFromSession,
+  type PhotoboothPreviewRoundItem,
+} from '@/src/features/photobooth/constants/framePreview'
 import { getAssetPath } from '@/src/features/photobooth/utils/assetPath'
 import { type PhotoboothLayoutPreviewMode } from '@/src/features/photobooth/utils/layoutPreview'
 
 const PRINT_QR_CODE_SRC = '/images/photobooth/print/qr_code.png'
 const FALLBACK_PRINT_MODES: PhotoboothLayoutPreviewMode[] = ['grid-4']
 
-function buildPrintModesFromSession(): PhotoboothLayoutPreviewMode[] {
-  return buildPhotoboothPreviewModesFromSession()
-}
-
 export default function PrintPage() {
   const screen = PHOTOBOOTH_SCREEN_STATE_MAP.print
 
-  const [printModes] = useState<PhotoboothLayoutPreviewMode[]>(() =>
-    buildPrintModesFromSession()
+  const [printRoundItems] = useState<PhotoboothPreviewRoundItem[]>(() =>
+    buildPhotoboothPreviewRoundItemsFromSession()
   )
   const [currentImageIndex, setCurrentImageIndex] = useState(0)
 
   const visiblePrintModes = useMemo<PhotoboothLayoutPreviewMode[]>(() => {
-    return printModes.length > 0 ? printModes : FALLBACK_PRINT_MODES
-  }, [printModes])
+    return printRoundItems.length > 0
+      ? printRoundItems.map((item) => item.previewMode)
+      : FALLBACK_PRINT_MODES
+  }, [printRoundItems])
 
   const swipeableModes = useMemo<PhotoboothLayoutPreviewMode[]>(
     () => visiblePrintModes,
@@ -87,7 +88,13 @@ export default function PrintPage() {
                     showNavigation={false}
                     wrapperClassName="w-[min(84vw,38svh)] max-w-[440px] min-w-[260px] flex flex-col items-center"
                     stackRootClassName="relative mx-auto"
-                    renderCard={(mode) => <PrintFrameCard mode={mode} priority />}
+                    renderCard={(mode, options) => (
+                      <PrintFrameCard
+                        mode={mode}
+                        priority
+                        photoSrc={printRoundItems[options.originalIndex]?.imageSrc ?? null}
+                      />
+                    )}
                   />
                 </div>
 

@@ -14,7 +14,10 @@ type PhotoboothFrameSwipePreviewProps = {
   canGoNext: boolean
   onPrev: () => void
   onNext: () => void
-  renderCard: (mode: PhotoboothLayoutPreviewMode) => ReactNode
+  renderCard: (
+    mode: PhotoboothLayoutPreviewMode,
+    options: { index: number; originalIndex: number; isFront: boolean }
+  ) => ReactNode
   stackRootClassName?: string
   wrapperClassName?: string
   showNavigation?: boolean
@@ -28,7 +31,10 @@ function FrameStagePreview({
 }: {
   modes: PhotoboothLayoutPreviewMode[]
   currentIndex: number
-  renderCard: (mode: PhotoboothLayoutPreviewMode) => ReactNode
+  renderCard: (
+    mode: PhotoboothLayoutPreviewMode,
+    options: { index: number; originalIndex: number; isFront: boolean }
+  ) => ReactNode
   stackRootClassName?: string
 }) {
   const stageRootClassName =
@@ -42,7 +48,7 @@ function FrameStagePreview({
       rootClassName={stageRootClassName}
       containerClassName="w-full max-w-[min(100%,500px)] aspect-[74/100]"
       itemClassName="aspect-[678/1018] w-[62%]"
-      renderCard={(mode) => renderCard(mode)}
+      renderCard={(mode, options) => renderCard(mode, options)}
     />
   )
 }

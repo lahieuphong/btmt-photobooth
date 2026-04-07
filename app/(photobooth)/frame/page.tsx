@@ -13,6 +13,7 @@ import { PHOTOBOOTH_FRAME_OPTIONS } from '@/src/features/photobooth/constants/fr
 import { PHOTOBOOTH_DEFAULT_SESSION } from '@/src/features/photobooth/constants/session'
 import {
   getDefaultPhotoboothRuntimeSession,
+  getPhotoboothRoundImageDataUrls,
   getPhotoboothRoundLayoutIds,
   readPhotoboothRuntimeSession,
 } from '@/src/features/photobooth/utils/runtimeSession'
@@ -26,23 +27,30 @@ type FrameImageItem = {
   label: string
   layoutId: string
   previewMode: PhotoboothLayoutPreviewMode
+  captureImageSrc: string | null
 }
 
-function buildFrameImageItems(layoutIds: string[]): FrameImageItem[] {
+function buildFrameImageItems(
+  layoutIds: string[],
+  roundImageDataUrls: Array<string | null> = []
+): FrameImageItem[] {
   return layoutIds.map((layoutId, index) => ({
     imageIndex: index,
     label: `Hình ${index + 1}`,
     layoutId,
     previewMode: getPhotoboothLayoutPreviewMode(layoutId),
+    captureImageSrc: roundImageDataUrls[index] ?? null,
   }))
 }
 
 function FrameArtwork({
   mode,
   compact = false,
+  photoSrc,
 }: {
   mode: PhotoboothLayoutPreviewMode
   compact?: boolean
+  photoSrc?: string | null
 }) {
   return (
     <PhotoboothFrameArtwork
@@ -52,6 +60,7 @@ function FrameArtwork({
       imageSizes={compact ? '140px' : '(max-width: 768px) 72vw, 680px'}
       imagePriority={!compact}
       slotBackground="gradient"
+      photoSrc={photoSrc}
     />
   )
 }
@@ -65,13 +74,19 @@ export default function FramePage() {
   const [selectedImageIndex, setSelectedImageIndex] = useState(0)
   const [frameImages, setFrameImages] = useState<FrameImageItem[]>(() => {
     const fallbackSession = getDefaultPhotoboothRuntimeSession()
-    return buildFrameImageItems(getPhotoboothRoundLayoutIds(fallbackSession))
+    return buildFrameImageItems(
+      getPhotoboothRoundLayoutIds(fallbackSession),
+      getPhotoboothRoundImageDataUrls(fallbackSession)
+    )
   })
 
   useEffect(() => {
     const timerId = window.setTimeout(() => {
       const session = readPhotoboothRuntimeSession()
-      const nextFrameImages = buildFrameImageItems(getPhotoboothRoundLayoutIds(session))
+      const nextFrameImages = buildFrameImageItems(
+        getPhotoboothRoundLayoutIds(session),
+        getPhotoboothRoundImageDataUrls(session)
+      )
 
       setFrameImages(nextFrameImages)
       setSelectedImageIndex((prev) =>
@@ -138,9 +153,12 @@ export default function FramePage() {
                   canGoNext={canGoNext}
                   onPrev={handlePrevImage}
                   onNext={handleNextImage}
-                  renderCard={(mode) => (
+                  renderCard={(mode, options) => (
                     <div className="relative h-full w-full overflow-hidden rounded-[clamp(6px,1cqw,9px)] border border-[#CFC8B3] bg-[#E1DCC8] shadow-[0_10px_24px_rgba(34,30,4,0.10)]">
-                      <FrameArtwork mode={mode} />
+                      <FrameArtwork
+                        mode={mode}
+                        photoSrc={frameImages[options.originalIndex]?.captureImageSrc ?? null}
+                      />
                     </div>
                   )}
                 />
@@ -167,7 +185,10 @@ export default function FramePage() {
                                 : 'border-[#E4DDCB] group-hover:border-[#D2C9AF] group-hover:shadow-[0_4px_10px_rgba(34,30,4,0.08)]',
                             ].join(' ')}
                           >
-                            <FrameOptionPreview mode={activePreviewMode} />
+                            <FrameOptionPreview
+                              mode={activePreviewMode}
+                              photoSrc={activeImage?.captureImageSrc ?? null}
+                            />
                           </div>
 
                           <div

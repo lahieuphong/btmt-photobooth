@@ -29,15 +29,18 @@ type PhotoboothFrameStackProps = {
   itemClassName?: string
   renderCard: (
     mode: PhotoboothLayoutPreviewMode,
-    options: { index: number; isFront: boolean }
+    options: { index: number; originalIndex: number; isFront: boolean }
   ) => ReactNode
 }
 
 function buildOrderedModes(
   modes: PhotoboothLayoutPreviewMode[],
   selectedIndex: number
-): PhotoboothLayoutPreviewMode[] {
-  const visibleModes = modes.slice(0, 3)
+): Array<{ mode: PhotoboothLayoutPreviewMode; originalIndex: number }> {
+  const visibleModes = modes.slice(0, 3).map((mode, index) => ({
+    mode,
+    originalIndex: index,
+  }))
 
   if (visibleModes.length <= 1) {
     return visibleModes
@@ -80,7 +83,7 @@ export default function PhotoboothFrameStack({
 
         return (
           <div
-            key={`${mode}-${index}`}
+            key={`${mode.mode}-${mode.originalIndex}-${index}`}
             className={['absolute', itemClassName].join(' ')}
             style={{
               left: position.left,
@@ -89,7 +92,11 @@ export default function PhotoboothFrameStack({
               zIndex: position.zIndex,
             }}
           >
-            {renderCard(mode, { index, isFront: index === 0 })}
+            {renderCard(mode.mode, {
+              index,
+              originalIndex: mode.originalIndex,
+              isFront: index === 0,
+            })}
           </div>
         )
       })}

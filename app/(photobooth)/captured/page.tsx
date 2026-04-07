@@ -8,9 +8,12 @@ import PhotoboothPageBody from '@/src/features/photobooth/components/shared/layo
 import PhotoboothPageHeader from '@/src/features/photobooth/components/shared/layout/PageHeader'
 import PhotoboothScreenShell from '@/src/features/photobooth/components/shared/layout/ScreenShell'
 import { PHOTOBOOTH_SCREEN_STATE_MAP } from '@/src/features/photobooth/config/screenState'
-import { buildPhotoboothPreviewModesFromSession } from '@/src/features/photobooth/constants/framePreview'
+import {
+  buildPhotoboothPreviewRoundItemsFromSession,
+} from '@/src/features/photobooth/constants/framePreview'
 import {
   getDefaultPhotoboothRuntimeSession,
+  getPhotoboothRoundImageDataUrls,
   getPhotoboothRoundLayoutIds,
 } from '@/src/features/photobooth/utils/runtimeSession'
 import {
@@ -19,10 +22,6 @@ import {
 } from '@/src/features/photobooth/utils/layoutPreview'
 
 const FALLBACK_CAPTURED_MODES: PhotoboothLayoutPreviewMode[] = ['grid-4']
-
-function buildCapturedModesFromSession(): PhotoboothLayoutPreviewMode[] {
-  return buildPhotoboothPreviewModesFromSession()
-}
 
 export default function CapturedPage() {
   const screen = PHOTOBOOTH_SCREEN_STATE_MAP.captured
@@ -33,13 +32,21 @@ export default function CapturedPage() {
       getPhotoboothLayoutPreviewMode(layoutId)
     )
   })
+  const [capturedRoundImageSrcs, setCapturedRoundImageSrcs] = useState<
+    Array<string | null>
+  >(() => {
+    const fallbackSession = getDefaultPhotoboothRuntimeSession()
+    return getPhotoboothRoundImageDataUrls(fallbackSession)
+  })
 
   const [currentImageIndex, setCurrentImageIndex] = useState(0)
 
   useEffect(() => {
     const timerId = window.setTimeout(() => {
-      const nextModes = buildCapturedModesFromSession()
+      const nextRoundItems = buildPhotoboothPreviewRoundItemsFromSession()
+      const nextModes = nextRoundItems.map((item) => item.previewMode)
       setCapturedModes(nextModes)
+      setCapturedRoundImageSrcs(nextRoundItems.map((item) => item.imageSrc))
       setCurrentImageIndex((prev) =>
         Math.min(prev, Math.max(nextModes.length - 1, 0))
       )
@@ -94,7 +101,12 @@ export default function CapturedPage() {
                   onPrev={handlePrevImage}
                   onNext={handleNextImage}
                   stackRootClassName="relative mx-auto"
-                  renderCard={(mode) => <CapturedFrameCard mode={mode} />}
+                  renderCard={(mode, options) => (
+                    <CapturedFrameCard
+                      mode={mode}
+                      photoSrc={capturedRoundImageSrcs[options.originalIndex] ?? null}
+                    />
+                  )}
                 />
               </div>
             </div>

@@ -10,6 +10,7 @@ type PhotoboothFrameArtworkProps = {
   imageSizes: string
   imagePriority?: boolean
   slotBackground?: 'solid' | 'gradient'
+  photoSrc?: string | null
 }
 
 function getFramePhotoBounds(
@@ -36,9 +37,11 @@ function getFramePhotoBounds(
 function FramePhotoSlot({
   className = '',
   slotBackground = 'solid',
+  photoSrc,
 }: {
   className?: string
   slotBackground?: 'solid' | 'gradient'
+  photoSrc?: string | null
 }) {
   return (
     <div
@@ -49,7 +52,18 @@ function FramePhotoSlot({
           : 'bg-[#E7E1C9]',
         className,
       ].join(' ')}
-    />
+    >
+      {photoSrc ? (
+        <Image
+          src={photoSrc}
+          alt="Ảnh đã chụp"
+          fill
+          unoptimized
+          sizes="(max-width: 768px) 40vw, 220px"
+          className="object-cover"
+        />
+      ) : null}
+    </div>
   )
 }
 
@@ -57,10 +71,12 @@ function FramePhotoLayout({
   mode,
   compact,
   slotBackground,
+  photoSrc,
 }: {
   mode: PhotoboothLayoutPreviewMode
   compact: boolean
   slotBackground?: 'solid' | 'gradient'
+  photoSrc?: string | null
 }) {
   if (mode === 'vertical-4') {
     const containerClass = compact
@@ -79,6 +95,7 @@ function FramePhotoLayout({
             key={index}
             className="h-full"
             slotBackground={slotBackground}
+            photoSrc={photoSrc}
           />
         ))}
       </div>
@@ -100,6 +117,7 @@ function FramePhotoLayout({
             key={index}
             className="aspect-[175/150]"
             slotBackground={slotBackground}
+            photoSrc={photoSrc}
           />
         ))}
       </div>
@@ -120,6 +138,7 @@ function FramePhotoLayout({
           key={index}
           className="aspect-[182/240]"
           slotBackground={slotBackground}
+          photoSrc={photoSrc}
         />
       ))}
     </div>
@@ -133,6 +152,7 @@ export default function PhotoboothFrameArtwork({
   imageSizes,
   imagePriority = false,
   slotBackground = 'solid',
+  photoSrc,
 }: PhotoboothFrameArtworkProps) {
   const overlaySrc = getPhotoboothFrameOverlaySrc(mode)
   const photoBoundsClass = getFramePhotoBounds(mode, compact)
@@ -144,6 +164,7 @@ export default function PhotoboothFrameArtwork({
           mode={mode}
           compact={compact}
           slotBackground={slotBackground}
+          photoSrc={photoSrc}
         />
       </div>
 

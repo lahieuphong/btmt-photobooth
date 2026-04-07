@@ -3,6 +3,7 @@ import {
   type PhotoboothLayoutPreviewMode,
 } from '@/src/features/photobooth/utils/layoutPreview'
 import {
+  getPhotoboothRoundImageDataUrls,
   getPhotoboothRoundLayoutIds,
   readPhotoboothRuntimeSession,
 } from '@/src/features/photobooth/utils/runtimeSession'
@@ -15,6 +16,13 @@ export const PHOTOBOOTH_FRAME_OVERLAY_BY_MODE: Record<PhotoboothLayoutPreviewMod
 
 export const PHOTOBOOTH_FRAME_ARROW_SRC = '/images/photobooth/frame/angle-right.png'
 
+export type PhotoboothPreviewRoundItem = {
+  index: number
+  layoutId: string
+  previewMode: PhotoboothLayoutPreviewMode
+  imageSrc: string | null
+}
+
 export function getPhotoboothFrameOverlaySrc(mode: PhotoboothLayoutPreviewMode) {
   return PHOTOBOOTH_FRAME_OVERLAY_BY_MODE[mode] ?? PHOTOBOOTH_FRAME_OVERLAY_BY_MODE['grid-4']
 }
@@ -25,4 +33,17 @@ export function buildPhotoboothPreviewModesFromSession(): PhotoboothLayoutPrevie
   return getPhotoboothRoundLayoutIds(session).map((layoutId) =>
     getPhotoboothLayoutPreviewMode(layoutId)
   )
+}
+
+export function buildPhotoboothPreviewRoundItemsFromSession(): PhotoboothPreviewRoundItem[] {
+  const session = readPhotoboothRuntimeSession()
+  const layoutIds = getPhotoboothRoundLayoutIds(session)
+  const roundImageSrcs = getPhotoboothRoundImageDataUrls(session)
+
+  return layoutIds.map((layoutId, index) => ({
+    index,
+    layoutId,
+    previewMode: getPhotoboothLayoutPreviewMode(layoutId),
+    imageSrc: roundImageSrcs[index] ?? null,
+  }))
 }

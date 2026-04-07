@@ -15,7 +15,7 @@ import {
 import { PHOTOBOOTH_DEFAULT_SESSION } from '@/src/features/photobooth/constants/session'
 import { PHOTOBOOTH_SCREEN_STATE_MAP } from '@/src/features/photobooth/config/screenState'
 import { getAssetPath } from '@/src/features/photobooth/utils/assetPath'
-import { setPhotoboothLatestCaptureDataUrl } from '@/src/features/photobooth/utils/runtimeSession'
+import { setPhotoboothCaptureRoundImageDataUrl } from '@/src/features/photobooth/utils/runtimeSession'
 
 export default function CapturePage() {
   const router = useRouter()
@@ -145,7 +145,7 @@ export default function CapturePage() {
 
   function handleCapture() {
     const capturedDataUrl = captureCurrentFrame()
-    setPhotoboothLatestCaptureDataUrl(capturedDataUrl)
+    setPhotoboothCaptureRoundImageDataUrl(capturedDataUrl)
     router.push(screen.nextHref ?? '/preview')
   }
 

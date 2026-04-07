@@ -9,6 +9,7 @@ export type PhotoboothRuntimeSession = {
   captureRoundsCompleted: number
   completedRoundLayoutIds: string[]
   latestCaptureDataUrl: string | null
+  capturedRoundImageDataUrls: Array<string | null>
 }
 
 const PHOTOBOOTH_RUNTIME_SESSION_KEY = 'photobooth_runtime_session'
@@ -37,6 +38,23 @@ function sanitizeLatestCaptureDataUrl(value: unknown) {
   return typeof value === 'string' && value.length > 0 ? value : null
 }
 
+function sanitizeCapturedRoundImageDataUrls(
+  value: unknown,
+  maxLength: number
+): Array<string | null> {
+  const sanitized = Array.from({ length: maxLength }, () => null as string | null)
+
+  if (!Array.isArray(value)) {
+    return sanitized
+  }
+
+  for (let index = 0; index < maxLength; index += 1) {
+    sanitized[index] = sanitizeLatestCaptureDataUrl(value[index])
+  }
+
+  return sanitized
+}
+
 export function getDefaultPhotoboothRuntimeSession(): PhotoboothRuntimeSession {
   const selectedPackageId = PHOTOBOOTH_DEFAULT_SESSION.selectedPackageId
   const selectedLayoutId = PHOTOBOOTH_DEFAULT_SESSION.selectedLayoutId
@@ -48,6 +66,7 @@ export function getDefaultPhotoboothRuntimeSession(): PhotoboothRuntimeSession {
     captureRoundsCompleted: 0,
     completedRoundLayoutIds: [],
     latestCaptureDataUrl: null,
+    capturedRoundImageDataUrls: [],
   }
 }
 
@@ -96,6 +115,10 @@ export function readPhotoboothRuntimeSession(): PhotoboothRuntimeSession {
     const latestCaptureDataUrl = sanitizeLatestCaptureDataUrl(
       parsedValue.latestCaptureDataUrl
     )
+    const capturedRoundImageDataUrls = sanitizeCapturedRoundImageDataUrls(
+      parsedValue.capturedRoundImageDataUrls,
+      captureRoundsRequired
+    )
 
     return {
       selectedPackageId,
@@ -104,6 +127,7 @@ export function readPhotoboothRuntimeSession(): PhotoboothRuntimeSession {
       captureRoundsCompleted,
       completedRoundLayoutIds,
       latestCaptureDataUrl,
+      capturedRoundImageDataUrls,
     }
   } catch {
     return fallback
@@ -129,6 +153,7 @@ export function startPhotoboothRuntimeSession(selectedPackageId: string) {
     captureRoundsCompleted: 0,
     completedRoundLayoutIds: [],
     latestCaptureDataUrl: null,
+    capturedRoundImageDataUrls: [],
   }
 
   writePhotoboothRuntimeSession(nextValue)
@@ -189,6 +214,32 @@ export function setPhotoboothLatestCaptureDataUrl(dataUrl: string | null) {
   return nextValue
 }
 
+export function setPhotoboothCaptureRoundImageDataUrl(dataUrl: string | null) {
+  const currentValue = readPhotoboothRuntimeSession()
+  const currentRoundIndex = Math.min(
+    currentValue.captureRoundsCompleted,
+    Math.max(currentValue.captureRoundsRequired - 1, 0)
+  )
+
+  const nextCapturedRoundImageDataUrls = sanitizeCapturedRoundImageDataUrls(
+    currentValue.capturedRoundImageDataUrls,
+    currentValue.captureRoundsRequired
+  )
+
+  nextCapturedRoundImageDataUrls[currentRoundIndex] =
+    sanitizeLatestCaptureDataUrl(dataUrl)
+
+  const nextValue: PhotoboothRuntimeSession = {
+    ...currentValue,
+    latestCaptureDataUrl: sanitizeLatestCaptureDataUrl(dataUrl),
+    capturedRoundImageDataUrls: nextCapturedRoundImageDataUrls,
+  }
+
+  writePhotoboothRuntimeSession(nextValue)
+
+  return nextValue
+}
+
 export function getPreviewNextRoute(session: PhotoboothRuntimeSession) {
   if (session.captureRoundsCompleted < session.captureRoundsRequired) {
     return PHOTOBOOTH_ROUTES.LAYOUT
@@ -223,4 +274,14 @@ export function getPhotoboothRoundLayoutIds(session: PhotoboothRuntimeSession) {
   return Array.from({ length: totalRounds }, (_, index) => {
     return session.completedRoundLayoutIds[index] ?? fallbackLayoutId
   })
+}
+
+export function getPhotoboothRoundImageDataUrls(session: PhotoboothRuntimeSession) {
+  const totalRounds = Math.max(1, session.captureRoundsRequired)
+  const sanitized = sanitizeCapturedRoundImageDataUrls(
+    session.capturedRoundImageDataUrls,
+    totalRounds
+  )
+
+  return Array.from({ length: totalRounds }, (_, index) => sanitized[index] ?? null)
 }

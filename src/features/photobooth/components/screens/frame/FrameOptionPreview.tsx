@@ -3,9 +3,13 @@ import type { PhotoboothLayoutPreviewMode } from '@/src/features/photobooth/util
 
 type FrameOptionPreviewProps = {
   mode: PhotoboothLayoutPreviewMode
+  photoSrc?: string | null
 }
 
-export default function FrameOptionPreview({ mode }: FrameOptionPreviewProps) {
+export default function FrameOptionPreview({
+  mode,
+  photoSrc,
+}: FrameOptionPreviewProps) {
   return (
     <div className="aspect-[110/148] w-full rounded-[12px]">
       <PhotoboothFrameArtwork
@@ -15,6 +19,7 @@ export default function FrameOptionPreview({ mode }: FrameOptionPreviewProps) {
         imageSizes="140px"
         imagePriority={false}
         slotBackground="gradient"
+        photoSrc={photoSrc}
       />
     </div>
   )

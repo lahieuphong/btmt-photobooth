@@ -3,10 +3,12 @@ import type { PhotoboothLayoutPreviewMode } from '@/src/features/photobooth/util
 
 type CapturedFrameCardProps = {
   mode: PhotoboothLayoutPreviewMode
+  photoSrc?: string | null
 }
 
 export default function CapturedFrameCard({
   mode,
+  photoSrc,
 }: CapturedFrameCardProps) {
   return (
     <div className="relative h-full w-full overflow-hidden rounded-[clamp(6px,1cqw,9px)] border border-[#CFC8B3] bg-[#E1DCC8] shadow-[0_10px_24px_rgba(34,30,4,0.10)]">
@@ -16,6 +18,7 @@ export default function CapturedFrameCard({
         imageSizes="(max-width: 480px) 76vw, (max-width: 768px) 340px, 390px"
         imagePriority
         slotBackground="solid"
+        photoSrc={photoSrc}
       />
     </div>
   )
