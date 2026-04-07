@@ -8,6 +8,7 @@ export type PhotoboothRuntimeSession = {
   captureRoundsRequired: number
   captureRoundsCompleted: number
   completedRoundLayoutIds: string[]
+  latestCaptureDataUrl: string | null
 }
 
 const PHOTOBOOTH_RUNTIME_SESSION_KEY = 'photobooth_runtime_session'
@@ -32,6 +33,10 @@ function sanitizeCompletedRoundLayoutIds(value: unknown, maxLength: number) {
     .slice(0, maxLength)
 }
 
+function sanitizeLatestCaptureDataUrl(value: unknown) {
+  return typeof value === 'string' && value.length > 0 ? value : null
+}
+
 export function getDefaultPhotoboothRuntimeSession(): PhotoboothRuntimeSession {
   const selectedPackageId = PHOTOBOOTH_DEFAULT_SESSION.selectedPackageId
   const selectedLayoutId = PHOTOBOOTH_DEFAULT_SESSION.selectedLayoutId
@@ -42,6 +47,7 @@ export function getDefaultPhotoboothRuntimeSession(): PhotoboothRuntimeSession {
     captureRoundsRequired: getPackageCaptureRounds(selectedPackageId),
     captureRoundsCompleted: 0,
     completedRoundLayoutIds: [],
+    latestCaptureDataUrl: null,
   }
 }
 
@@ -87,6 +93,9 @@ export function readPhotoboothRuntimeSession(): PhotoboothRuntimeSession {
       parsedValue.completedRoundLayoutIds,
       captureRoundsRequired
     )
+    const latestCaptureDataUrl = sanitizeLatestCaptureDataUrl(
+      parsedValue.latestCaptureDataUrl
+    )
 
     return {
       selectedPackageId,
@@ -94,6 +103,7 @@ export function readPhotoboothRuntimeSession(): PhotoboothRuntimeSession {
       captureRoundsRequired,
       captureRoundsCompleted,
       completedRoundLayoutIds,
+      latestCaptureDataUrl,
     }
   } catch {
     return fallback
@@ -118,6 +128,7 @@ export function startPhotoboothRuntimeSession(selectedPackageId: string) {
     captureRoundsRequired: getPackageCaptureRounds(selectedPackageId),
     captureRoundsCompleted: 0,
     completedRoundLayoutIds: [],
+    latestCaptureDataUrl: null,
   }
 
   writePhotoboothRuntimeSession(nextValue)
@@ -159,6 +170,18 @@ export function completePhotoboothCaptureRound() {
       0,
       currentValue.captureRoundsRequired
     ),
+  }
+
+  writePhotoboothRuntimeSession(nextValue)
+
+  return nextValue
+}
+
+export function setPhotoboothLatestCaptureDataUrl(dataUrl: string | null) {
+  const currentValue = readPhotoboothRuntimeSession()
+  const nextValue: PhotoboothRuntimeSession = {
+    ...currentValue,
+    latestCaptureDataUrl: sanitizeLatestCaptureDataUrl(dataUrl),
   }
 
   writePhotoboothRuntimeSession(nextValue)

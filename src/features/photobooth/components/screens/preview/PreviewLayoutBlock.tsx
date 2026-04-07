@@ -1,18 +1,31 @@
+import Image from 'next/image'
 import type { PhotoboothLayoutPreviewMode } from '@/src/features/photobooth/utils/layoutPreview'
 
 function PreviewPhotoCard({
   className = '',
+  imageSrc,
 }: {
   className?: string
+  imageSrc?: string | null
 }) {
   return (
     <div
       className={[
-        'overflow-hidden rounded-[12px]',
+        'relative overflow-hidden rounded-[12px]',
         'bg-[linear-gradient(180deg,#9CC0E9_0%,#D5D2B2_28%,#E7C95F_62%,#D9B54D_100%)]',
         className,
       ].join(' ')}
     >
+      {imageSrc ? (
+        <Image
+          src={imageSrc}
+          alt="Ảnh vừa chụp"
+          fill
+          unoptimized
+          sizes="(max-width: 768px) 45vw, 280px"
+          className="absolute inset-0 object-cover"
+        />
+      ) : null}
       <div className="h-full w-full bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.10),transparent_46%)]" />
     </div>
   )
@@ -20,8 +33,10 @@ function PreviewPhotoCard({
 
 export default function PreviewLayoutBlock({
   mode,
+  previewImageSrc = null,
 }: {
   mode: PhotoboothLayoutPreviewMode
+  previewImageSrc?: string | null
 }) {
   const frameClassName = 'mx-auto h-full w-auto max-w-full aspect-[900/1196]'
 
@@ -36,7 +51,11 @@ export default function PreviewLayoutBlock({
           <div className={frameInnerClassName}>
             <div className="mx-auto grid w-[48%] grid-cols-1 gap-[14px]">
               {Array.from({ length: 4 }).map((_, index) => (
-                <PreviewPhotoCard key={index} className="aspect-[430/260]" />
+                <PreviewPhotoCard
+                  key={index}
+                  className="aspect-[430/260]"
+                  imageSrc={previewImageSrc}
+                />
               ))}
             </div>
           </div>
@@ -52,7 +71,11 @@ export default function PreviewLayoutBlock({
           <div className={frameInnerClassName}>
             <div className="grid grid-cols-2 gap-[14px]">
               {Array.from({ length: 6 }).map((_, index) => (
-                <PreviewPhotoCard key={index} className="aspect-[430/372]" />
+                <PreviewPhotoCard
+                  key={index}
+                  className="aspect-[430/372]"
+                  imageSrc={previewImageSrc}
+                />
               ))}
             </div>
           </div>
@@ -67,7 +90,11 @@ export default function PreviewLayoutBlock({
         <div className={frameInnerClassName}>
           <div className="grid grid-cols-2 gap-[14px]">
             {Array.from({ length: 4 }).map((_, index) => (
-              <PreviewPhotoCard key={index} className="aspect-[430/578]" />
+              <PreviewPhotoCard
+                key={index}
+                className="aspect-[430/578]"
+                imageSrc={previewImageSrc}
+              />
             ))}
           </div>
         </div>

@@ -25,6 +25,7 @@ export default function PreviewPage() {
   const [selectedLayoutId, setSelectedLayoutId] = useState(
     PHOTOBOOTH_DEFAULT_SESSION.selectedLayoutId
   )
+  const [latestCaptureDataUrl, setLatestCaptureDataUrl] = useState<string | null>(null)
   const [captureRoundsRequired, setCaptureRoundsRequired] = useState(1)
   const [captureRoundsCompleted, setCaptureRoundsCompleted] = useState(0)
 
@@ -33,6 +34,7 @@ export default function PreviewPage() {
       const session = readPhotoboothRuntimeSession()
 
       setSelectedLayoutId(session.selectedLayoutId)
+      setLatestCaptureDataUrl(session.latestCaptureDataUrl)
       setCaptureRoundsRequired(session.captureRoundsRequired)
       setCaptureRoundsCompleted(session.captureRoundsCompleted)
     }, 0)
@@ -90,7 +92,10 @@ export default function PreviewPage() {
           >
             <div className="flex min-h-0 flex-1 flex-col">
               <div className="mt-3 min-h-0 flex-1 overflow-hidden pt-1 sm:pt-2 pb-2">
-                <PreviewLayoutBlock mode={previewMode} />
+                <PreviewLayoutBlock
+                  mode={previewMode}
+                  previewImageSrc={latestCaptureDataUrl}
+                />
               </div>
 
               <PhotoboothDualActionBar
