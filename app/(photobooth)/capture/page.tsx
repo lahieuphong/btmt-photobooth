@@ -3,10 +3,10 @@
 import Link from 'next/link'
 import Image from 'next/image'
 import { useState } from 'react'
-import PhotoboothCaptureRoundHint from '@/src/features/photobooth/components/PhotoboothCaptureRoundHint'
-import PhotoboothScreenShell from '@/src/features/photobooth/components/PhotoboothScreenShell'
-import PhotoboothPageHeader from '@/src/features/photobooth/components/PhotoboothPageHeader'
-import PhotoboothPageBody from '@/src/features/photobooth/components/PhotoboothPageBody'
+import PhotoboothCaptureRoundHint from '@/src/features/photobooth/components/flow/round/CaptureRoundHint'
+import PhotoboothScreenShell from '@/src/features/photobooth/components/shared/layout/ScreenShell'
+import PhotoboothPageHeader from '@/src/features/photobooth/components/shared/layout/PageHeader'
+import PhotoboothPageBody from '@/src/features/photobooth/components/shared/layout/PageBody'
 import {
   PHOTOBOOTH_CAPTURE_GUIDE_TEXT,
   PHOTOBOOTH_COUNTDOWN_OPTIONS,

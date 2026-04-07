@@ -2,99 +2,21 @@
 
 import { useEffect, useMemo, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import PhotoboothCaptureRoundHint from '@/src/features/photobooth/components/PhotoboothCaptureRoundHint'
-import PhotoboothScreenShell from '@/src/features/photobooth/components/PhotoboothScreenShell'
-import PhotoboothPageHeader from '@/src/features/photobooth/components/PhotoboothPageHeader'
-import PhotoboothPageBody from '@/src/features/photobooth/components/PhotoboothPageBody'
-import PhotoboothDualActionBar from '@/src/features/photobooth/components/PhotoboothDualActionBar'
-import { PHOTOBOOTH_DEFAULT_SESSION } from '@/src/features/photobooth/constants/session'
+import PhotoboothCaptureRoundHint from '@/src/features/photobooth/components/flow/round/CaptureRoundHint'
+import PhotoboothDualActionBar from '@/src/features/photobooth/components/flow/actions/DualActionBar'
+import PreviewLayoutBlock from '@/src/features/photobooth/components/screens/preview/PreviewLayoutBlock'
+import PhotoboothPageBody from '@/src/features/photobooth/components/shared/layout/PageBody'
+import PhotoboothPageHeader from '@/src/features/photobooth/components/shared/layout/PageHeader'
+import PhotoboothScreenShell from '@/src/features/photobooth/components/shared/layout/ScreenShell'
 import { PHOTOBOOTH_SCREEN_STATE_MAP } from '@/src/features/photobooth/config/screenState'
+import { PHOTOBOOTH_DEFAULT_SESSION } from '@/src/features/photobooth/constants/session'
 import {
   completePhotoboothCaptureRound,
   getPreviewNextRoute,
   readPhotoboothRuntimeSession,
 } from '@/src/features/photobooth/utils/runtimeSession'
-import {
-  getPhotoboothLayoutPreviewMode,
-  type PhotoboothLayoutPreviewMode,
-} from '@/src/features/photobooth/utils/layoutPreview'
+import { getPhotoboothLayoutPreviewMode } from '@/src/features/photobooth/utils/layoutPreview'
 import { getAssetPath } from '@/src/features/photobooth/utils/assetPath'
-
-function PreviewPhotoCard({
-  className = '',
-}: {
-  className?: string
-}) {
-  return (
-    <div
-      className={[
-        'overflow-hidden rounded-[12px]',
-        'bg-[linear-gradient(180deg,#9CC0E9_0%,#D5D2B2_28%,#E7C95F_62%,#D9B54D_100%)]',
-        className,
-      ].join(' ')}
-    >
-      <div className="h-full w-full bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.10),transparent_46%)]" />
-    </div>
-  )
-}
-
-function PreviewLayoutBlock({
-  mode,
-}: {
-  mode: PhotoboothLayoutPreviewMode
-}) {
-  const frameClassName = 'mx-auto h-full w-auto max-w-full aspect-[900/1196]'
-
-  const frameContentClassName = 'flex h-full w-full items-center justify-center'
-
-  const frameInnerClassName = 'w-[97.7778%] max-w-full'
-
-  if (mode === 'vertical-4') {
-    return (
-      <div className={frameClassName}>
-        <div className={frameContentClassName}>
-          <div className={frameInnerClassName}>
-            <div className="mx-auto grid w-[48%] grid-cols-1 gap-[14px]">
-              {Array.from({ length: 4 }).map((_, index) => (
-                <PreviewPhotoCard key={index} className="aspect-[430/260]" />
-              ))}
-            </div>
-          </div>
-        </div>
-      </div>
-    )
-  }
-
-  if (mode === 'grid-6') {
-    return (
-      <div className={frameClassName}>
-        <div className={frameContentClassName}>
-          <div className={frameInnerClassName}>
-            <div className="grid grid-cols-2 gap-[14px]">
-              {Array.from({ length: 6 }).map((_, index) => (
-                <PreviewPhotoCard key={index} className="aspect-[430/372]" />
-              ))}
-            </div>
-          </div>
-        </div>
-      </div>
-    )
-  }
-
-  return (
-    <div className={frameClassName}>
-      <div className={frameContentClassName}>
-        <div className={frameInnerClassName}>
-          <div className="grid grid-cols-2 gap-[14px]">
-            {Array.from({ length: 4 }).map((_, index) => (
-              <PreviewPhotoCard key={index} className="aspect-[430/578]" />
-            ))}
-          </div>
-        </div>
-      </div>
-    </div>
-  )
-}
 
 export default function PreviewPage() {
   const router = useRouter()
@@ -107,11 +29,17 @@ export default function PreviewPage() {
   const [captureRoundsCompleted, setCaptureRoundsCompleted] = useState(0)
 
   useEffect(() => {
-    const session = readPhotoboothRuntimeSession()
+    const timerId = window.setTimeout(() => {
+      const session = readPhotoboothRuntimeSession()
 
-    setSelectedLayoutId(session.selectedLayoutId)
-    setCaptureRoundsRequired(session.captureRoundsRequired)
-    setCaptureRoundsCompleted(session.captureRoundsCompleted)
+      setSelectedLayoutId(session.selectedLayoutId)
+      setCaptureRoundsRequired(session.captureRoundsRequired)
+      setCaptureRoundsCompleted(session.captureRoundsCompleted)
+    }, 0)
+
+    return () => {
+      window.clearTimeout(timerId)
+    }
   }, [])
 
   const previewMode = useMemo(

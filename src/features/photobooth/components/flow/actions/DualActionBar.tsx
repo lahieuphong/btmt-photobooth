@@ -1,5 +1,5 @@
 import Image from 'next/image'
-import PrimaryButton from '@/src/features/photobooth/components/PrimaryButton'
+import PrimaryButton from '@/src/features/photobooth/components/shared/controls/PrimaryButton'
 
 type PhotoboothDualActionBarProps = {
   secondaryLabel?: string

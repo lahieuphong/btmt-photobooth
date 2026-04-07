@@ -1,5 +1,5 @@
 import React from 'react'
-import { formatPriceVND } from '../utils/formatPrice'
+import { formatPriceVND } from '../../../utils/formatPrice'
 
 type PackageCardProps = {
   badge: string

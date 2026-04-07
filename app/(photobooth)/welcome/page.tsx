@@ -1,6 +1,6 @@
-import PhotoboothScreenShell from '@/src/features/photobooth/components/PhotoboothScreenShell'
-import PhotoboothFooter from '@/src/features/photobooth/components/PhotoboothFooter'
-import PrimaryButton from '@/src/features/photobooth/components/PrimaryButton'
+import PhotoboothScreenShell from '@/src/features/photobooth/components/shared/layout/ScreenShell'
+import PhotoboothFooter from '@/src/features/photobooth/components/shared/layout/Footer'
+import PrimaryButton from '@/src/features/photobooth/components/shared/controls/PrimaryButton'
 import { PHOTOBOOTH_SCREEN_STATE_MAP } from '@/src/features/photobooth/config/screenState'
 
 export default function WelcomePage() {

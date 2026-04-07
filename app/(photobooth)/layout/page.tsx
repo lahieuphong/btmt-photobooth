@@ -1,160 +1,19 @@
 'use client'
 
-import Image from 'next/image'
 import { useEffect, useState } from 'react'
-import PhotoboothCaptureRoundHint from '@/src/features/photobooth/components/PhotoboothCaptureRoundHint'
-import PhotoboothScreenShell from '@/src/features/photobooth/components/PhotoboothScreenShell'
-import PhotoboothPageHeader from '@/src/features/photobooth/components/PhotoboothPageHeader'
-import PhotoboothPageBody from '@/src/features/photobooth/components/PhotoboothPageBody'
-import PrimaryButton from '@/src/features/photobooth/components/PrimaryButton'
+import PhotoboothCaptureRoundHint from '@/src/features/photobooth/components/flow/round/CaptureRoundHint'
+import LayoutPreview from '@/src/features/photobooth/components/screens/layout/LayoutPreview'
+import PrimaryButton from '@/src/features/photobooth/components/shared/controls/PrimaryButton'
+import PhotoboothPageBody from '@/src/features/photobooth/components/shared/layout/PageBody'
+import PhotoboothPageHeader from '@/src/features/photobooth/components/shared/layout/PageHeader'
+import PhotoboothScreenShell from '@/src/features/photobooth/components/shared/layout/ScreenShell'
+import { PHOTOBOOTH_SCREEN_STATE_MAP } from '@/src/features/photobooth/config/screenState'
 import { PHOTOBOOTH_LAYOUT_OPTIONS } from '@/src/features/photobooth/constants/layouts'
 import { PHOTOBOOTH_DEFAULT_SESSION } from '@/src/features/photobooth/constants/session'
-import { PHOTOBOOTH_SCREEN_STATE_MAP } from '@/src/features/photobooth/config/screenState'
-import { getAssetPath } from '@/src/features/photobooth/utils/assetPath'
 import {
   readPhotoboothRuntimeSession,
   setPhotoboothSelectedLayoutId,
 } from '@/src/features/photobooth/utils/runtimeSession'
-
-type LayoutPreviewMode = 'grid-4' | 'vertical-4' | 'grid-6'
-
-const LAYOUT_PLACEHOLDER_IMAGE = '/images/photobooth/layouts/vector.png'
-
-function LayoutPreviewCard({
-  className = '',
-  mode,
-  isDisabled = false,
-  loading = 'lazy',
-}: {
-  className?: string
-  mode: LayoutPreviewMode
-  isDisabled?: boolean
-  loading?: 'lazy' | 'eager'
-}) {
-  const iconWrapperClass =
-    mode === 'grid-4'
-      ? 'absolute inset-x-0 top-[33.045%] flex justify-center'
-      : 'absolute inset-0 flex items-center justify-center'
-
-  const iconWidthClass =
-    mode === 'grid-4'
-      ? 'w-[47.674%]'
-      : mode === 'grid-6'
-        ? 'w-[30%]'
-        : 'w-[34%]'
-
-  return (
-    <div
-      aria-disabled={isDisabled}
-      className={[
-        'relative overflow-hidden rounded-[12px] bg-[rgba(196,196,196,0.20)] transition-opacity duration-200',
-        isDisabled ? 'cursor-not-allowed' : '',
-        className,
-      ].join(' ')}
-    >
-      <div className={iconWrapperClass}>
-        <div
-          className={[
-            `relative ${iconWidthClass} aspect-[205/196] transition-opacity duration-200`,
-            isDisabled ? 'opacity-20' : 'opacity-100',
-          ].join(' ')}
-        >
-          <Image
-            src={getAssetPath(LAYOUT_PLACEHOLDER_IMAGE)}
-            alt=""
-            fill
-            loading={loading}
-            sizes="(max-width: 768px) 96px, 205px"
-            className="object-contain"
-          />
-        </div>
-      </div>
-
-      {isDisabled ? (
-        <div className="absolute inset-0 bg-white/18" aria-hidden="true" />
-      ) : null}
-    </div>
-  )
-}
-
-function LayoutPreviewFrame({
-  children,
-}: {
-  children: React.ReactNode
-}) {
-  return (
-    <div className="mx-auto h-full w-auto max-w-full aspect-[900/1196]">
-      <div className="flex h-full w-full items-center justify-center">
-        <div className="w-[97.7778%] max-w-full">{children}</div>
-      </div>
-    </div>
-  )
-}
-
-function LayoutPreviewGrid({
-  mode,
-  count,
-  cardAspectClassName,
-  disabledIndices = [],
-  gapClassName = 'gap-[14px]',
-}: {
-  mode: LayoutPreviewMode
-  count: number
-  cardAspectClassName: string
-  disabledIndices?: number[]
-  gapClassName?: string
-}) {
-  return (
-    <div className={`grid grid-cols-2 ${gapClassName}`}>
-      {Array.from({ length: count }).map((_, index) => (
-        <LayoutPreviewCard
-          key={index}
-          mode={mode}
-          isDisabled={disabledIndices.includes(index)}
-          loading={index === 0 ? 'eager' : 'lazy'}
-          className={cardAspectClassName}
-        />
-      ))}
-    </div>
-  )
-}
-
-function LayoutPreview({ mode }: { mode: LayoutPreviewMode }) {
-  if (mode === 'vertical-4') {
-    return (
-      <LayoutPreviewFrame>
-        <LayoutPreviewGrid
-          mode={mode}
-          count={8}
-          disabledIndices={[1, 3, 5, 7]}
-          cardAspectClassName="aspect-[430/260]"
-        />
-      </LayoutPreviewFrame>
-    )
-  }
-
-  if (mode === 'grid-6') {
-    return (
-      <LayoutPreviewFrame>
-        <LayoutPreviewGrid
-          mode={mode}
-          count={6}
-          cardAspectClassName="aspect-[430/372]"
-        />
-      </LayoutPreviewFrame>
-    )
-  }
-
-  return (
-    <LayoutPreviewFrame>
-      <LayoutPreviewGrid
-        mode={mode}
-        count={4}
-        cardAspectClassName="aspect-[430/578]"
-      />
-    </LayoutPreviewFrame>
-  )
-}
 
 export default function LayoutPage() {
   const screen = PHOTOBOOTH_SCREEN_STATE_MAP.layout
@@ -163,8 +22,14 @@ export default function LayoutPage() {
   const [activeLayoutId, setActiveLayoutId] = useState(defaultLayoutId)
 
   useEffect(() => {
-    const session = readPhotoboothRuntimeSession()
-    setActiveLayoutId(session.selectedLayoutId)
+    const timerId = window.setTimeout(() => {
+      const session = readPhotoboothRuntimeSession()
+      setActiveLayoutId(session.selectedLayoutId)
+    }, 0)
+
+    return () => {
+      window.clearTimeout(timerId)
+    }
   }, [])
 
   const activeLayout =

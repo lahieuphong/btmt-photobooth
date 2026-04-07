@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { ReactNode } from 'react'
-import LanguageDropdown from './LanguageDropdown'
+import LanguageDropdown from '../controls/LanguageDropdown'
 
 type PhotoboothPageHeaderProps = {
   title: string

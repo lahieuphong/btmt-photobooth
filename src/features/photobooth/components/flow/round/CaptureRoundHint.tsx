@@ -1,20 +1,16 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import {
   getPhotoboothCaptureRoundLabel,
   readPhotoboothRuntimeSession,
 } from '@/src/features/photobooth/utils/runtimeSession'
 
 export default function PhotoboothCaptureRoundHint() {
-  const [roundLabel, setRoundLabel] = useState('')
-
-  useEffect(() => {
+  const [roundLabel] = useState(() => {
     const session = readPhotoboothRuntimeSession()
-    const nextLabel = getPhotoboothCaptureRoundLabel(session)
-
-    setRoundLabel(nextLabel)
-  }, [])
+    return getPhotoboothCaptureRoundLabel(session)
+  })
 
   if (!roundLabel) {
     return null

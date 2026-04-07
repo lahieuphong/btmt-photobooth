@@ -2,130 +2,27 @@
 
 import Image from 'next/image'
 import { useEffect, useRef, useState } from 'react'
-import PhotoboothCaptureRoundHint from '@/src/features/photobooth/components/PhotoboothCaptureRoundHint'
-import PhotoboothScreenShell from '@/src/features/photobooth/components/PhotoboothScreenShell'
-import PhotoboothPageHeader from '@/src/features/photobooth/components/PhotoboothPageHeader'
-import PhotoboothPageBody from '@/src/features/photobooth/components/PhotoboothPageBody'
-import PrimaryButton from '@/src/features/photobooth/components/PrimaryButton'
+import PhotoboothCaptureRoundHint from '@/src/features/photobooth/components/flow/round/CaptureRoundHint'
+import CustomizeLayoutStackPreview from '@/src/features/photobooth/components/screens/customize/CustomizeLayoutStackPreview'
+import CustomizeOptionCard from '@/src/features/photobooth/components/screens/customize/CustomizeOptionCard'
+import PrimaryButton from '@/src/features/photobooth/components/shared/controls/PrimaryButton'
+import PhotoboothPageBody from '@/src/features/photobooth/components/shared/layout/PageBody'
+import PhotoboothPageHeader from '@/src/features/photobooth/components/shared/layout/PageHeader'
+import PhotoboothScreenShell from '@/src/features/photobooth/components/shared/layout/ScreenShell'
 import {
   PHOTOBOOTH_BACKGROUND_OPTIONS,
   PHOTOBOOTH_FILTER_OPTIONS,
 } from '@/src/features/photobooth/constants/customize'
-import { PHOTOBOOTH_DEFAULT_SESSION } from '@/src/features/photobooth/constants/session'
 import { PHOTOBOOTH_SCREEN_STATE_MAP } from '@/src/features/photobooth/config/screenState'
+import { PHOTOBOOTH_DEFAULT_SESSION } from '@/src/features/photobooth/constants/session'
 import { getAssetPath } from '@/src/features/photobooth/utils/assetPath'
 import {
   getCurrentPhotoboothCaptureRound,
   readPhotoboothRuntimeSession,
 } from '@/src/features/photobooth/utils/runtimeSession'
 
-const CUSTOMIZE_LAYOUT_PREVIEW_IMAGES: Record<string, string> = {
-  'layout-grid-4': '/images/photobooth/customize/photo-grid-2x2.png',
-  'layout-vertical-4': '/images/photobooth/customize/photo-stack-4.png',
-  'layout-grid-6': '/images/photobooth/customize/photo-grid-2x3.png',
-}
 const CUSTOMIZE_PREVIEW_CHARACTER_IMAGE =
   '/images/photobooth/customize/bg_removed.png'
-
-function getCustomizePreviewImage(selectedLayoutId: string) {
-  return (
-    CUSTOMIZE_LAYOUT_PREVIEW_IMAGES[selectedLayoutId] ??
-    CUSTOMIZE_LAYOUT_PREVIEW_IMAGES['layout-grid-4']
-  )
-}
-
-function CustomizeOptionCard({
-  name,
-  previewClassName,
-  isSelected,
-  onClick,
-}: {
-  name: string
-  previewClassName: string
-  isSelected: boolean
-  onClick?: () => void
-}) {
-  return (
-    <button
-      type="button"
-      aria-pressed={isSelected}
-      onClick={onClick}
-      className="group flex w-[56px] flex-col items-center text-center transition-transform duration-200 ease-out active:scale-[0.97] sm:w-[62px]"
-    >
-      <div
-        className={[
-          'w-full overflow-hidden rounded-[6px] border bg-white aspect-[76/46]',
-          'transition-[border-color,transform,box-shadow] duration-200 ease-out',
-          isSelected
-            ? 'border-[#F15A29] shadow-[0_5px_12px_rgba(241,90,41,0.16)]'
-            : 'border-transparent group-hover:scale-[1.02]',
-        ].join(' ')}
-      >
-        <div className={`h-full w-full rounded-[4px] ${previewClassName}`} />
-      </div>
-
-      <div
-        className={[
-          'mt-1 w-full text-[clamp(7px,0.75vw,9px)] leading-[1.15] transition-colors duration-200',
-          isSelected ? 'text-[#F15A29]' : 'text-[#5B5B5B]',
-        ].join(' ')}
-      >
-        {name}
-      </div>
-    </button>
-  )
-}
-
-function CustomizeLayoutStackPreview({
-  selectedLayoutId,
-  currentRound,
-}: {
-  selectedLayoutId: string
-  currentRound: number
-}) {
-  const previewImage = getCustomizePreviewImage(selectedLayoutId)
-  const stackCount = Math.max(1, Math.min(currentRound, 3))
-
-  const layerOffsets = [0, 5, 10]
-  const layerRotations = [0, 1.2, 2.4]
-
-  return (
-    <div className="relative h-[88px] w-[74px] shrink-0 overflow-visible">
-      {Array.from({ length: stackCount }).map((_, renderIndex) => {
-        const depth = stackCount - 1 - renderIndex
-        const offset = layerOffsets[depth] ?? 0
-        const rotation = layerRotations[depth] ?? 0
-
-        return (
-          <div
-            key={`${selectedLayoutId}-${currentRound}-${renderIndex}`}
-            className="absolute origin-bottom-left"
-            style={{
-              left: `${offset}px`,
-              bottom: `${offset}px`,
-              width: '60px',
-              height: '80px',
-              transform: `rotate(${rotation}deg)`,
-              zIndex: renderIndex + 1,
-            }}
-          >
-            <Image
-              src={getAssetPath(previewImage)}
-              alt="Bố cục đã chọn"
-              fill
-              sizes="60px"
-              className="object-contain drop-shadow-[0_3px_8px_rgba(0,0,0,0.12)]"
-            />
-          </div>
-        )
-      })}
-
-      <div className="absolute right-0 top-0 z-[40] flex h-6 w-6 items-center justify-center rounded-full bg-[#171717] text-[11px] font-semibold text-white shadow-[0_4px_10px_rgba(0,0,0,0.18)]">
-        {currentRound}
-      </div>
-    </div>
-  )
-}
 
 const FILTER_STYLE_MAP: Record<string, string> = {
   original: 'none',
@@ -161,9 +58,15 @@ export default function CustomizePage() {
   const selectedFilterStyle = FILTER_STYLE_MAP[selectedFilterId] ?? 'none'
 
   useEffect(() => {
-    const session = readPhotoboothRuntimeSession()
-    setSelectedLayoutId(session.selectedLayoutId)
-    setCurrentRound(getCurrentPhotoboothCaptureRound(session))
+    const timerId = window.setTimeout(() => {
+      const session = readPhotoboothRuntimeSession()
+      setSelectedLayoutId(session.selectedLayoutId)
+      setCurrentRound(getCurrentPhotoboothCaptureRound(session))
+    }, 0)
+
+    return () => {
+      window.clearTimeout(timerId)
+    }
   }, [])
 
   useEffect(() => {
@@ -172,13 +75,16 @@ export default function CustomizePage() {
       return
     }
 
-    setIsPreviewTransitioning(true)
+    const startTimerId = window.setTimeout(() => {
+      setIsPreviewTransitioning(true)
+    }, 0)
 
     const timeoutId = window.setTimeout(() => {
       setIsPreviewTransitioning(false)
     }, 180)
 
     return () => {
+      window.clearTimeout(startTimerId)
       window.clearTimeout(timeoutId)
     }
   }, [selectedFilterId, selectedBackgroundId])

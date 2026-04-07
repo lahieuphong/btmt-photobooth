@@ -1,7 +1,7 @@
 import Image from 'next/image'
 import type { MouseEvent, ReactNode, TouchEvent } from 'react'
 import { useRef } from 'react'
-import PhotoboothFrameStack from '@/src/features/photobooth/components/PhotoboothFrameStack'
+import PhotoboothFrameStack from '@/src/features/photobooth/components/flow/frame/FrameStack'
 import type { PhotoboothLayoutPreviewMode } from '@/src/features/photobooth/utils/layoutPreview'
 import { getAssetPath } from '@/src/features/photobooth/utils/assetPath'
 import { PHOTOBOOTH_FRAME_ARROW_SRC } from '@/src/features/photobooth/constants/framePreview'

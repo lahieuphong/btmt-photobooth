@@ -1,13 +1,14 @@
 'use client'
 
 import { useEffect, useMemo, useState } from 'react'
-import PhotoboothScreenShell from '@/src/features/photobooth/components/PhotoboothScreenShell'
-import PhotoboothPageHeader from '@/src/features/photobooth/components/PhotoboothPageHeader'
-import PhotoboothPageBody from '@/src/features/photobooth/components/PhotoboothPageBody'
-import PrimaryButton from '@/src/features/photobooth/components/PrimaryButton'
-import PhotoboothFrameArtwork from '@/src/features/photobooth/components/PhotoboothFrameArtwork'
-import PhotoboothFrameSwipePreview from '@/src/features/photobooth/components/PhotoboothFrameSwipePreview'
+import PhotoboothFrameSwipePreview from '@/src/features/photobooth/components/flow/frame/FrameSwipePreview'
+import CapturedFrameCard from '@/src/features/photobooth/components/screens/captured/CapturedFrameCard'
+import PrimaryButton from '@/src/features/photobooth/components/shared/controls/PrimaryButton'
+import PhotoboothPageBody from '@/src/features/photobooth/components/shared/layout/PageBody'
+import PhotoboothPageHeader from '@/src/features/photobooth/components/shared/layout/PageHeader'
+import PhotoboothScreenShell from '@/src/features/photobooth/components/shared/layout/ScreenShell'
 import { PHOTOBOOTH_SCREEN_STATE_MAP } from '@/src/features/photobooth/config/screenState'
+import { buildPhotoboothPreviewModesFromSession } from '@/src/features/photobooth/constants/framePreview'
 import {
   getDefaultPhotoboothRuntimeSession,
   getPhotoboothRoundLayoutIds,
@@ -16,39 +17,11 @@ import {
   getPhotoboothLayoutPreviewMode,
   type PhotoboothLayoutPreviewMode,
 } from '@/src/features/photobooth/utils/layoutPreview'
-import { buildPhotoboothPreviewModesFromSession } from '@/src/features/photobooth/constants/framePreview'
+
 const FALLBACK_CAPTURED_MODES: PhotoboothLayoutPreviewMode[] = ['grid-4']
 
 function buildCapturedModesFromSession(): PhotoboothLayoutPreviewMode[] {
   return buildPhotoboothPreviewModesFromSession()
-}
-
-function CapturedFrameArtwork({
-  mode,
-}: {
-  mode: PhotoboothLayoutPreviewMode
-}) {
-  return (
-    <PhotoboothFrameArtwork
-      mode={mode}
-      overlayAlt="Khung ảnh đã chụp"
-      imageSizes="(max-width: 480px) 76vw, (max-width: 768px) 340px, 390px"
-      imagePriority
-      slotBackground="solid"
-    />
-  )
-}
-
-function CapturedFrameCard({
-  mode,
-}: {
-  mode: PhotoboothLayoutPreviewMode
-}) {
-  return (
-    <div className="relative h-full w-full overflow-hidden rounded-[clamp(6px,1cqw,9px)] border border-[#CFC8B3] bg-[#E1DCC8] shadow-[0_10px_24px_rgba(34,30,4,0.10)]">
-      <CapturedFrameArtwork mode={mode} />
-    </div>
-  )
 }
 
 export default function CapturedPage() {
@@ -64,11 +37,17 @@ export default function CapturedPage() {
   const [currentImageIndex, setCurrentImageIndex] = useState(0)
 
   useEffect(() => {
-    const nextModes = buildCapturedModesFromSession()
-    setCapturedModes(nextModes)
-    setCurrentImageIndex((prev) =>
-      Math.min(prev, Math.max(nextModes.length - 1, 0))
-    )
+    const timerId = window.setTimeout(() => {
+      const nextModes = buildCapturedModesFromSession()
+      setCapturedModes(nextModes)
+      setCurrentImageIndex((prev) =>
+        Math.min(prev, Math.max(nextModes.length - 1, 0))
+      )
+    }, 0)
+
+    return () => {
+      window.clearTimeout(timerId)
+    }
   }, [])
 
   const visibleCapturedModes = useMemo<PhotoboothLayoutPreviewMode[]>(() => {
@@ -121,17 +100,17 @@ export default function CapturedPage() {
 
             <div className="z-10 mt-2 shrink-0 pt-3 pb-[calc(4px+env(safe-area-inset-bottom))]">
               <div className="grid grid-cols-2 gap-[clamp(12px,2cqw,16px)]">
-              <PrimaryButton
-                href={screen.secondaryActionHref}
-                variant="secondary"
-                fullWidth
-              >
-                {screen.secondaryActionLabel}
-              </PrimaryButton>
+                <PrimaryButton
+                  href={screen.secondaryActionHref}
+                  variant="secondary"
+                  fullWidth
+                >
+                  {screen.secondaryActionLabel}
+                </PrimaryButton>
 
-              <PrimaryButton href={screen.nextHref} fullWidth>
-                {screen.primaryActionLabel}
-              </PrimaryButton>
+                <PrimaryButton href={screen.nextHref} fullWidth>
+                  {screen.primaryActionLabel}
+                </PrimaryButton>
               </div>
             </div>
           </div>

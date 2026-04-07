@@ -1,10 +1,13 @@
 import Image from 'next/image'
-import React from 'react'
+import type { ReactNode } from 'react'
 import { getAssetPath } from '@/src/features/photobooth/utils/assetPath'
 
-type PhotoboothBackgroundMuseumProps = {
-  children?: React.ReactNode
+export type PhotoboothBackgroundVariant = 'plain' | 'museum'
+
+type PhotoboothBackgroundProps = {
+  children?: ReactNode
   backgroundImage?: string
+  variant?: PhotoboothBackgroundVariant
 }
 
 const FIGMA_BASE_WIDTH = 1080
@@ -63,10 +66,13 @@ function LayerImage({
   )
 }
 
-export default function PhotoboothBackgroundMuseum({
+function MuseumBackground({
   children,
   backgroundImage,
-}: PhotoboothBackgroundMuseumProps) {
+}: {
+  children?: ReactNode
+  backgroundImage?: string
+}) {
   const resolvedBackgroundImage =
     backgroundImage || `${ASSET_BASE_PATH}/bg_removal.png`
 
@@ -111,4 +117,28 @@ export default function PhotoboothBackgroundMuseum({
       <div className="relative z-10 h-full w-full">{children}</div>
     </div>
   )
+}
+
+function PlainBackground({ children }: { children?: ReactNode }) {
+  return (
+    <div className="relative h-full w-full overflow-hidden bg-white">
+      <div className="relative z-10 h-full w-full">{children}</div>
+    </div>
+  )
+}
+
+export default function PhotoboothBackground({
+  children,
+  backgroundImage,
+  variant = 'plain',
+}: PhotoboothBackgroundProps) {
+  if (variant === 'museum') {
+    return (
+      <MuseumBackground backgroundImage={backgroundImage}>
+        {children}
+      </MuseumBackground>
+    )
+  }
+
+  return <PlainBackground>{children}</PlainBackground>
 }

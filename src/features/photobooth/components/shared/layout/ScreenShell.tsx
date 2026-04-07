@@ -1,8 +1,7 @@
 import React from 'react'
-import PhotoboothBackgroundMuseum from './PhotoboothBackground/PhotoboothBackgroundMuseum'
-import PhotoboothBackgroundPlain from './PhotoboothBackground/PhotoboothBackgroundPlain'
-
-export type PhotoboothBackgroundVariant = 'plain' | 'museum'
+import PhotoboothBackground, {
+  type PhotoboothBackgroundVariant,
+} from './background/Background'
 
 type PhotoboothScreenShellProps = {
   children?: React.ReactNode
@@ -15,18 +14,16 @@ export default function PhotoboothScreenShell({
   backgroundImage,
   backgroundVariant = 'plain',
 }: PhotoboothScreenShellProps) {
-  const BackgroundComponent =
-    backgroundVariant === 'museum'
-      ? PhotoboothBackgroundMuseum
-      : PhotoboothBackgroundPlain
-
   return (
     <main className="relative isolate flex h-[100svh] h-[100dvh] w-full max-w-full items-center justify-center overflow-hidden bg-white">
       <section className="absolute inset-0 overflow-hidden bg-white">
         <div className="h-full w-full">
-          <BackgroundComponent backgroundImage={backgroundImage}>
+          <PhotoboothBackground
+            backgroundImage={backgroundImage}
+            variant={backgroundVariant}
+          >
             {children}
-          </BackgroundComponent>
+          </PhotoboothBackground>
         </div>
       </section>
     </main>

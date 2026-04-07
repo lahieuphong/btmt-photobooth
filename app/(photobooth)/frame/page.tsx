@@ -1,15 +1,16 @@
 'use client'
 
 import { useEffect, useMemo, useState } from 'react'
-import PhotoboothScreenShell from '@/src/features/photobooth/components/PhotoboothScreenShell'
-import PhotoboothPageHeader from '@/src/features/photobooth/components/PhotoboothPageHeader'
-import PhotoboothPageBody from '@/src/features/photobooth/components/PhotoboothPageBody'
-import PrimaryButton from '@/src/features/photobooth/components/PrimaryButton'
-import PhotoboothFrameArtwork from '@/src/features/photobooth/components/PhotoboothFrameArtwork'
-import PhotoboothFrameSwipePreview from '@/src/features/photobooth/components/PhotoboothFrameSwipePreview'
+import PhotoboothFrameArtwork from '@/src/features/photobooth/components/flow/frame/FrameArtwork'
+import PhotoboothFrameSwipePreview from '@/src/features/photobooth/components/flow/frame/FrameSwipePreview'
+import FrameOptionPreview from '@/src/features/photobooth/components/screens/frame/FrameOptionPreview'
+import PrimaryButton from '@/src/features/photobooth/components/shared/controls/PrimaryButton'
+import PhotoboothPageBody from '@/src/features/photobooth/components/shared/layout/PageBody'
+import PhotoboothPageHeader from '@/src/features/photobooth/components/shared/layout/PageHeader'
+import PhotoboothScreenShell from '@/src/features/photobooth/components/shared/layout/ScreenShell'
+import { PHOTOBOOTH_SCREEN_STATE_MAP } from '@/src/features/photobooth/config/screenState'
 import { PHOTOBOOTH_FRAME_OPTIONS } from '@/src/features/photobooth/constants/frames'
 import { PHOTOBOOTH_DEFAULT_SESSION } from '@/src/features/photobooth/constants/session'
-import { PHOTOBOOTH_SCREEN_STATE_MAP } from '@/src/features/photobooth/config/screenState'
 import {
   getDefaultPhotoboothRuntimeSession,
   getPhotoboothRoundLayoutIds,
@@ -55,18 +56,6 @@ function FrameArtwork({
   )
 }
 
-function FrameOptionPreview({
-  mode,
-}: {
-  mode: PhotoboothLayoutPreviewMode
-}) {
-  return (
-    <div className="aspect-[110/148] w-full rounded-[12px]">
-      <FrameArtwork mode={mode} compact />
-    </div>
-  )
-}
-
 export default function FramePage() {
   const screen = PHOTOBOOTH_SCREEN_STATE_MAP.frame
 
@@ -80,13 +69,19 @@ export default function FramePage() {
   })
 
   useEffect(() => {
-    const session = readPhotoboothRuntimeSession()
-    const nextFrameImages = buildFrameImageItems(getPhotoboothRoundLayoutIds(session))
+    const timerId = window.setTimeout(() => {
+      const session = readPhotoboothRuntimeSession()
+      const nextFrameImages = buildFrameImageItems(getPhotoboothRoundLayoutIds(session))
 
-    setFrameImages(nextFrameImages)
-    setSelectedImageIndex((prev) =>
-      Math.min(prev, Math.max(nextFrameImages.length - 1, 0))
-    )
+      setFrameImages(nextFrameImages)
+      setSelectedImageIndex((prev) =>
+        Math.min(prev, Math.max(nextFrameImages.length - 1, 0))
+      )
+    }, 0)
+
+    return () => {
+      window.clearTimeout(timerId)
+    }
   }, [])
 
   const activeImage = frameImages[selectedImageIndex] ?? frameImages[0]
