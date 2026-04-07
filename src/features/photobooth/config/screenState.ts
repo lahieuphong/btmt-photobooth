@@ -6,6 +6,7 @@ export type PhotoboothScreenState = {
   title?: string
   showHeader: boolean
   showBackButton: boolean
+  showLanguageDropdown: boolean
   backHref?: string
   nextHref?: string
   primaryActionLabel?: string
@@ -18,6 +19,7 @@ export const PHOTOBOOTH_SCREEN_STATE_MAP = {
     route: PHOTOBOOTH_ROUTES.WELCOME,
     showHeader: false,
     showBackButton: false,
+    showLanguageDropdown: true,
     nextHref: PHOTOBOOTH_ROUTES.PACKAGES,
     primaryActionLabel: 'Bắt đầu ngay',
   },
@@ -27,6 +29,7 @@ export const PHOTOBOOTH_SCREEN_STATE_MAP = {
     title: PHOTOBOOTH_PAGE_TITLES.PACKAGES,
     showHeader: true,
     showBackButton: true,
+    showLanguageDropdown: true,
     backHref: PHOTOBOOTH_ROUTES.WELCOME,
     nextHref: PHOTOBOOTH_ROUTES.PAYMENT,
     primaryActionLabel: 'Xác nhận',
@@ -37,6 +40,7 @@ export const PHOTOBOOTH_SCREEN_STATE_MAP = {
     title: PHOTOBOOTH_PAGE_TITLES.PAYMENT,
     showHeader: true,
     showBackButton: true,
+    showLanguageDropdown: true,
     backHref: PHOTOBOOTH_ROUTES.PACKAGES,
     nextHref: PHOTOBOOTH_ROUTES.LAYOUT,
     primaryActionLabel: 'Giả lập thanh toán xong',
@@ -47,6 +51,7 @@ export const PHOTOBOOTH_SCREEN_STATE_MAP = {
     title: PHOTOBOOTH_PAGE_TITLES.LAYOUT,
     showHeader: true,
     showBackButton: true,
+    showLanguageDropdown: true,
     backHref: PHOTOBOOTH_ROUTES.PAYMENT,
     nextHref: PHOTOBOOTH_ROUTES.CUSTOMIZE,
     primaryActionLabel: 'Tiếp tục',
@@ -57,6 +62,7 @@ export const PHOTOBOOTH_SCREEN_STATE_MAP = {
     title: PHOTOBOOTH_PAGE_TITLES.CUSTOMIZE,
     showHeader: true,
     showBackButton: true,
+    showLanguageDropdown: true,
     backHref: PHOTOBOOTH_ROUTES.LAYOUT,
     nextHref: PHOTOBOOTH_ROUTES.CAPTURE,
     primaryActionLabel: 'Sẵn sàng chụp',
@@ -67,6 +73,7 @@ export const PHOTOBOOTH_SCREEN_STATE_MAP = {
     title: PHOTOBOOTH_PAGE_TITLES.CAPTURE,
     showHeader: true,
     showBackButton: true,
+    showLanguageDropdown: true,
     backHref: PHOTOBOOTH_ROUTES.CUSTOMIZE,
     nextHref: PHOTOBOOTH_ROUTES.PREVIEW,
     primaryActionLabel: 'Chụp',
@@ -77,6 +84,7 @@ export const PHOTOBOOTH_SCREEN_STATE_MAP = {
     title: PHOTOBOOTH_PAGE_TITLES.PREVIEW,
     showHeader: true,
     showBackButton: true,
+    showLanguageDropdown: true,
     backHref: PHOTOBOOTH_ROUTES.CAPTURE,
     nextHref: PHOTOBOOTH_ROUTES.FRAME,
     primaryActionLabel: 'Chọn khung',
@@ -90,6 +98,7 @@ export const PHOTOBOOTH_SCREEN_STATE_MAP = {
     title: PHOTOBOOTH_PAGE_TITLES.FRAME,
     showHeader: true,
     showBackButton: true,
+    showLanguageDropdown: true,
     backHref: PHOTOBOOTH_ROUTES.PREVIEW,
     nextHref: PHOTOBOOTH_ROUTES.PRINT,
     primaryActionLabel: 'Hoàn tất',
@@ -100,6 +109,7 @@ export const PHOTOBOOTH_SCREEN_STATE_MAP = {
     title: PHOTOBOOTH_PAGE_TITLES.PRINT,
     showHeader: true,
     showBackButton: true,
+    showLanguageDropdown: true,
     backHref: PHOTOBOOTH_ROUTES.FRAME,
     nextHref: PHOTOBOOTH_ROUTES.CAPTURED,
     primaryActionLabel: 'Tiếp tục',
@@ -110,6 +120,7 @@ export const PHOTOBOOTH_SCREEN_STATE_MAP = {
     title: PHOTOBOOTH_PAGE_TITLES.CAPTURED,
     showHeader: true,
     showBackButton: true,
+    showLanguageDropdown: true,
     backHref: PHOTOBOOTH_ROUTES.WELCOME,
     nextHref: PHOTOBOOTH_ROUTES.CAPTURE,
     primaryActionLabel: 'Chụp lại',

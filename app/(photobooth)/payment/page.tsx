@@ -25,6 +25,7 @@ export default function PaymentPage() {
           title={screen.title}
           backHref={screen.backHref}
           showBackButton={screen.showBackButton}
+          showLanguageDropdown={screen.showLanguageDropdown}
           languageLabel="VI"
         />
 

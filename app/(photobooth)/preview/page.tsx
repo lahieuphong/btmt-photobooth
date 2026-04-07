@@ -77,6 +77,7 @@ export default function PreviewPage() {
           title={screen.title}
           backHref={screen.backHref}
           showBackButton={screen.showBackButton}
+          showLanguageDropdown={screen.showLanguageDropdown}
           languageLabel="VI"
           titleBottomSlot={<PhotoboothCaptureRoundHint />}
           titleClassName="text-[clamp(20px,5.93cqw,64px)] leading-[1.546875] tracking-[0.03em] text-[#212121]"

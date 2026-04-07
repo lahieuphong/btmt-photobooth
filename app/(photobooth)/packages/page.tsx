@@ -33,6 +33,7 @@ export default function PackagesPage() {
           title={screen.title}
           backHref={screen.backHref}
           showBackButton={screen.showBackButton}
+          showLanguageDropdown={screen.showLanguageDropdown}
           languageLabel="VI"
         />
 

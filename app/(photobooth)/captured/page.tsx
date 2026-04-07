@@ -74,6 +74,7 @@ export default function CapturedPage() {
           title={screen.title}
           backHref={screen.backHref}
           showBackButton={screen.showBackButton}
+          showLanguageDropdown={screen.showLanguageDropdown}
           languageLabel="VI"
         />
 

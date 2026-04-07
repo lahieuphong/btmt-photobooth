@@ -1,0 +1,42 @@
+import Link from 'next/link'
+import { ReactNode } from 'react'
+import LanguageDropdown from '../controls/LanguageDropdown'
+
+type HeaderControlsProps = {
+  backHref?: string
+  showBackButton?: boolean
+  showLanguageDropdown?: boolean
+  languageLabel?: 'VI' | 'EN' | 'CH'
+  rightSlot?: ReactNode
+}
+
+export default function HeaderControls({
+  backHref = '/welcome',
+  showBackButton = true,
+  showLanguageDropdown = true,
+  languageLabel = 'VI',
+  rightSlot,
+}: HeaderControlsProps) {
+  return (
+    <div className="flex items-start justify-between">
+      {showBackButton ? (
+        <Link
+          href={backHref}
+          className="inline-flex w-[19.5%] min-w-0 aspect-[195/88] items-center justify-center rounded-full bg-[rgba(26,26,26,0.50)] text-[clamp(8px,0.95vw,18px)] font-medium leading-none text-white shadow-[0_0_15px_rgba(39,39,39,0.15)]"
+        >
+          Quay lại
+        </Link>
+      ) : (
+        <div className="w-[19.5%] min-w-0 aspect-[195/88]" />
+      )}
+
+      {rightSlot ? (
+        rightSlot
+      ) : showLanguageDropdown ? (
+        <LanguageDropdown defaultValue={languageLabel} />
+      ) : (
+        <div className="w-[19.5%] min-w-0 aspect-[195/68]" />
+      )}
+    </div>
+  )
+}
