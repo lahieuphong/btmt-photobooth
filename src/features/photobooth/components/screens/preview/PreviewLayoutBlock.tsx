@@ -12,7 +12,7 @@ function PreviewPhotoCard({
     <div
       className={[
         'relative overflow-hidden rounded-[12px]',
-        'bg-[linear-gradient(180deg,#9CC0E9_0%,#D5D2B2_28%,#E7C95F_62%,#D9B54D_100%)]',
+        'bg-[#E8E5CC]',
         className,
       ].join(' ')}
     >
@@ -26,7 +26,7 @@ function PreviewPhotoCard({
           className="absolute inset-0 object-cover"
         />
       ) : null}
-      <div className="h-full w-full bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.10),transparent_46%)]" />
+      <div className="h-full w-full bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.06),transparent_52%)]" />
     </div>
   )
 }

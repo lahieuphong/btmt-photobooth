@@ -7,6 +7,7 @@ import PhotoboothCaptureRoundHint from '@/src/features/photobooth/components/flo
 import PhotoboothScreenShell from '@/src/features/photobooth/components/shared/layout/ScreenShell'
 import PhotoboothPageHeader from '@/src/features/photobooth/components/shared/layout/PageHeader'
 import PhotoboothPageBody from '@/src/features/photobooth/components/shared/layout/PageBody'
+import CaptureCameraLoadingFrame from '@/src/features/photobooth/components/screens/capture/CaptureCameraLoadingFrame'
 import {
   PHOTOBOOTH_CAPTURE_GUIDE_TEXT,
   PHOTOBOOTH_COUNTDOWN_OPTIONS,
@@ -27,14 +28,6 @@ export default function CapturePage() {
   const [isCameraReady, setIsCameraReady] = useState(false)
   const videoRef = useRef<HTMLVideoElement | null>(null)
 
-  const isCameraApiSupported = useMemo(() => {
-    if (typeof navigator === 'undefined') {
-      return false
-    }
-
-    return Boolean(navigator.mediaDevices?.getUserMedia)
-  }, [])
-
   const isMobileDevice = useMemo(() => {
     if (typeof window === 'undefined' || typeof navigator === 'undefined') {
       return false
@@ -52,14 +45,14 @@ export default function CapturePage() {
       return
     }
 
-    if (!isCameraApiSupported) {
-      return
-    }
-
     let isMounted = true
     let stream: MediaStream | null = null
 
     async function startCamera() {
+      if (!navigator.mediaDevices?.getUserMedia) {
+        throw new Error('CAMERA_API_NOT_SUPPORTED')
+      }
+
       const preferredFacingMode = isMobileDevice ? 'environment' : 'user'
 
       const constraintsWithFacingMode: MediaStreamConstraints = {
@@ -104,11 +97,19 @@ export default function CapturePage() {
       }
     }
 
-    void startCamera().catch(() => {
+    void startCamera().catch((error: unknown) => {
       if (isMounted) {
-        setCameraError(
-          'Không thể mở camera. Hãy cấp quyền camera cho website rồi thử lại.'
-        )
+        const errorMessage =
+          error instanceof Error ? error.message : 'CAMERA_OPEN_FAILED'
+
+        if (errorMessage === 'CAMERA_API_NOT_SUPPORTED') {
+          setCameraError(
+            'Thiết bị hoặc trình duyệt này chưa hỗ trợ camera. Vui lòng thử trình duyệt khác.'
+          )
+          return
+        }
+
+        setCameraError('Không thể mở camera. Hãy cấp quyền camera cho website rồi thử lại.')
       }
     })
 
@@ -116,11 +117,9 @@ export default function CapturePage() {
       isMounted = false
       stream?.getTracks().forEach((track) => track.stop())
     }
-  }, [isCameraApiSupported, isMobileDevice])
+  }, [isMobileDevice])
 
-  const resolvedCameraError = !isCameraApiSupported
-    ? 'Thiết bị hoặc trình duyệt này chưa hỗ trợ camera. Vui lòng thử trình duyệt khác.'
-    : cameraError
+  const resolvedCameraError = cameraError
 
   function captureCurrentFrame() {
     const video = videoRef.current
@@ -178,17 +177,23 @@ export default function CapturePage() {
 
               <div className="aspect-[0.74] w-full bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.15),transparent_45%)] sm:aspect-[0.82]" />
 
-              <div className="absolute left-1/2 top-4 z-40 w-fit -translate-x-1/2 whitespace-nowrap rounded-full bg-white/90 px-3 py-1 text-center text-[11px] text-[#2E2A26] shadow-sm">
-                {PHOTOBOOTH_CAPTURE_GUIDE_TEXT}
-              </div>
+              {isCameraReady ? (
+                <>
+                  <div className="absolute left-1/2 top-4 z-40 w-fit -translate-x-1/2 whitespace-nowrap rounded-full bg-white/90 px-3 py-1 text-center text-[11px] text-[#2E2A26] shadow-sm">
+                    {PHOTOBOOTH_CAPTURE_GUIDE_TEXT}
+                  </div>
 
-              <div className="pointer-events-none absolute inset-x-0 top-[24%] bottom-[24%] z-30 border-2 border-[#FF8A3D]" />
+                  <div className="pointer-events-none absolute inset-x-0 top-[24%] bottom-[24%] z-30 border-2 border-[#FF8A3D]" />
 
-              <div className="pointer-events-none absolute inset-x-0 top-0 z-20 h-[24%] bg-black/35 backdrop-blur-[1px]" />
-              <div className="pointer-events-none absolute inset-x-0 bottom-0 z-20 h-[24%] bg-black/35 backdrop-blur-[1px]" />
+                  <div className="pointer-events-none absolute inset-x-0 top-0 z-20 h-[24%] bg-black/35 backdrop-blur-[1px]" />
+                  <div className="pointer-events-none absolute inset-x-0 bottom-0 z-20 h-[24%] bg-black/35 backdrop-blur-[1px]" />
+                </>
+              ) : (
+                <CaptureCameraLoadingFrame />
+              )}
 
               {resolvedCameraError ? (
-                <div className="absolute inset-0 flex items-center justify-center px-5 text-center text-[11px] text-white sm:text-[12px]">
+                <div className="absolute inset-0 z-50 flex items-center justify-center px-5 text-center text-[11px] text-white sm:text-[12px]">
                   <p className="rounded-md bg-black/45 px-3 py-2">{resolvedCameraError}</p>
                 </div>
               ) : null}
