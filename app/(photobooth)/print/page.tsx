@@ -1,37 +1,20 @@
 'use client'
 
 import Image from 'next/image'
-import {
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-  type PointerEvent as ReactPointerEvent,
-} from 'react'
+import { useMemo, useState } from 'react'
 import PhotoboothScreenShell from '@/src/features/photobooth/components/PhotoboothScreenShell'
 import PhotoboothPageHeader from '@/src/features/photobooth/components/PhotoboothPageHeader'
 import PhotoboothPageBody from '@/src/features/photobooth/components/PhotoboothPageBody'
 import PrimaryButton from '@/src/features/photobooth/components/PrimaryButton'
 import PhotoboothFrameArtwork from '@/src/features/photobooth/components/PhotoboothFrameArtwork'
-import PhotoboothFrameStack from '@/src/features/photobooth/components/PhotoboothFrameStack'
+import PhotoboothFrameSwipePreview from '@/src/features/photobooth/components/PhotoboothFrameSwipePreview'
 import { PHOTOBOOTH_SCREEN_STATE_MAP } from '@/src/features/photobooth/config/screenState'
-import {
-  getDefaultPhotoboothRuntimeSession,
-  getPhotoboothRoundLayoutIds,
-} from '@/src/features/photobooth/utils/runtimeSession'
-import {
-  getPhotoboothLayoutPreviewMode,
-  type PhotoboothLayoutPreviewMode,
-} from '@/src/features/photobooth/utils/layoutPreview'
+import { type PhotoboothLayoutPreviewMode } from '@/src/features/photobooth/utils/layoutPreview'
 import { getAssetPath } from '@/src/features/photobooth/utils/assetPath'
 import { buildPhotoboothPreviewModesFromSession } from '@/src/features/photobooth/constants/framePreview'
 
 const PRINT_QR_CODE_SRC = '/images/photobooth/print/qr_code.png'
 const FALLBACK_PRINT_MODES: PhotoboothLayoutPreviewMode[] = ['grid-4']
-
-const STACK_DRAG_LIMIT = 10
-const STACK_SWIPE_DISTANCE = 14
-const STACK_SWIPE_VELOCITY = 0.24
 
 function buildPrintModesFromSession(): PhotoboothLayoutPreviewMode[] {
   return buildPhotoboothPreviewModesFromSession()
@@ -69,215 +52,38 @@ function PrintFrameCard({
   )
 }
 
-function PrintFrameStack({
-  modes,
-}: {
-  modes: PhotoboothLayoutPreviewMode[]
-}) {
-  return (
-    <PhotoboothFrameStack
-      modes={modes}
-      renderCard={(mode, { isFront }) => (
-        <PrintFrameCard mode={mode} priority={isFront} />
-      )}
-    />
-  )
-}
-
 export default function PrintPage() {
   const screen = PHOTOBOOTH_SCREEN_STATE_MAP.print
-  const stackTrackRef = useRef<HTMLDivElement | null>(null)
-  const stackSwipeRef = useRef<HTMLDivElement | null>(null)
-  const swipeStartXRef = useRef<number | null>(null)
-  const swipeLastXRef = useRef<number>(0)
-  const swipeStartTimeRef = useRef<number>(0)
-  const isDraggingRef = useRef(false)
-  const pendingOffsetXRef = useRef(0)
-  const rafIdRef = useRef<number | null>(null)
-  const switchTimerRef = useRef<number | null>(null)
 
-  const [printModes, setPrintModes] = useState<PhotoboothLayoutPreviewMode[]>(() => {
-    const fallbackSession = getDefaultPhotoboothRuntimeSession()
-    return getPhotoboothRoundLayoutIds(fallbackSession).map((layoutId) =>
-      getPhotoboothLayoutPreviewMode(layoutId)
-    )
-  })
-  const [activeModeIndex, setActiveModeIndex] = useState(0)
-
-  useEffect(() => {
-    setPrintModes(buildPrintModesFromSession())
-  }, [])
+  const [printModes] = useState<PhotoboothLayoutPreviewMode[]>(() =>
+    buildPrintModesFromSession()
+  )
+  const [currentImageIndex, setCurrentImageIndex] = useState(0)
 
   const visiblePrintModes = useMemo<PhotoboothLayoutPreviewMode[]>(() => {
     return printModes.length > 0 ? printModes : FALLBACK_PRINT_MODES
   }, [printModes])
-  const swipeModeCount = Math.min(3, visiblePrintModes.length)
 
-  useEffect(() => {
-    setActiveModeIndex((prev) => {
-      if (swipeModeCount === 0) return 0
-      return prev % swipeModeCount
-    })
-  }, [swipeModeCount])
+  const swipeableModes = useMemo<PhotoboothLayoutPreviewMode[]>(
+    () => visiblePrintModes,
+    [visiblePrintModes]
+  )
 
-  const swipeableModes = useMemo<PhotoboothLayoutPreviewMode[]>(() => {
-    const baseModes = visiblePrintModes.slice(0, swipeModeCount)
-    if (baseModes.length <= 1) return baseModes
+  const hasMultipleModes = swipeableModes.length > 1
+  const canGoPrev = hasMultipleModes
+  const canGoNext = hasMultipleModes
 
-    return baseModes.map(
-      (_, offset) => baseModes[(activeModeIndex + offset) % baseModes.length]
-    )
-  }, [activeModeIndex, swipeModeCount, visiblePrintModes])
-
-  function goNextMode() {
-    if (swipeModeCount <= 1) return
-    setActiveModeIndex((prev) => (prev + 1) % swipeModeCount)
+  function handlePrevImage() {
+    const total = swipeableModes.length
+    if (total <= 1) return
+    setCurrentImageIndex((prev) => (prev - 1 + total) % total)
   }
 
-  function goPrevMode() {
-    if (swipeModeCount <= 1) return
-    setActiveModeIndex(
-      (prev) => (prev - 1 + swipeModeCount) % swipeModeCount
-    )
+  function handleNextImage() {
+    const total = swipeableModes.length
+    if (total <= 1) return
+    setCurrentImageIndex((prev) => (prev + 1) % total)
   }
-
-  function applyTrackOffset(offsetX: number, transition: string) {
-    if (!stackTrackRef.current) return
-    stackTrackRef.current.style.transition = transition
-    stackTrackRef.current.style.transform = `translate3d(${offsetX}px, 0, 0)`
-  }
-
-  function flushOffsetFrame() {
-    rafIdRef.current = null
-    applyTrackOffset(pendingOffsetXRef.current, 'none')
-  }
-
-  function queueOffsetFrame(offsetX: number) {
-    pendingOffsetXRef.current = offsetX
-    if (rafIdRef.current !== null) return
-    rafIdRef.current = window.requestAnimationFrame(flushOffsetFrame)
-  }
-
-  function handleSwipeEnd(endX: number | null) {
-    const startX = swipeStartXRef.current
-    const lastX = swipeLastXRef.current
-    const startTime = swipeStartTimeRef.current
-    swipeStartXRef.current = null
-    swipeLastXRef.current = 0
-    swipeStartTimeRef.current = 0
-    isDraggingRef.current = false
-
-    if (startX === null || typeof endX !== 'number') return
-    if (swipeModeCount <= 1) return
-
-    const deltaX = endX - startX
-    const elapsedMs = Math.max(1, performance.now() - startTime)
-    const velocityX = (endX - lastX) / elapsedMs
-    const shouldSwitch =
-      Math.abs(deltaX) >= STACK_SWIPE_DISTANCE ||
-      Math.abs(velocityX) >= STACK_SWIPE_VELOCITY
-
-    if (!shouldSwitch) {
-      applyTrackOffset(0, 'transform 220ms cubic-bezier(0.22, 0.61, 0.36, 1)')
-      return
-    }
-
-    const direction = deltaX < 0 ? -1 : 1
-    const outgoingOffsetX = direction * 10
-    const incomingOffsetX = -direction * 5
-
-    applyTrackOffset(
-      outgoingOffsetX,
-      'transform 120ms cubic-bezier(0.25, 0.46, 0.45, 0.94)'
-    )
-
-    if (switchTimerRef.current !== null) {
-      window.clearTimeout(switchTimerRef.current)
-    }
-
-    switchTimerRef.current = window.setTimeout(() => {
-      if (direction < 0) {
-        goNextMode()
-      } else {
-        goPrevMode()
-      }
-
-      applyTrackOffset(incomingOffsetX, 'none')
-      window.requestAnimationFrame(() => {
-        applyTrackOffset(
-          0,
-          'transform 180ms cubic-bezier(0.22, 0.61, 0.36, 1)'
-        )
-      })
-    }, 120)
-  }
-
-  function handleStackPointerDown(event: ReactPointerEvent<HTMLDivElement>) {
-    if (event.pointerType === 'mouse' && event.button !== 0) return
-    if (swipeModeCount <= 1) return
-
-    if (switchTimerRef.current !== null) {
-      window.clearTimeout(switchTimerRef.current)
-      switchTimerRef.current = null
-    }
-
-    if (rafIdRef.current !== null) {
-      window.cancelAnimationFrame(rafIdRef.current)
-      rafIdRef.current = null
-    }
-
-    swipeStartXRef.current = event.clientX
-    swipeLastXRef.current = event.clientX
-    swipeStartTimeRef.current = performance.now()
-    isDraggingRef.current = true
-    applyTrackOffset(0, 'none')
-    stackSwipeRef.current = event.currentTarget
-    event.currentTarget.setPointerCapture(event.pointerId)
-  }
-
-  function handleStackPointerMove(event: ReactPointerEvent<HTMLDivElement>) {
-    if (!isDraggingRef.current) return
-    const startX = swipeStartXRef.current
-    if (startX === null) return
-
-    const deltaX = event.clientX - startX
-    swipeLastXRef.current = event.clientX
-    const clampedDeltaX = Math.max(-STACK_DRAG_LIMIT, Math.min(STACK_DRAG_LIMIT, deltaX))
-    queueOffsetFrame(clampedDeltaX)
-  }
-
-  function handleStackPointerUp(event: ReactPointerEvent<HTMLDivElement>) {
-    handleSwipeEnd(event.clientX)
-    if (stackSwipeRef.current?.hasPointerCapture(event.pointerId)) {
-      stackSwipeRef.current.releasePointerCapture(event.pointerId)
-    }
-  }
-
-  function handleStackPointerCancel() {
-    swipeStartXRef.current = null
-    swipeLastXRef.current = 0
-    swipeStartTimeRef.current = 0
-    isDraggingRef.current = false
-    applyTrackOffset(0, 'transform 180ms ease-out')
-  }
-
-  useEffect(() => {
-    return () => {
-      if (rafIdRef.current !== null) {
-        window.cancelAnimationFrame(rafIdRef.current)
-      }
-
-      if (switchTimerRef.current !== null) {
-        window.clearTimeout(switchTimerRef.current)
-      }
-    }
-  }, [])
-
-  useEffect(() => {
-    if (!isDraggingRef.current) {
-      applyTrackOffset(0, 'none')
-    }
-  }, [activeModeIndex])
 
   return (
     <PhotoboothScreenShell>
@@ -289,45 +95,50 @@ export default function PrintPage() {
           languageLabel="VI"
         />
 
-        <PhotoboothPageBody className="flex min-h-0 flex-1 flex-col items-center overflow-hidden px-[4.5%] pt-[1.8%] pb-[2.2%] max-[480px]:px-4 max-[480px]:pt-1 max-[480px]:pb-2">
+        <PhotoboothPageBody className="flex min-h-0 flex-1 flex-col items-center overflow-hidden px-[4.5%] pt-[1.2%] pb-[1.6%] max-[480px]:px-4 max-[480px]:pt-1 max-[480px]:pb-2">
           <div
-            className="mx-auto flex h-full max-h-full w-full max-w-[920px] flex-col items-center"
+            className="mx-auto flex h-full min-h-0 max-h-full w-full max-w-[920px] flex-col items-center"
             style={{ containerType: 'inline-size' }}
           >
-            <div className="w-full shrink-0 flex flex-col items-center gap-[clamp(6px,1.1svh,14px)]">
+            <div className="w-full min-h-0 flex-1 overflow-hidden">
+              <div className="flex w-full flex-col items-center gap-[clamp(4px,0.8svh,10px)]">
               <div className="max-w-full shrink-0 whitespace-nowrap text-center text-[clamp(11px,1.95cqw,18px)] font-medium leading-[1.3] text-[#2E2A26]">
                 Hình ảnh đang được in, vui lòng chờ giây lát
               </div>
 
-              <div
-                className="flex w-full shrink-0 touch-pan-y items-start justify-center pt-[clamp(6px,1.1svh,16px)]"
-                onPointerDown={handleStackPointerDown}
-                onPointerMove={handleStackPointerMove}
-                onPointerUp={handleStackPointerUp}
-                onPointerCancel={handleStackPointerCancel}
-                onPointerLeave={handleStackPointerCancel}
-              >
-                <div ref={stackTrackRef} className="will-change-transform">
-                  <PrintFrameStack modes={swipeableModes} />
-                </div>
+              <div className="flex w-full shrink-0 items-start justify-center pt-[clamp(4px,0.8svh,10px)]">
+                <PhotoboothFrameSwipePreview
+                  modes={swipeableModes}
+                  currentIndex={currentImageIndex}
+                  label={`Hình ${currentImageIndex + 1}`}
+                  canGoPrev={canGoPrev}
+                  canGoNext={canGoNext}
+                  onPrev={handlePrevImage}
+                  onNext={handleNextImage}
+                  showNavigation={false}
+                  wrapperClassName="w-[min(84vw,38svh)] max-w-[440px] min-w-[260px] flex flex-col items-center"
+                  stackRootClassName="relative mx-auto"
+                  renderCard={(mode) => <PrintFrameCard mode={mode} priority />}
+                />
               </div>
 
-              <div className="relative mt-[clamp(12px,2svh,22px)] h-[clamp(70px,10svh,104px)] w-[clamp(70px,10svh,104px)] shrink-0 overflow-hidden rounded-[12px] bg-white">
+              <div className="relative mt-[clamp(8px,1.2svh,14px)] h-[clamp(56px,8svh,88px)] w-[clamp(56px,8svh,88px)] shrink-0 overflow-hidden rounded-[10px] bg-white">
                 <Image
                   src={getAssetPath(PRINT_QR_CODE_SRC)}
                   alt="QR code nhận file online"
                   fill
-                  sizes="110px"
-                  className="object-contain p-[8px]"
+                  sizes="90px"
+                  className="object-contain p-[6px]"
                 />
               </div>
 
-              <div className="shrink-0 text-center text-[clamp(11px,1.75cqw,15px)] text-[#2E2A26]">
+              <div className="shrink-0 text-center text-[clamp(10px,1.4cqw,14px)] text-[#2E2A26]">
                 Quét mã QR để nhận file online
               </div>
             </div>
+            </div>
 
-            <div className="mt-auto flex w-full shrink-0 justify-center pb-0.5 pt-[clamp(6px,1svh,14px)]">
+            <div className="mt-auto flex w-full shrink-0 justify-center pt-[clamp(4px,0.6svh,8px)] pb-[calc(4px+env(safe-area-inset-bottom))]">
               <PrimaryButton
                 href={screen.nextHref}
                 className="h-[48px] rounded-full px-8 sm:h-[52px] sm:px-10 text-[13px] sm:text-[16px] font-semibold"

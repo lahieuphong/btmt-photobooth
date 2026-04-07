@@ -9,10 +9,10 @@ type StackPosition = {
 }
 
 const PHOTOBOOTH_FRAME_STACK_POSITIONS_BY_COUNT: Record<number, StackPosition[]> = {
-  1: [{ left: '12%', top: '8%', rotate: '0deg', zIndex: 30 }],
+  1: [{ left: '19%', top: '8%', rotate: '0deg', zIndex: 30 }],
   2: [
-    { left: '8%', top: '11%', rotate: '0deg', zIndex: 30 },
-    { left: '20%', top: '4%', rotate: '7deg', zIndex: 20 },
+    { left: '14%', top: '11%', rotate: '0deg', zIndex: 30 },
+    { left: '26%', top: '4%', rotate: '7deg', zIndex: 20 },
   ],
   3: [
     { left: '8%', top: '12%', rotate: '0deg', zIndex: 30 },

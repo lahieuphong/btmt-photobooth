@@ -1,13 +1,12 @@
 'use client'
 
-import Image from 'next/image'
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import PhotoboothScreenShell from '@/src/features/photobooth/components/PhotoboothScreenShell'
 import PhotoboothPageHeader from '@/src/features/photobooth/components/PhotoboothPageHeader'
 import PhotoboothPageBody from '@/src/features/photobooth/components/PhotoboothPageBody'
 import PrimaryButton from '@/src/features/photobooth/components/PrimaryButton'
 import PhotoboothFrameArtwork from '@/src/features/photobooth/components/PhotoboothFrameArtwork'
-import PhotoboothFrameStack from '@/src/features/photobooth/components/PhotoboothFrameStack'
+import PhotoboothFrameSwipePreview from '@/src/features/photobooth/components/PhotoboothFrameSwipePreview'
 import { PHOTOBOOTH_FRAME_OPTIONS } from '@/src/features/photobooth/constants/frames'
 import { PHOTOBOOTH_DEFAULT_SESSION } from '@/src/features/photobooth/constants/session'
 import { PHOTOBOOTH_SCREEN_STATE_MAP } from '@/src/features/photobooth/config/screenState'
@@ -20,8 +19,6 @@ import {
   getPhotoboothLayoutPreviewMode,
   type PhotoboothLayoutPreviewMode,
 } from '@/src/features/photobooth/utils/layoutPreview'
-import { getAssetPath } from '@/src/features/photobooth/utils/assetPath'
-import { PHOTOBOOTH_FRAME_ARROW_SRC } from '@/src/features/photobooth/constants/framePreview'
 
 type FrameImageItem = {
   imageIndex: number
@@ -58,29 +55,6 @@ function FrameArtwork({
   )
 }
 
-function FrameStagePreview({
-  modes,
-  currentIndex,
-}: {
-  modes: PhotoboothLayoutPreviewMode[]
-  currentIndex: number
-}) {
-  return (
-    <PhotoboothFrameStack
-      modes={modes}
-      selectedIndex={currentIndex}
-      rootClassName="relative mr-auto -ml-[6%]"
-      containerClassName="w-full max-w-[min(100%,500px)] aspect-[74/100]"
-      itemClassName="aspect-[678/1018] w-[62%]"
-      renderCard={(mode) => (
-        <div className="relative h-full w-full overflow-hidden rounded-[clamp(6px,1cqw,9px)] border border-[#CFC8B3] bg-[#E1DCC8] shadow-[0_10px_24px_rgba(34,30,4,0.10)]">
-          <FrameArtwork mode={mode} />
-        </div>
-      )}
-    />
-  )
-}
-
 function FrameOptionPreview({
   mode,
 }: {
@@ -93,73 +67,8 @@ function FrameOptionPreview({
   )
 }
 
-function FrameNavigation({
-  label,
-  canGoPrev,
-  canGoNext,
-  onPrev,
-  onNext,
-}: {
-  label: string
-  canGoPrev: boolean
-  canGoNext: boolean
-  onPrev: () => void
-  onNext: () => void
-}) {
-  return (
-    <div className="mx-auto flex h-[60px] w-full max-w-[533px] items-center justify-between">
-      <button
-        type="button"
-        onClick={onPrev}
-        disabled={!canGoPrev}
-        aria-label="Xem hình trước"
-        className={[
-          'flex h-[32px] w-[32px] shrink-0 items-center justify-center transition-opacity',
-          canGoPrev ? 'opacity-100' : 'cursor-not-allowed opacity-35',
-        ].join(' ')}
-      >
-        <div className="relative h-[18px] w-[18px] rotate-180">
-          <Image
-            src={getAssetPath(PHOTOBOOTH_FRAME_ARROW_SRC)}
-            alt=""
-            fill
-            sizes="18px"
-            className="object-contain"
-          />
-        </div>
-      </button>
-
-      <div className="min-w-[120px] text-center text-[clamp(18px,2.35cqw,20px)] font-medium leading-none text-[#2E2A26]">
-        {label}
-      </div>
-
-      <button
-        type="button"
-        onClick={onNext}
-        disabled={!canGoNext}
-        aria-label="Xem hình tiếp theo"
-        className={[
-          'flex h-[32px] w-[32px] shrink-0 items-center justify-center transition-opacity',
-          canGoNext ? 'opacity-100' : 'cursor-not-allowed opacity-35',
-        ].join(' ')}
-      >
-        <div className="relative h-[18px] w-[18px]">
-          <Image
-            src={getAssetPath(PHOTOBOOTH_FRAME_ARROW_SRC)}
-            alt=""
-            fill
-            sizes="18px"
-            className="object-contain"
-          />
-        </div>
-      </button>
-    </div>
-  )
-}
-
 export default function FramePage() {
   const screen = PHOTOBOOTH_SCREEN_STATE_MAP.frame
-  const swipeStartXRef = useRef<number | null>(null)
 
   const [selectedFrameId, setSelectedFrameId] = useState(
     PHOTOBOOTH_DEFAULT_SESSION.selectedFrameId
@@ -207,45 +116,6 @@ export default function FramePage() {
     setSelectedImageIndex((prev) => prev + 1)
   }
 
-  function handleSwipeEnd(endX: number | null) {
-    const startX = swipeStartXRef.current
-    swipeStartXRef.current = null
-
-    if (startX === null || typeof endX !== 'number') return
-
-    const deltaX = endX - startX
-    const SWIPE_THRESHOLD = 42
-
-    if (Math.abs(deltaX) < SWIPE_THRESHOLD) return
-
-    if (deltaX < 0) {
-      handleNextImage()
-      return
-    }
-
-    handlePrevImage()
-  }
-
-  function handleStageTouchStart(event: React.TouchEvent<HTMLDivElement>) {
-    swipeStartXRef.current = event.touches[0]?.clientX ?? null
-  }
-
-  function handleStageTouchEnd(event: React.TouchEvent<HTMLDivElement>) {
-    handleSwipeEnd(event.changedTouches[0]?.clientX ?? null)
-  }
-
-  function handleStageMouseDown(event: React.MouseEvent<HTMLDivElement>) {
-    swipeStartXRef.current = event.clientX
-  }
-
-  function handleStageMouseUp(event: React.MouseEvent<HTMLDivElement>) {
-    handleSwipeEnd(event.clientX)
-  }
-
-  function handleStageMouseLeave() {
-    swipeStartXRef.current = null
-  }
-
   return (
     <PhotoboothScreenShell>
       <div className="flex h-full min-h-0 flex-col">
@@ -264,29 +134,20 @@ export default function FramePage() {
           >
             <div className="grid min-h-0 flex-1 grid-cols-[minmax(0,1fr)_clamp(64px,15%,112px)] items-stretch gap-[clamp(12px,2.6cqw,28px)] overflow-hidden">
               <div className="min-w-0 flex min-h-0 flex-col items-center">
-                <div
-                  className="w-full max-w-[678px] touch-pan-y"
-                  onTouchStart={handleStageTouchStart}
-                  onTouchEnd={handleStageTouchEnd}
-                  onMouseDown={handleStageMouseDown}
-                  onMouseUp={handleStageMouseUp}
-                  onMouseLeave={handleStageMouseLeave}
-                >
-                  <FrameStagePreview
-                    modes={stagePreviewModes}
-                    currentIndex={selectedImageIndex}
-                  />
-                </div>
-
-                <div className="mt-[clamp(12px,2cqw,20px)] w-full">
-                  <FrameNavigation
-                    label={activeImage?.label ?? 'Hình 1'}
-                    canGoPrev={canGoPrev}
-                    canGoNext={canGoNext}
-                    onPrev={handlePrevImage}
-                    onNext={handleNextImage}
-                  />
-                </div>
+                <PhotoboothFrameSwipePreview
+                  modes={stagePreviewModes}
+                  currentIndex={selectedImageIndex}
+                  label={activeImage?.label ?? 'Hình 1'}
+                  canGoPrev={canGoPrev}
+                  canGoNext={canGoNext}
+                  onPrev={handlePrevImage}
+                  onNext={handleNextImage}
+                  renderCard={(mode) => (
+                    <div className="relative h-full w-full overflow-hidden rounded-[clamp(6px,1cqw,9px)] border border-[#CFC8B3] bg-[#E1DCC8] shadow-[0_10px_24px_rgba(34,30,4,0.10)]">
+                      <FrameArtwork mode={mode} />
+                    </div>
+                  )}
+                />
               </div>
 
               <div className="min-w-0 min-h-0 h-full">

@@ -155,6 +155,7 @@ export default function PhotoboothFrameArtwork({
           sizes={imageSizes}
           className="object-contain"
           priority={imagePriority}
+          loading={imagePriority ? 'eager' : 'lazy'}
         />
       </div>
     </div>
