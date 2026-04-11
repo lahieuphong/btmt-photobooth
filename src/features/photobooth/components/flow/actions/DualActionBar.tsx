@@ -9,6 +9,7 @@ type PhotoboothDualActionBarProps = {
   className?: string
   secondaryIconSrc?: string
   primaryIconSrc?: string
+  hideSecondary?: boolean
 }
 
 export default function PhotoboothDualActionBar({
@@ -19,7 +20,12 @@ export default function PhotoboothDualActionBar({
   className = '',
   secondaryIconSrc,
   primaryIconSrc,
+  hideSecondary = false,
 }: PhotoboothDualActionBarProps) {
+  const rootLayoutClassName = hideSecondary
+    ? 'flex justify-center'
+    : 'grid grid-cols-2 gap-3 sm:gap-4 md:gap-5'
+
   return (
     <div
       className={[
@@ -27,34 +33,39 @@ export default function PhotoboothDualActionBar({
         className,
       ].join(' ')}
     >
-      <div className="grid grid-cols-2 gap-3 sm:gap-4 md:gap-5">
-        <PrimaryButton
-          variant="secondary"
-          fullWidth
-          onClick={onSecondaryClick}
-          className="h-[48px] sm:h-[52px] px-6 sm:px-7 text-[11px] sm:text-[14px]"
-        >
-          <span className="inline-flex items-center justify-center gap-2 whitespace-nowrap leading-none font-semibold text-white">
-            {secondaryIconSrc ? (
-              <Image
-                src={secondaryIconSrc}
-                alt=""
-                aria-hidden="true"
-                width={16}
-                height={16}
-                className="h-4 w-4 shrink-0"
-              />
-            ) : null}
-            <span className="whitespace-nowrap font-semibold text-white">
-              {secondaryLabel}
+      <div className={rootLayoutClassName}>
+        {hideSecondary ? null : (
+          <PrimaryButton
+            variant="secondary"
+            fullWidth
+            onClick={onSecondaryClick}
+            className="h-[48px] sm:h-[52px] px-6 sm:px-7 text-[11px] sm:text-[14px]"
+          >
+            <span className="inline-flex items-center justify-center gap-2 whitespace-nowrap leading-none font-semibold text-white">
+              {secondaryIconSrc ? (
+                <Image
+                  src={secondaryIconSrc}
+                  alt=""
+                  aria-hidden="true"
+                  width={16}
+                  height={16}
+                  className="h-4 w-4 shrink-0"
+                />
+              ) : null}
+              <span className="whitespace-nowrap font-semibold text-white">
+                {secondaryLabel}
+              </span>
             </span>
-          </span>
-        </PrimaryButton>
+          </PrimaryButton>
+        )}
 
         <PrimaryButton
-          fullWidth
+          fullWidth={!hideSecondary}
           onClick={onPrimaryClick}
-          className="h-[48px] sm:h-[52px] px-6 sm:px-7 text-[11px] sm:text-[14px]"
+          className={[
+            'h-[48px] sm:h-[52px] px-6 sm:px-7 text-[11px] sm:text-[14px]',
+            hideSecondary ? 'min-w-[160px] px-9 text-[14px] sm:text-[16px]' : '',
+          ].join(' ')}
         >
           <span className="inline-flex items-center justify-center gap-2 whitespace-nowrap leading-none font-semibold text-white">
             <span className="whitespace-nowrap font-semibold text-white">

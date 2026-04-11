@@ -27,30 +27,30 @@ type FrameImageItem = {
   label: string
   layoutId: string
   previewMode: PhotoboothLayoutPreviewMode
-  captureImageSrc: string | null
+  captureImageSrcs: Array<string | null>
 }
 
 function buildFrameImageItems(
   layoutIds: string[],
-  roundImageDataUrls: Array<string | null> = []
+  roundImageDataUrls: Array<Array<string | null>> = []
 ): FrameImageItem[] {
   return layoutIds.map((layoutId, index) => ({
     imageIndex: index,
     label: `Hình ${index + 1}`,
     layoutId,
     previewMode: getPhotoboothLayoutPreviewMode(layoutId),
-    captureImageSrc: roundImageDataUrls[index] ?? null,
+    captureImageSrcs: roundImageDataUrls[index] ?? [],
   }))
 }
 
 function FrameArtwork({
   mode,
   compact = false,
-  photoSrc,
+  photoSrcs = [],
 }: {
   mode: PhotoboothLayoutPreviewMode
   compact?: boolean
-  photoSrc?: string | null
+  photoSrcs?: Array<string | null>
 }) {
   return (
     <PhotoboothFrameArtwork
@@ -60,7 +60,7 @@ function FrameArtwork({
       imageSizes={compact ? '140px' : '(max-width: 768px) 72vw, 680px'}
       imagePriority={!compact}
       slotBackground="gradient"
-      photoSrc={photoSrc}
+      photoSrcs={photoSrcs}
     />
   )
 }
@@ -157,7 +157,9 @@ export default function FramePage() {
                     <div className="relative h-full w-full overflow-hidden rounded-[clamp(6px,1cqw,9px)] border border-[#CFC8B3] bg-[#E1DCC8] shadow-[0_10px_24px_rgba(34,30,4,0.10)]">
                       <FrameArtwork
                         mode={mode}
-                        photoSrc={frameImages[options.originalIndex]?.captureImageSrc ?? null}
+                        photoSrcs={
+                          frameImages[options.originalIndex]?.captureImageSrcs ?? []
+                        }
                       />
                     </div>
                   )}
@@ -187,7 +189,7 @@ export default function FramePage() {
                           >
                             <FrameOptionPreview
                               mode={activePreviewMode}
-                              photoSrc={activeImage?.captureImageSrc ?? null}
+                              photoSrcs={activeImage?.captureImageSrcs ?? []}
                             />
                           </div>
 

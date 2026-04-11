@@ -20,7 +20,7 @@ export type PhotoboothPreviewRoundItem = {
   index: number
   layoutId: string
   previewMode: PhotoboothLayoutPreviewMode
-  imageSrc: string | null
+  imageSrcs: Array<string | null>
 }
 
 export function getPhotoboothFrameOverlaySrc(mode: PhotoboothLayoutPreviewMode) {
@@ -44,6 +44,6 @@ export function buildPhotoboothPreviewRoundItemsFromSession(): PhotoboothPreview
     index,
     layoutId,
     previewMode: getPhotoboothLayoutPreviewMode(layoutId),
-    imageSrc: roundImageSrcs[index] ?? null,
+    imageSrcs: roundImageSrcs[index] ?? [],
   }))
 }

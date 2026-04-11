@@ -4,19 +4,35 @@ import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import PhotoboothCaptureRoundHint from '@/src/features/photobooth/components/flow/round/CaptureRoundHint'
-import PhotoboothScreenShell from '@/src/features/photobooth/components/shared/layout/ScreenShell'
-import PhotoboothPageHeader from '@/src/features/photobooth/components/shared/layout/PageHeader'
-import PhotoboothPageBody from '@/src/features/photobooth/components/shared/layout/PageBody'
 import CaptureCameraLoadingFrame from '@/src/features/photobooth/components/screens/capture/CaptureCameraLoadingFrame'
+import PhotoboothPageBody from '@/src/features/photobooth/components/shared/layout/PageBody'
+import PhotoboothPageHeader from '@/src/features/photobooth/components/shared/layout/PageHeader'
+import PhotoboothScreenShell from '@/src/features/photobooth/components/shared/layout/ScreenShell'
+import { PHOTOBOOTH_ROUTES } from '@/src/features/photobooth/config/routes'
+import { PHOTOBOOTH_SCREEN_STATE_MAP } from '@/src/features/photobooth/config/screenState'
 import {
   PHOTOBOOTH_CAPTURE_GUIDE_TEXT,
   PHOTOBOOTH_COUNTDOWN_OPTIONS,
   type PhotoboothCountdownOption,
 } from '@/src/features/photobooth/constants/capture'
 import { PHOTOBOOTH_DEFAULT_SESSION } from '@/src/features/photobooth/constants/session'
-import { PHOTOBOOTH_SCREEN_STATE_MAP } from '@/src/features/photobooth/config/screenState'
+import { PHOTOBOOTH_LAYOUT_OPTIONS } from '@/src/features/photobooth/constants/layouts'
 import { getAssetPath } from '@/src/features/photobooth/utils/assetPath'
-import { setPhotoboothCaptureRoundImageDataUrl } from '@/src/features/photobooth/utils/runtimeSession'
+import {
+  clearPhotoboothSingleRetake,
+  readPhotoboothRuntimeSession,
+  setPhotoboothCaptureRoundImageDataUrl,
+  setPhotoboothRetakeDraftImageDataUrl,
+  writePhotoboothRuntimeSession,
+} from '@/src/features/photobooth/utils/runtimeSession'
+
+const INTER_CAPTURE_LOADING_MS = 650
+
+function waitFor(ms: number) {
+  return new Promise<void>((resolve) => {
+    window.setTimeout(resolve, ms)
+  })
+}
 
 export default function CapturePage() {
   const router = useRouter()
@@ -26,6 +42,10 @@ export default function CapturePage() {
   )
   const [cameraError, setCameraError] = useState<string | null>(null)
   const [isCameraReady, setIsCameraReady] = useState(false)
+  const [isSingleRetakeMode, setIsSingleRetakeMode] = useState(false)
+  const [countdownValue, setCountdownValue] = useState<number | null>(null)
+  const [isCapturingSequence, setIsCapturingSequence] = useState(false)
+  const [isInterCaptureLoading, setIsInterCaptureLoading] = useState(false)
   const videoRef = useRef<HTMLVideoElement | null>(null)
 
   const isMobileDevice = useMemo(() => {
@@ -38,6 +58,13 @@ export default function CapturePage() {
     const hasTouch = navigator.maxTouchPoints > 1
 
     return mobileUaRegex.test(navigator.userAgent) || hasTouch
+  }, [])
+
+  useEffect(() => {
+    const session = readPhotoboothRuntimeSession()
+    setIsSingleRetakeMode(
+      session.retakeTargetRoundIndex !== null && session.retakeTargetSlotIndex !== null
+    )
   }, [])
 
   useEffect(() => {
@@ -142,10 +169,83 @@ export default function CapturePage() {
     return canvas.toDataURL('image/jpeg', 0.92)
   }
 
-  function handleCapture() {
-    const capturedDataUrl = captureCurrentFrame()
-    setPhotoboothCaptureRoundImageDataUrl(capturedDataUrl)
-    router.push(screen.nextHref ?? '/preview')
+  async function runCountdown(seconds: number) {
+    for (let value = seconds; value >= 0; value -= 1) {
+      setCountdownValue(value)
+      await waitFor(1000)
+    }
+
+    setCountdownValue(null)
+  }
+
+  function getCaptureSlotsCount() {
+    const session = readPhotoboothRuntimeSession()
+    const selectedLayoutId = session.selectedLayoutId
+    const slotCount =
+      PHOTOBOOTH_LAYOUT_OPTIONS.find((item) => item.id === selectedLayoutId)?.slots ?? 4
+
+    return Math.max(1, slotCount)
+  }
+
+  async function handleCaptureSequence() {
+    if (isCapturingSequence || !isCameraReady) {
+      return
+    }
+
+    const currentSession = readPhotoboothRuntimeSession()
+    const resolvedSingleRetakeMode =
+      currentSession.retakeTargetRoundIndex !== null &&
+      currentSession.retakeTargetSlotIndex !== null
+    const totalCaptures = resolvedSingleRetakeMode ? 1 : getCaptureSlotsCount()
+    const currentRoundIndex = Math.min(
+      currentSession.captureRoundsCompleted,
+      Math.max(currentSession.captureRoundsRequired - 1, 0)
+    )
+    if (!resolvedSingleRetakeMode) {
+      const nextCapturedRoundImageDataUrls = Array.from(
+        { length: Math.max(1, currentSession.captureRoundsRequired) },
+        (_, roundIndex) => {
+          if (roundIndex === currentRoundIndex) {
+            return Array.from({ length: totalCaptures }, () => null as string | null)
+          }
+
+          const persistedRound = currentSession.capturedRoundImageDataUrls[roundIndex]
+          return Array.isArray(persistedRound) ? [...persistedRound] : []
+        }
+      )
+
+      writePhotoboothRuntimeSession({
+        ...currentSession,
+        latestCaptureDataUrl: null,
+        capturedRoundImageDataUrls: nextCapturedRoundImageDataUrls,
+      })
+    }
+
+    setIsCapturingSequence(true)
+    setCameraError(null)
+
+    try {
+      for (let captureIndex = 0; captureIndex < totalCaptures; captureIndex += 1) {
+        await runCountdown(selectedCountdown)
+
+        const capturedDataUrl = captureCurrentFrame()
+        if (resolvedSingleRetakeMode) {
+          setPhotoboothRetakeDraftImageDataUrl(capturedDataUrl)
+        } else {
+          setPhotoboothCaptureRoundImageDataUrl(capturedDataUrl, captureIndex)
+        }
+
+        setIsInterCaptureLoading(true)
+        await waitFor(INTER_CAPTURE_LOADING_MS)
+        setIsInterCaptureLoading(false)
+      }
+
+      router.push(screen.nextHref ?? '/preview')
+    } finally {
+      setCountdownValue(null)
+      setIsInterCaptureLoading(false)
+      setIsCapturingSequence(false)
+    }
   }
 
   return (
@@ -185,12 +285,20 @@ export default function CapturePage() {
 
                   <div className="pointer-events-none absolute inset-x-0 top-[24%] bottom-[24%] z-30 border-2 border-[#FF8A3D]" />
 
-                  <div className="pointer-events-none absolute inset-x-0 top-0 z-20 h-[24%] bg-black/35 backdrop-blur-[1px]" />
-                  <div className="pointer-events-none absolute inset-x-0 bottom-0 z-20 h-[24%] bg-black/35 backdrop-blur-[1px]" />
+                  <div className="pointer-events-none absolute inset-x-0 top-0 z-20 h-[24%] bg-black/22 backdrop-blur-[0.6px]" />
+                  <div className="pointer-events-none absolute inset-x-0 bottom-0 z-20 h-[24%] bg-black/22 backdrop-blur-[0.6px]" />
                 </>
-              ) : (
-                <CaptureCameraLoadingFrame />
-              )}
+              ) : null}
+
+              {!isCameraReady || isInterCaptureLoading ? <CaptureCameraLoadingFrame /> : null}
+
+              {countdownValue !== null && isCameraReady && !isInterCaptureLoading ? (
+                <div className="pointer-events-none absolute inset-0 z-[45] flex items-center justify-center">
+                  <span className="text-[94px] font-bold leading-none text-white drop-shadow-[0_6px_16px_rgba(0,0,0,0.4)] sm:text-[108px]">
+                    {countdownValue}
+                  </span>
+                </div>
+              ) : null}
 
               {resolvedCameraError ? (
                 <div className="absolute inset-0 z-50 flex items-center justify-center px-5 text-center text-[11px] text-white sm:text-[12px]">
@@ -198,7 +306,7 @@ export default function CapturePage() {
                 </div>
               ) : null}
 
-              <div className="pointer-events-none absolute inset-0 z-10 bg-black/10" />
+              <div className="pointer-events-none absolute inset-0 z-10 bg-black/6" />
             </div>
 
             <div className="mt-auto pt-[clamp(16px,2.6vh,34px)]">
@@ -212,11 +320,13 @@ export default function CapturePage() {
                       type="button"
                       onClick={() => setSelectedCountdown(value)}
                       aria-pressed={isSelected}
+                      disabled={isCapturingSequence}
                       className={[
                         'flex h-[30px] min-w-[58px] transform-gpu items-center justify-center gap-1 rounded-[9px] px-2 text-[10px] font-medium leading-none text-white transition-[transform,background-color,border-color,box-shadow,opacity] duration-220 ease-out active:scale-95 sm:h-[32px] sm:min-w-[64px] sm:text-[11px]',
                         isSelected
                           ? 'scale-105 border-2 border-[#FF5A2A] bg-[#15181F] shadow-[0_0_10px_rgba(255,90,42,0.28)]'
                           : 'scale-90 bg-[#75777B]',
+                        isCapturingSequence ? 'cursor-not-allowed opacity-65' : '',
                       ].join(' ')}
                     >
                       <Image
@@ -248,15 +358,23 @@ export default function CapturePage() {
               <div className="mt-4 flex justify-center">
                 <button
                   type="button"
-                  onClick={handleCapture}
-                  className="flex h-[84px] w-[84px] flex-col items-center justify-center rounded-full bg-[#F56F58] text-white shadow-[0_12px_28px_rgba(245,111,88,0.38)] sm:h-[92px] sm:w-[92px]"
+                  onClick={() => {
+                    void handleCaptureSequence()
+                  }}
+                  disabled={!isCameraReady || isCapturingSequence}
+                  className={[
+                    'flex h-[84px] w-[84px] flex-col items-center justify-center rounded-full bg-[#F56F58] text-white shadow-[0_12px_28px_rgba(245,111,88,0.38)] sm:h-[92px] sm:w-[92px]',
+                    !isCameraReady || isCapturingSequence
+                      ? 'cursor-not-allowed opacity-70'
+                      : '',
+                  ].join(' ')}
                 >
-              <Image
-                src={getAssetPath('/images/photobooth/capture/camera-sparkles.svg')}
-                alt=""
-                aria-hidden="true"
-                width={22}
-                height={22}
+                  <Image
+                    src={getAssetPath('/images/photobooth/capture/camera-sparkles.svg')}
+                    alt=""
+                    aria-hidden="true"
+                    width={22}
+                    height={22}
                     className="h-[22px] w-[22px] sm:h-[24px] sm:w-[24px]"
                   />
                   <span className="mt-1 text-[14px] font-semibold leading-none text-white sm:text-[16px]">
@@ -264,6 +382,22 @@ export default function CapturePage() {
                   </span>
                 </button>
               </div>
+
+              {isSingleRetakeMode ? (
+                <div className="mt-3 flex justify-center">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      clearPhotoboothSingleRetake()
+                      setIsSingleRetakeMode(false)
+                      router.push(PHOTOBOOTH_ROUTES.PREVIEW)
+                    }}
+                    className="text-[12px] font-medium text-[#6D6D6D] underline underline-offset-2"
+                  >
+                    Hủy chụp lại ảnh này
+                  </button>
+                </div>
+              ) : null}
             </div>
           </div>
         </PhotoboothPageBody>

@@ -11,6 +11,7 @@ type PhotoboothFrameArtworkProps = {
   imagePriority?: boolean
   slotBackground?: 'solid' | 'gradient'
   photoSrc?: string | null
+  photoSrcs?: Array<string | null>
 }
 
 function getFramePhotoBounds(
@@ -72,12 +73,18 @@ function FramePhotoLayout({
   compact,
   slotBackground,
   photoSrc,
+  photoSrcs = [],
 }: {
   mode: PhotoboothLayoutPreviewMode
   compact: boolean
   slotBackground?: 'solid' | 'gradient'
   photoSrc?: string | null
+  photoSrcs?: Array<string | null>
 }) {
+  function resolveSlotPhotoSrc(slotIndex: number) {
+    return photoSrcs[slotIndex] ?? photoSrc ?? null
+  }
+
   if (mode === 'vertical-4') {
     const containerClass = compact
       ? 'h-[82%] gap-[clamp(2px,0.4cqw,4px)]'
@@ -95,7 +102,7 @@ function FramePhotoLayout({
             key={index}
             className="h-full"
             slotBackground={slotBackground}
-            photoSrc={photoSrc}
+            photoSrc={resolveSlotPhotoSrc(index)}
           />
         ))}
       </div>
@@ -117,7 +124,7 @@ function FramePhotoLayout({
             key={index}
             className="aspect-[175/150]"
             slotBackground={slotBackground}
-            photoSrc={photoSrc}
+            photoSrc={resolveSlotPhotoSrc(index)}
           />
         ))}
       </div>
@@ -138,7 +145,7 @@ function FramePhotoLayout({
           key={index}
           className="aspect-[182/240]"
           slotBackground={slotBackground}
-          photoSrc={photoSrc}
+          photoSrc={resolveSlotPhotoSrc(index)}
         />
       ))}
     </div>
@@ -153,6 +160,7 @@ export default function PhotoboothFrameArtwork({
   imagePriority = false,
   slotBackground = 'solid',
   photoSrc,
+  photoSrcs = [],
 }: PhotoboothFrameArtworkProps) {
   const overlaySrc = getPhotoboothFrameOverlaySrc(mode)
   const photoBoundsClass = getFramePhotoBounds(mode, compact)
@@ -165,6 +173,7 @@ export default function PhotoboothFrameArtwork({
           compact={compact}
           slotBackground={slotBackground}
           photoSrc={photoSrc}
+          photoSrcs={photoSrcs}
         />
       </div>
 

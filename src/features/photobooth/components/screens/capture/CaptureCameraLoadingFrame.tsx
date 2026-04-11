@@ -1,6 +1,21 @@
-export default function CaptureCameraLoadingFrame() {
+import type { HTMLAttributes } from 'react'
+
+type CaptureCameraLoadingFrameProps = {
+  className?: string
+} & HTMLAttributes<HTMLDivElement>
+
+export default function CaptureCameraLoadingFrame({
+  className = '',
+  ...props
+}: CaptureCameraLoadingFrameProps) {
   return (
-    <div className="absolute inset-0 z-40 flex items-center justify-center rounded-[8px] bg-[#E8E5CC] sm:rounded-[10px]">
+    <div
+      className={[
+        'absolute inset-0 z-40 flex items-center justify-center rounded-[8px] bg-[#E8E5CC] sm:rounded-[10px]',
+        className,
+      ].join(' ')}
+      {...props}
+    >
       <div className="flex flex-col items-center justify-center">
         <div className="relative h-[56px] w-[56px]">
           <div className="absolute inset-0 rounded-full border-[7px] border-[#F3CBAF]/70" />

@@ -33,7 +33,7 @@ export default function CapturedPage() {
     )
   })
   const [capturedRoundImageSrcs, setCapturedRoundImageSrcs] = useState<
-    Array<string | null>
+    Array<Array<string | null>>
   >(() => {
     const fallbackSession = getDefaultPhotoboothRuntimeSession()
     return getPhotoboothRoundImageDataUrls(fallbackSession)
@@ -46,7 +46,7 @@ export default function CapturedPage() {
       const nextRoundItems = buildPhotoboothPreviewRoundItemsFromSession()
       const nextModes = nextRoundItems.map((item) => item.previewMode)
       setCapturedModes(nextModes)
-      setCapturedRoundImageSrcs(nextRoundItems.map((item) => item.imageSrc))
+      setCapturedRoundImageSrcs(nextRoundItems.map((item) => item.imageSrcs))
       setCurrentImageIndex((prev) =>
         Math.min(prev, Math.max(nextModes.length - 1, 0))
       )
@@ -104,7 +104,7 @@ export default function CapturedPage() {
                   renderCard={(mode, options) => (
                     <CapturedFrameCard
                       mode={mode}
-                      photoSrc={capturedRoundImageSrcs[options.originalIndex] ?? null}
+                      photoSrcs={capturedRoundImageSrcs[options.originalIndex] ?? []}
                     />
                   )}
                 />

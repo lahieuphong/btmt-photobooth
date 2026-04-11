@@ -92,7 +92,7 @@ export default function PrintPage() {
                       <PrintFrameCard
                         mode={mode}
                         priority
-                        photoSrc={printRoundItems[options.originalIndex]?.imageSrc ?? null}
+                        photoSrcs={printRoundItems[options.originalIndex]?.imageSrcs ?? []}
                       />
                     )}
                   />

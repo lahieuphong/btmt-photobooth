@@ -1,7 +1,7 @@
 import React from 'react'
 import PhotoboothBackground, {
   type PhotoboothBackgroundVariant,
-} from './background/Background'
+} from './Background'
 
 type PhotoboothScreenShellProps = {
   children?: React.ReactNode

@@ -9,7 +9,10 @@ export type PhotoboothRuntimeSession = {
   captureRoundsCompleted: number
   completedRoundLayoutIds: string[]
   latestCaptureDataUrl: string | null
-  capturedRoundImageDataUrls: Array<string | null>
+  capturedRoundImageDataUrls: Array<Array<string | null>>
+  retakeTargetRoundIndex: number | null
+  retakeTargetSlotIndex: number | null
+  retakeDraftImageDataUrl: string | null
 }
 
 const PHOTOBOOTH_RUNTIME_SESSION_KEY = 'photobooth_runtime_session'
@@ -40,19 +43,40 @@ function sanitizeLatestCaptureDataUrl(value: unknown) {
 
 function sanitizeCapturedRoundImageDataUrls(
   value: unknown,
-  maxLength: number
-): Array<string | null> {
-  const sanitized = Array.from({ length: maxLength }, () => null as string | null)
+  maxRounds: number
+): Array<Array<string | null>> {
+  const sanitized: Array<Array<string | null>> = Array.from(
+    { length: maxRounds },
+    () => []
+  )
 
   if (!Array.isArray(value)) {
     return sanitized
   }
 
-  for (let index = 0; index < maxLength; index += 1) {
-    sanitized[index] = sanitizeLatestCaptureDataUrl(value[index])
+  for (let round = 0; round < maxRounds; round += 1) {
+    if (!Array.isArray(value[round])) {
+      continue
+    }
+
+    sanitized[round] = value[round].map((slotValue: unknown) =>
+      sanitizeLatestCaptureDataUrl(slotValue)
+    )
   }
 
   return sanitized
+}
+
+function sanitizeRetakeTargetIndex(value: unknown, maxValue: number) {
+  if (typeof value !== 'number' || !Number.isInteger(value) || value < 0) {
+    return null
+  }
+
+  if (maxValue < 0) {
+    return null
+  }
+
+  return Math.min(value, maxValue)
 }
 
 export function getDefaultPhotoboothRuntimeSession(): PhotoboothRuntimeSession {
@@ -67,6 +91,9 @@ export function getDefaultPhotoboothRuntimeSession(): PhotoboothRuntimeSession {
     completedRoundLayoutIds: [],
     latestCaptureDataUrl: null,
     capturedRoundImageDataUrls: [],
+    retakeTargetRoundIndex: null,
+    retakeTargetSlotIndex: null,
+    retakeDraftImageDataUrl: null,
   }
 }
 
@@ -119,6 +146,22 @@ export function readPhotoboothRuntimeSession(): PhotoboothRuntimeSession {
       parsedValue.capturedRoundImageDataUrls,
       captureRoundsRequired
     )
+    const retakeTargetRoundIndex = sanitizeRetakeTargetIndex(
+      parsedValue.retakeTargetRoundIndex,
+      Math.max(captureRoundsRequired - 1, 0)
+    )
+    const roundSlotsCount =
+      retakeTargetRoundIndex !== null
+        ? (capturedRoundImageDataUrls[retakeTargetRoundIndex]?.length ?? 0)
+        : 0
+    const retakeTargetSlotIndex =
+      retakeTargetRoundIndex !== null
+        ? sanitizeRetakeTargetIndex(parsedValue.retakeTargetSlotIndex, roundSlotsCount - 1)
+        : null
+    const retakeDraftImageDataUrl =
+      retakeTargetRoundIndex !== null && retakeTargetSlotIndex !== null
+        ? sanitizeLatestCaptureDataUrl(parsedValue.retakeDraftImageDataUrl)
+        : null
 
     return {
       selectedPackageId,
@@ -128,6 +171,9 @@ export function readPhotoboothRuntimeSession(): PhotoboothRuntimeSession {
       completedRoundLayoutIds,
       latestCaptureDataUrl,
       capturedRoundImageDataUrls,
+      retakeTargetRoundIndex,
+      retakeTargetSlotIndex,
+      retakeDraftImageDataUrl,
     }
   } catch {
     return fallback
@@ -154,6 +200,9 @@ export function startPhotoboothRuntimeSession(selectedPackageId: string) {
     completedRoundLayoutIds: [],
     latestCaptureDataUrl: null,
     capturedRoundImageDataUrls: [],
+    retakeTargetRoundIndex: null,
+    retakeTargetSlotIndex: null,
+    retakeDraftImageDataUrl: null,
   }
 
   writePhotoboothRuntimeSession(nextValue)
@@ -214,25 +263,125 @@ export function setPhotoboothLatestCaptureDataUrl(dataUrl: string | null) {
   return nextValue
 }
 
-export function setPhotoboothCaptureRoundImageDataUrl(dataUrl: string | null) {
+export function setPhotoboothCaptureRoundImageDataUrl(
+  dataUrl: string | null,
+  slotIndex: number
+) {
   const currentValue = readPhotoboothRuntimeSession()
   const currentRoundIndex = Math.min(
     currentValue.captureRoundsCompleted,
     Math.max(currentValue.captureRoundsRequired - 1, 0)
   )
+  const safeSlotIndex = Math.max(0, slotIndex)
 
   const nextCapturedRoundImageDataUrls = sanitizeCapturedRoundImageDataUrls(
     currentValue.capturedRoundImageDataUrls,
     currentValue.captureRoundsRequired
   )
+  const nextCurrentRoundSlots = [
+    ...(nextCapturedRoundImageDataUrls[currentRoundIndex] ?? []),
+  ]
 
-  nextCapturedRoundImageDataUrls[currentRoundIndex] =
+  nextCurrentRoundSlots[safeSlotIndex] =
     sanitizeLatestCaptureDataUrl(dataUrl)
+  nextCapturedRoundImageDataUrls[currentRoundIndex] = nextCurrentRoundSlots
 
   const nextValue: PhotoboothRuntimeSession = {
     ...currentValue,
     latestCaptureDataUrl: sanitizeLatestCaptureDataUrl(dataUrl),
     capturedRoundImageDataUrls: nextCapturedRoundImageDataUrls,
+  }
+
+  writePhotoboothRuntimeSession(nextValue)
+
+  return nextValue
+}
+
+export function startPhotoboothSingleRetake(roundIndex: number, slotIndex: number) {
+  const currentValue = readPhotoboothRuntimeSession()
+  const safeRoundIndex = Math.min(
+    Math.max(0, roundIndex),
+    Math.max(currentValue.captureRoundsRequired - 1, 0)
+  )
+  const currentRoundSlots =
+    currentValue.capturedRoundImageDataUrls[safeRoundIndex]?.length ?? 0
+  const safeSlotIndex = Math.min(Math.max(0, slotIndex), Math.max(currentRoundSlots - 1, 0))
+
+  const nextValue: PhotoboothRuntimeSession = {
+    ...currentValue,
+    retakeTargetRoundIndex: safeRoundIndex,
+    retakeTargetSlotIndex: safeSlotIndex,
+    retakeDraftImageDataUrl: null,
+  }
+
+  writePhotoboothRuntimeSession(nextValue)
+
+  return nextValue
+}
+
+export function setPhotoboothRetakeDraftImageDataUrl(dataUrl: string | null) {
+  const currentValue = readPhotoboothRuntimeSession()
+
+  if (
+    currentValue.retakeTargetRoundIndex === null ||
+    currentValue.retakeTargetSlotIndex === null
+  ) {
+    return currentValue
+  }
+
+  const nextValue: PhotoboothRuntimeSession = {
+    ...currentValue,
+    retakeDraftImageDataUrl: sanitizeLatestCaptureDataUrl(dataUrl),
+  }
+
+  writePhotoboothRuntimeSession(nextValue)
+
+  return nextValue
+}
+
+export function commitPhotoboothSingleRetake() {
+  const currentValue = readPhotoboothRuntimeSession()
+
+  if (
+    currentValue.retakeTargetRoundIndex === null ||
+    currentValue.retakeTargetSlotIndex === null ||
+    !currentValue.retakeDraftImageDataUrl
+  ) {
+    return currentValue
+  }
+
+  const nextCapturedRoundImageDataUrls = sanitizeCapturedRoundImageDataUrls(
+    currentValue.capturedRoundImageDataUrls,
+    currentValue.captureRoundsRequired
+  )
+  const nextRoundImages = [
+    ...(nextCapturedRoundImageDataUrls[currentValue.retakeTargetRoundIndex] ?? []),
+  ]
+
+  nextRoundImages[currentValue.retakeTargetSlotIndex] = currentValue.retakeDraftImageDataUrl
+  nextCapturedRoundImageDataUrls[currentValue.retakeTargetRoundIndex] = nextRoundImages
+
+  const nextValue: PhotoboothRuntimeSession = {
+    ...currentValue,
+    latestCaptureDataUrl: currentValue.retakeDraftImageDataUrl,
+    capturedRoundImageDataUrls: nextCapturedRoundImageDataUrls,
+    retakeTargetRoundIndex: null,
+    retakeTargetSlotIndex: null,
+    retakeDraftImageDataUrl: null,
+  }
+
+  writePhotoboothRuntimeSession(nextValue)
+
+  return nextValue
+}
+
+export function clearPhotoboothSingleRetake() {
+  const currentValue = readPhotoboothRuntimeSession()
+  const nextValue: PhotoboothRuntimeSession = {
+    ...currentValue,
+    retakeTargetRoundIndex: null,
+    retakeTargetSlotIndex: null,
+    retakeDraftImageDataUrl: null,
   }
 
   writePhotoboothRuntimeSession(nextValue)
@@ -255,7 +404,7 @@ export function getCurrentPhotoboothCaptureRound(session: PhotoboothRuntimeSessi
 export function getPhotoboothCaptureRoundLabel(session: PhotoboothRuntimeSession) {
   const currentRound = getCurrentPhotoboothCaptureRound(session)
 
-  if (currentRound <= 1) {
+  if (session.captureRoundsRequired <= 1) {
     return ''
   }
 
@@ -283,5 +432,5 @@ export function getPhotoboothRoundImageDataUrls(session: PhotoboothRuntimeSessio
     totalRounds
   )
 
-  return Array.from({ length: totalRounds }, (_, index) => sanitized[index] ?? null)
+  return Array.from({ length: totalRounds }, (_, index) => sanitized[index] ?? [])
 }
