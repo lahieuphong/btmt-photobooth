@@ -9,19 +9,27 @@ import PhotoboothPageBody from '@/src/features/photobooth/components/shared/layo
 import PhotoboothFooter from '@/src/features/photobooth/components/shared/layout/Footer'
 import PrimaryButton from '@/src/features/photobooth/components/shared/controls/PrimaryButton'
 import { PHOTOBOOTH_PACKAGE_OPTIONS } from '@/src/features/photobooth/constants/packages'
-import { PHOTOBOOTH_PAYMENT_MOCK } from '@/src/features/photobooth/constants/payment'
+import {
+  PHOTOBOOTH_PAYMENT_BANK_ACCOUNT,
+  PHOTOBOOTH_PAYMENT_QR_EXPIRED_IN_SECONDS,
+  PHOTOBOOTH_PAYMENT_QR_TEXT,
+} from '@/src/features/photobooth/constants/payment'
 import { PHOTOBOOTH_SCREEN_STATE_MAP } from '@/src/features/photobooth/config/screenState'
 import { getAssetPath } from '@/src/features/photobooth/utils/assetPath'
+import { buildPaymentQrSrc } from '@/src/features/photobooth/utils/paymentQr'
 import { readPhotoboothRuntimeSession } from '@/src/features/photobooth/utils/runtimeSession'
+
+const PAYMENT_QR_FRAME_SRC = '/images/payment/qr-frame.png'
 
 export default function PaymentPage() {
   const router = useRouter()
   const screen = PHOTOBOOTH_SCREEN_STATE_MAP.payment
-  const paymentInfo = PHOTOBOOTH_PAYMENT_MOCK
   const [selectedPackageId, setSelectedPackageId] = useState<string | null>(null)
   const [isPaymentSuccess, setIsPaymentSuccess] = useState(false)
+  const [qrRequestVersion, setQrRequestVersion] = useState(0)
+  const [loadedQrSrc, setLoadedQrSrc] = useState<string | null>(null)
   const [remainingSeconds, setRemainingSeconds] = useState(
-    PHOTOBOOTH_PAYMENT_MOCK.expiredInSeconds
+    PHOTOBOOTH_PAYMENT_QR_EXPIRED_IN_SECONDS
   )
 
   useEffect(() => {
@@ -30,7 +38,7 @@ export default function PaymentPage() {
   }, [])
 
   useEffect(() => {
-    if (remainingSeconds <= 0) {
+    if (remainingSeconds <= 0 || isPaymentSuccess) {
       return
     }
 
@@ -41,7 +49,7 @@ export default function PaymentPage() {
     return () => {
       window.clearInterval(intervalId)
     }
-  }, [remainingSeconds])
+  }, [isPaymentSuccess, remainingSeconds])
 
   useEffect(() => {
     if (!isPaymentSuccess) {
@@ -58,102 +66,166 @@ export default function PaymentPage() {
   }, [isPaymentSuccess, router, screen.nextHref])
 
   const selectedAmount = useMemo(() => {
-    if (!selectedPackageId) {
-      return paymentInfo.amount
-    }
-
     return (
       PHOTOBOOTH_PACKAGE_OPTIONS.find((item) => item.id === selectedPackageId)?.price ??
-      paymentInfo.amount
+      PHOTOBOOTH_PACKAGE_OPTIONS[0]?.price ??
+      0
     )
-  }, [paymentInfo.amount, selectedPackageId])
+  }, [selectedPackageId])
 
   const minutes = Math.floor(remainingSeconds / 60)
   const seconds = remainingSeconds % 60
+  const isQrExpired = remainingSeconds === 0
   const timeText = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(
     2,
     '0'
   )}`
   const priceTagText = `${new Intl.NumberFormat('vi-VN').format(selectedAmount)} vnd`
+  const paymentQrSrc = useMemo(() => {
+    return buildPaymentQrSrc({
+      bankAccount: PHOTOBOOTH_PAYMENT_BANK_ACCOUNT,
+      amount: selectedAmount,
+      addInfo: PHOTOBOOTH_PAYMENT_QR_TEXT,
+      cacheBust: qrRequestVersion,
+    })
+  }, [qrRequestVersion, selectedAmount])
+  const isQrLoading = loadedQrSrc !== paymentQrSrc
 
   function handleMockPaymentComplete() {
     if (isPaymentSuccess) return
     setIsPaymentSuccess(true)
   }
 
+  function handleRefreshQrCode() {
+    setRemainingSeconds(PHOTOBOOTH_PAYMENT_QR_EXPIRED_IN_SECONDS)
+    setQrRequestVersion((prev) => prev + 1)
+  }
+
   return (
     <PhotoboothScreenShell backgroundVariant="museum">
-      <div className="flex h-full flex-col">
+      <div className="relative flex h-full flex-col">
+        <div
+          className={[
+            'pointer-events-none absolute left-1/2 top-[clamp(56px,7.5vh,84px)] z-30 h-[66px] w-[min(78vw,320px)] -translate-x-1/2 rounded-[12px] bg-[#DFF5E8]/90 px-3 text-center transition-opacity duration-200',
+            isPaymentSuccess ? 'opacity-100' : 'opacity-0',
+          ].join(' ')}
+        >
+          <div className="flex translate-y-[2px] flex-col items-center">
+            <div className="mx-auto mb-0 grid h-10 w-10 place-items-center">
+              <Image
+                src={getAssetPath('/images/payment/checked.svg')}
+                alt=""
+                width={30}
+                height={30}
+                className="h-[30px] w-[30px]"
+                aria-hidden="true"
+              />
+            </div>
+            <p className="text-[13px] font-medium text-[#009245]">Thanh toán thành công</p>
+          </div>
+        </div>
+
         <PhotoboothPageHeader
           title={screen.title}
           backHref={screen.backHref}
           showBackButton={screen.showBackButton}
           showLanguageDropdown={screen.showLanguageDropdown}
           languageLabel="VI"
+          titleClassName={`transition-opacity duration-200 ${
+            isPaymentSuccess ? 'opacity-0' : 'opacity-100'
+          }`}
         />
 
-        <PhotoboothPageBody className="flex flex-1 flex-col items-center pt-[14px] pb-0">
-          <div className="relative -mt-7 w-full max-w-[215px] pt-[78px] sm:-mt-6">
-            <div
-              className={[
-                'pointer-events-none absolute left-0 right-0 top-0 z-10 h-[66px] rounded-[12px] bg-[#DFF5E8]/75 px-3 text-center transition-opacity duration-200 sm:h-[68px]',
-                isPaymentSuccess ? 'opacity-100' : 'opacity-0',
-              ].join(' ')}
-            >
-              <div className="flex translate-y-[2px] flex-col items-center">
-                <div className="mx-auto mb-0 grid h-10 w-10 place-items-center">
-                  <Image
-                    src={getAssetPath('/images/payment/checked.svg')}
-                    alt=""
-                    width={30}
-                    height={30}
-                    className="h-[30px] w-[30px]"
-                    aria-hidden="true"
-                  />
-                </div>
-                <p className="text-[13px] font-medium text-[#009245]">Thanh toán thành công</p>
-              </div>
-            </div>
-
-            <div className="relative rounded-[16px] border border-[#F2B39B] bg-white/90 px-[8px] pt-[8px] pb-[26px]">
-              <div className="rounded-[12px] bg-[#F2F2F2] p-[6px] shadow-[0_2px_8px_rgba(0,0,0,0.08)]">
+        <PhotoboothPageBody className="flex flex-1 flex-col items-center overflow-x-hidden pt-0 pb-0">
+          <div className="relative mt-0 w-full max-w-[340px] pt-[clamp(1px,0.2vh,3px)]">
+            <div className="relative mx-auto w-[min(78vw,320px)] rounded-[24px] border border-[#F2B39B] bg-white/90 px-[8px] pt-[8px] pb-[26px]">
+              <div className="p-0">
                 <div className="relative aspect-square w-full overflow-hidden rounded-[10px] bg-white">
+                  <div className="absolute left-[14.2%] right-[14.2%] top-[18.8%] bottom-[14.2%] z-[1] overflow-hidden bg-white">
+                    <Image
+                      src={paymentQrSrc}
+                      alt="QR thanh toán MB"
+                      fill
+                      unoptimized
+                      sizes="(max-width: 768px) 210px, 260px"
+                      className="object-cover"
+                      onLoad={() => setLoadedQrSrc(paymentQrSrc)}
+                      onError={() => setLoadedQrSrc(paymentQrSrc)}
+                    />
+
+                    {isQrLoading ? (
+                      <div className="absolute inset-0 z-[9] flex flex-col items-center justify-center bg-white/92">
+                        <div className="relative h-[46px] w-[46px]">
+                          <div className="absolute inset-0 rounded-full border-[6px] border-[#F3CBAF]/70" />
+                          <div
+                            aria-hidden="true"
+                            className="absolute inset-0 animate-spin rounded-full border-[6px] border-transparent border-r-[#FF5A2A] border-t-[#FF7A5F]"
+                          />
+                        </div>
+                        <span className="mt-1 text-[12px] font-medium text-[#FF5A2A]">
+                          Đang tạo mã QR...
+                        </span>
+                      </div>
+                    ) : null}
+                  </div>
+
                   <Image
-                    src={getAssetPath('/images/payment/qr-frame.svg')}
-                    alt="QR thanh toán"
+                    src={getAssetPath(PAYMENT_QR_FRAME_SRC)}
+                    alt="Khung mã QR"
                     fill
-                    sizes="(max-width: 768px) 190px, 210px"
-                    className="object-cover"
+                    sizes="(max-width: 768px) 240px, 320px"
+                    className="pointer-events-none absolute inset-0 z-[2] object-contain"
                   />
+
+                  {isQrExpired ? (
+                    <div className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-4 bg-white/80 px-4 text-center">
+                      <p className="text-[20px] font-medium leading-none text-[#1E1E1E]">
+                        Mã QR hết hạn
+                      </p>
+                      <button
+                        type="button"
+                        onClick={handleRefreshQrCode}
+                        className="inline-flex h-[42px] min-w-[160px] items-center justify-center rounded-full bg-[#FF5A2A] px-6 text-[13px] font-semibold text-white transition-all duration-200 hover:brightness-95 active:scale-[0.98]"
+                      >
+                        Lấy mã QR mới
+                      </button>
+                    </div>
+                  ) : null}
                 </div>
               </div>
 
-              <div className="absolute left-1/2 top-full -translate-x-1/2 -translate-y-[65%] whitespace-nowrap rounded-[10px] bg-[#1F2024] px-[24px] py-[10px] text-[14px] font-medium uppercase leading-none tracking-[0.02em] text-white">
+              <div className="absolute left-1/2 top-full -translate-x-1/2 -translate-y-[65%] whitespace-nowrap rounded-[8px] bg-[#1F2024] px-[26px] py-[11px] text-[14px] font-medium lowercase leading-none tracking-[0.02em] text-white">
                 {priceTagText}
               </div>
             </div>
           </div>
 
-          <div className="mt-5 text-center text-[13px] font-medium text-[#2E2A26]">
+          <div className="mt-[clamp(12px,2.2vh,18px)] text-center text-[13px] font-medium text-[#2E2A26]">
             Quét mã để thanh toán
           </div>
 
-          <div className="mt-1 text-center text-[18px] font-semibold text-[#2E2A26]">
+          <div
+            className={[
+              'mt-1 text-center text-[18px] font-medium',
+              isQrExpired ? 'text-[#FF5A2A]' : 'text-[#2E2A26]',
+            ].join(' ')}
+          >
             {timeText}
           </div>
 
-          <div className="mt-auto w-full max-w-[180px] pb-0 pt-3">
+          <div className="mt-auto flex w-full justify-center pb-0 pt-4">
             <PrimaryButton
               onClick={handleMockPaymentComplete}
               disabled={isPaymentSuccess}
-              fullWidth
+              className="whitespace-nowrap !text-[12px]"
+              fullWidth={false}
             >
               {screen.primaryActionLabel}
             </PrimaryButton>
           </div>
         </PhotoboothPageBody>
 
-        <PhotoboothFooter />
+        <PhotoboothFooter className="shrink-0" />
       </div>
     </PhotoboothScreenShell>
   )

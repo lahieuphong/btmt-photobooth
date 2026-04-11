@@ -8,6 +8,12 @@ const nextConfig: NextConfig = {
   trailingSlash: true,
   images: {
     unoptimized: true,
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'img.vietqr.io',
+      },
+    ],
   },
   basePath: isProd ? `/${repoName}` : '',
   assetPrefix: isProd ? `/${repoName}/` : '',
