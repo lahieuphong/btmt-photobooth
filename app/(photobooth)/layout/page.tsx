@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import Image from 'next/image'
 import PhotoboothCaptureRoundHint from '@/src/features/photobooth/components/flow/round/CaptureRoundHint'
 import LayoutPreview from '@/src/features/photobooth/components/screens/layout/LayoutPreview'
 import PrimaryButton from '@/src/features/photobooth/components/shared/controls/PrimaryButton'
@@ -10,6 +11,7 @@ import PhotoboothScreenShell from '@/src/features/photobooth/components/shared/l
 import { PHOTOBOOTH_SCREEN_STATE_MAP } from '@/src/features/photobooth/config/screenState'
 import { PHOTOBOOTH_LAYOUT_OPTIONS } from '@/src/features/photobooth/constants/layouts'
 import { PHOTOBOOTH_DEFAULT_SESSION } from '@/src/features/photobooth/constants/session'
+import { getAssetPath } from '@/src/features/photobooth/utils/assetPath'
 import {
   readPhotoboothRuntimeSession,
   setPhotoboothSelectedLayoutId,
@@ -92,7 +94,21 @@ export default function LayoutPage() {
 
             <div className="mt-2 shrink-0 flex justify-center pb-[calc(2px+env(safe-area-inset-bottom))]">
               <PrimaryButton href={screen.nextHref} className="min-w-[142px]">
-                {screen.primaryActionLabel}
+                {screen.primaryActionLabel === 'Tiếp tục' ? (
+                  <span className="inline-flex items-center gap-2 whitespace-nowrap">
+                    <span>Tiếp tục</span>
+                    <Image
+                      src={getAssetPath('/icons/arrow-right.svg')}
+                      alt=""
+                      aria-hidden="true"
+                      width={14}
+                      height={14}
+                      className="h-[14px] w-[14px] shrink-0"
+                    />
+                  </span>
+                ) : (
+                  screen.primaryActionLabel
+                )}
               </PrimaryButton>
             </div>
           </div>

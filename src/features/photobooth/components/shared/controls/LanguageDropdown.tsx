@@ -21,17 +21,17 @@ const LANGUAGE_OPTIONS: LanguageOption[] = [
   {
     code: 'VI',
     label: 'VI',
-    flagSrc: '/images/photobooth/flags/vn.svg',
+    flagSrc: '/flags/vn.svg',
   },
   {
     code: 'EN',
     label: 'EN',
-    flagSrc: '/images/photobooth/flags/en.svg',
+    flagSrc: '/flags/en.svg',
   },
   {
     code: 'CH',
     label: 'CH',
-    flagSrc: '/images/photobooth/flags/ch.svg',
+    flagSrc: '/flags/ch.svg',
   },
 ]
 

@@ -379,7 +379,7 @@ export default function CapturePage() {
                   }}
                   disabled={!isCameraReady || isCapturingSequence}
                   className={[
-                    'flex h-[84px] w-[84px] flex-col items-center justify-center rounded-full bg-[#F56F58] text-white shadow-[0_12px_28px_rgba(245,111,88,0.38)] sm:h-[92px] sm:w-[92px]',
+                    'flex h-[84px] w-[84px] flex-col items-center justify-center rounded-full bg-[#FF5A2A] text-white shadow-[0_12px_28px_rgba(255,90,42,0.38)] sm:h-[92px] sm:w-[92px]',
                     !isCameraReady || isCapturingSequence
                       ? 'cursor-not-allowed opacity-70'
                       : '',

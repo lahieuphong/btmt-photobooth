@@ -199,10 +199,8 @@ export default function PreviewPage() {
                 primaryLabel={resolvedPrimaryLabel}
                 onSecondaryClick={handleRetakeAll}
                 onPrimaryClick={handleConfirmPreview}
-                secondaryIconSrc={getAssetPath(
-                  '/images/photobooth/preview/arrow-rotate-left.svg'
-                )}
-                primaryIconSrc={getAssetPath('/images/photobooth/preview/arrow-right.svg')}
+                secondaryIconSrc={getAssetPath('/icons/arrow-rotate-left.svg')}
+                primaryIconSrc={getAssetPath('/icons/arrow-right.svg')}
                 hideSecondary={isRetakeReviewMode}
               />
             </div>

@@ -119,7 +119,21 @@ export default function PrintPage() {
                 href={screen.nextHref}
                 className="h-[48px] rounded-full px-8 sm:h-[52px] sm:px-10 text-[13px] sm:text-[16px] font-semibold"
               >
-                {screen.primaryActionLabel}
+                {screen.primaryActionLabel === 'Tiếp tục' ? (
+                  <span className="inline-flex items-center gap-2 whitespace-nowrap">
+                    <span>Tiếp tục</span>
+                    <Image
+                      src={getAssetPath('/icons/arrow-right.svg')}
+                      alt=""
+                      aria-hidden="true"
+                      width={14}
+                      height={14}
+                      className="h-[14px] w-[14px] shrink-0"
+                    />
+                  </span>
+                ) : (
+                  screen.primaryActionLabel
+                )}
               </PrimaryButton>
             </div>
           </div>

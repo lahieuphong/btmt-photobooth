@@ -23,7 +23,7 @@ export default function PrimaryButton({
   variant = 'primary',
 }: PrimaryButtonProps) {
   const baseClass =
-    'inline-flex h-[42px] min-w-[132px] items-center justify-center rounded-full px-6 text-[13px] font-semibold !text-white transition-all duration-200'
+    'inline-flex h-[42px] min-w-[132px] max-w-full items-center justify-center rounded-full px-5 text-[clamp(11px,2.8vw,13px)] font-semibold !text-white transition-all duration-200 whitespace-nowrap overflow-hidden'
 
   const variantClass =
     variant === 'primary'
@@ -34,7 +34,7 @@ export default function PrimaryButton({
         ? 'cursor-not-allowed bg-[#7D7D7D]'
         : 'bg-[#171717] hover:brightness-110 active:scale-[0.98]'
 
-  const widthClass = fullWidth ? 'w-full' : ''
+  const widthClass = fullWidth ? 'w-full min-w-0' : ''
 
   const classes = `${baseClass} ${variantClass} ${widthClass} ${className}`.trim()
 

@@ -39,20 +39,20 @@ export default function PhotoboothDualActionBar({
             variant="secondary"
             fullWidth
             onClick={onSecondaryClick}
-            className="h-[48px] sm:h-[52px] px-6 sm:px-7 text-[11px] sm:text-[14px]"
+            className="h-[48px] min-w-0 sm:h-[52px] px-3 sm:px-5 text-[10px] sm:text-[14px]"
           >
-            <span className="inline-flex items-center justify-center gap-2 whitespace-nowrap leading-none font-semibold text-white">
+            <span className="inline-flex w-full min-w-0 max-w-full items-center justify-center gap-1.5 whitespace-nowrap leading-none font-semibold text-white">
               {secondaryIconSrc ? (
                 <Image
                   src={secondaryIconSrc}
                   alt=""
                   aria-hidden="true"
-                  width={16}
-                  height={16}
-                  className="h-4 w-4 shrink-0"
+                  width={14}
+                  height={14}
+                  className="h-[14px] w-[14px] shrink-0 sm:h-4 sm:w-4"
                 />
               ) : null}
-              <span className="whitespace-nowrap font-semibold text-white">
+              <span className="block min-w-0 flex-1 truncate whitespace-nowrap text-center font-semibold text-white">
                 {secondaryLabel}
               </span>
             </span>
@@ -63,12 +63,12 @@ export default function PhotoboothDualActionBar({
           fullWidth={!hideSecondary}
           onClick={onPrimaryClick}
           className={[
-            'h-[48px] sm:h-[52px] px-6 sm:px-7 text-[11px] sm:text-[14px]',
+            'h-[48px] min-w-0 sm:h-[52px] px-3 sm:px-5 text-[10px] sm:text-[14px]',
             hideSecondary ? 'min-w-[160px] px-9 text-[14px] sm:text-[16px]' : '',
           ].join(' ')}
         >
-          <span className="inline-flex items-center justify-center gap-2 whitespace-nowrap leading-none font-semibold text-white">
-            <span className="whitespace-nowrap font-semibold text-white">
+          <span className="inline-flex w-full min-w-0 max-w-full items-center justify-center gap-1.5 whitespace-nowrap leading-none font-semibold text-white">
+            <span className="block min-w-0 flex-1 truncate whitespace-nowrap text-center font-semibold text-white">
               {primaryLabel}
             </span>
             {primaryIconSrc ? (
@@ -76,9 +76,9 @@ export default function PhotoboothDualActionBar({
                 src={primaryIconSrc}
                 alt=""
                 aria-hidden="true"
-                width={16}
-                height={16}
-                className="h-4 w-4 shrink-0"
+                width={14}
+                height={14}
+                className="h-[14px] w-[14px] shrink-0 sm:h-4 sm:w-4"
               />
             ) : null}
           </span>

@@ -43,7 +43,7 @@ function PreviewPhotoCard({
             className="pointer-events-auto inline-flex items-center justify-center gap-1.5 rounded-full bg-[#FF5A2A] px-4 py-2 text-[12px] font-semibold text-white shadow-[0_8px_20px_rgba(255,90,42,0.35)] transition-transform duration-150 hover:scale-[1.02] active:scale-[0.98]"
           >
             <Image
-              src={getAssetPath('/images/photobooth/preview/arrow-rotate-left.svg')}
+              src={getAssetPath('/icons/arrow-rotate-left.svg')}
               alt=""
               aria-hidden="true"
               width={12}
