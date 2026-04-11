@@ -68,46 +68,40 @@ export default function LanguageDropdown({
   }
 
   return (
-    <div ref={rootRef} className="relative z-30 w-[19.5%] min-w-0">
+    <div ref={rootRef} className="relative z-30 w-[23.5%] min-w-0">
       <button
         type="button"
         onClick={() => setIsOpen((prev) => !prev)}
-        className="flex w-full aspect-[195/68] items-center gap-[8.205%] rounded-[12px] border-[2px] border-[#FF4D27] bg-white px-[7.179%]"
+        className="flex w-full aspect-[225/86] items-center rounded-[10px] border-[2px] border-[#FF4D27] bg-white px-[7.179%]"
       >
-        <div className="relative aspect-square h-[52.941%] shrink-0 overflow-hidden rounded-full">
+        <div className="relative h-[22px] w-[22px] shrink-0 overflow-hidden rounded-full sm:h-[26px] sm:w-[26px]">
           <Image
             src={getAssetPath(selectedOption.flagSrc)}
             alt={selectedOption.label}
             fill
-            sizes="(max-width: 768px) 24px, 36px"
+            sizes="(max-width: 768px) 22px, 26px"
             className="object-cover"
           />
         </div>
 
-        <span className="text-[clamp(8px,0.95vw,18px)] font-medium leading-none text-[#2E2A26]">
+        <span className="ml-3 text-left text-[clamp(12px,1.9vw,54px)] font-semibold leading-none text-[#171717]">
           {selectedOption.label}
         </span>
 
-        <svg
-          className={`ml-auto h-[35.294%] w-auto shrink-0 text-[#666666] transition-transform duration-200 ${
-            isOpen ? 'rotate-180' : ''
-          }`}
-          viewBox="0 0 20 20"
-          fill="none"
+        <Image
+          src={getAssetPath('/icons/angle-up.svg')}
+          alt=""
+          width={14}
+          height={14}
           aria-hidden="true"
-        >
-          <path
-            d="M4.75 7.25L10 12.5L15.25 7.25"
-            stroke="currentColor"
-            strokeWidth="1.8"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
-        </svg>
+          className={`ml-auto h-[14px] w-[14px] shrink-0 transition-transform duration-200 ${
+            !isOpen ? 'rotate-180' : ''
+          }`}
+        />
       </button>
 
       {isOpen ? (
-        <div className="absolute right-0 top-[calc(100%+8px)] w-full overflow-hidden rounded-[12px] border border-[#E6DED7] bg-white shadow-[0_12px_24px_rgba(0,0,0,0.14)]">
+        <div className="absolute right-0 top-[calc(100%+1px)] w-full overflow-hidden rounded-[10px] border border-[#B6B6B6] bg-white shadow-[0_12px_24px_rgba(0,0,0,0.14)]">
           {LANGUAGE_OPTIONS.map((item) => {
             const isSelected = item.code === selected
 
@@ -116,21 +110,21 @@ export default function LanguageDropdown({
                 key={item.code}
                 type="button"
                 onClick={() => handleSelect(item.code)}
-                className={`flex w-full aspect-[195/68] items-center gap-[8.205%] px-[7.179%] text-left ${
-                  isSelected ? 'bg-[#FFF3EE]' : 'bg-white hover:bg-[#F8F3EE]'
+                className={`flex w-full aspect-[225/86] items-center px-[7.179%] text-left ${
+                  isSelected ? 'bg-[#EAC5B2]' : 'bg-white hover:bg-[#F4F4F4]'
                 }`}
               >
-                <div className="relative aspect-square h-[52.941%] shrink-0 overflow-hidden rounded-full">
+                <div className="relative h-[22px] w-[22px] shrink-0 overflow-hidden rounded-full sm:h-[26px] sm:w-[26px]">
                   <Image
                     src={getAssetPath(item.flagSrc)}
                     alt={item.label}
                     fill
-                    sizes="(max-width: 768px) 24px, 36px"
+                    sizes="(max-width: 768px) 22px, 26px"
                     className="object-cover"
                   />
                 </div>
 
-                <span className="text-[clamp(8px,0.95vw,18px)] font-medium leading-none text-[#2E2A26]">
+                <span className="ml-3 text-[clamp(12px,1.9vw,54px)] font-semibold leading-none text-[#171717]">
                   {item.label}
                 </span>
               </button>
