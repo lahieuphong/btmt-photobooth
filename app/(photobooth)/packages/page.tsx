@@ -8,6 +8,7 @@ import PhotoboothPageBody from '@/src/features/photobooth/components/shared/layo
 import PhotoboothFooter from '@/src/features/photobooth/components/shared/layout/Footer'
 import PackageCard from '@/src/features/photobooth/components/screens/packages/PackageCard'
 import PrimaryButton from '@/src/features/photobooth/components/shared/controls/PrimaryButton'
+import { PHOTOBOOTH_DEFAULT_SESSION } from '@/src/features/photobooth/constants/session'
 import { PHOTOBOOTH_PACKAGE_OPTIONS } from '@/src/features/photobooth/constants/packages'
 import { PHOTOBOOTH_SCREEN_STATE_MAP } from '@/src/features/photobooth/config/screenState'
 import { startPhotoboothRuntimeSession } from '@/src/features/photobooth/utils/runtimeSession'
@@ -16,10 +17,11 @@ export default function PackagesPage() {
   const router = useRouter()
   const screen = PHOTOBOOTH_SCREEN_STATE_MAP.packages
 
-  const [selectedPackageId, setSelectedPackageId] = useState<string | null>(null)
+  const [selectedPackageId, setSelectedPackageId] = useState(
+    PHOTOBOOTH_DEFAULT_SESSION.selectedPackageId
+  )
 
   function handleConfirmPackage() {
-    if (!selectedPackageId) return
     startPhotoboothRuntimeSession(selectedPackageId)
     router.push(screen.nextHref ?? '/payment')
   }
@@ -50,11 +52,7 @@ export default function PackagesPage() {
           </div>
 
           <div className="mt-auto flex justify-center pb-0 pt-4">
-            <PrimaryButton
-              onClick={handleConfirmPackage}
-              disabled={!selectedPackageId}
-              className="min-w-[142px]"
-            >
+            <PrimaryButton onClick={handleConfirmPackage} className="min-w-[142px]">
               {screen.primaryActionLabel}
             </PrimaryButton>
           </div>
