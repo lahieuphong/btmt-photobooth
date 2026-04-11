@@ -1,0 +1,19 @@
+{
+  "name": "BTMT Photobooth",
+  "short_name": "BTMT Booth",
+  "description": "Photobooth trải nghiệm chụp ảnh tại Bảo tàng Mỹ thuật Thành phố Hồ Chí Minh",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#111111",
+  "theme_color": "#111111",
+  "icons": [
+    {
+      "src": "./favicon.ico",
+      "sizes": "48x48 72x72 96x96 144x144 192x192 256x256 384x384 512x512",
+      "type": "image/x-icon",
+      "purpose": "any"
+    }
+  ]
+}

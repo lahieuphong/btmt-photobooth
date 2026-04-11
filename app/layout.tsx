@@ -1,5 +1,7 @@
-import type { Metadata } from 'next'
+import type { Metadata, Viewport } from 'next'
+import Script from 'next/script'
 import { Geist, Geist_Mono } from 'next/font/google'
+import { getAssetPath } from '@/src/features/photobooth/utils/assetPath'
 import './globals.css'
 
 const geistSans = Geist({
@@ -15,6 +17,18 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: 'BTMT Photobooth',
   description: 'Photobooth trải nghiệm chụp ảnh tại Bảo tàng Mỹ thuật Thành phố Hồ Chí Minh',
+  manifest: getAssetPath('/manifest.webmanifest'),
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: 'black-translucent',
+    title: 'BTMT Photobooth',
+  },
+}
+
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  viewportFit: 'cover',
 }
 
 export default function RootLayout({
@@ -28,6 +42,17 @@ export default function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable} h-full`}
     >
       <body className="min-h-screen bg-[#111111] font-sans antialiased">
+        <Script id="register-sw" strategy="afterInteractive">
+          {`
+            if ('serviceWorker' in navigator) {
+              window.addEventListener('load', function () {
+                navigator.serviceWorker.register('${getAssetPath('/sw.js')}', {
+                  scope: '${getAssetPath('/')}'
+                }).catch(function () {})
+              })
+            }
+          `}
+        </Script>
         {children}
       </body>
     </html>
