@@ -170,7 +170,7 @@ export default function CapturePage() {
   }
 
   async function runCountdown(seconds: number) {
-    for (let value = seconds; value >= 0; value -= 1) {
+    for (let value = seconds; value >= 1; value -= 1) {
       setCountdownValue(value)
       await waitFor(1000)
     }
