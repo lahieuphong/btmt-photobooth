@@ -34,6 +34,14 @@ function waitFor(ms: number) {
   })
 }
 
+function buildStaticRouteHrefFromCapture(nextRoute: string) {
+  const normalizedNextRoute = nextRoute.startsWith('/') ? nextRoute : `/${nextRoute}`
+  const currentPath = window.location.pathname
+  const basePath = currentPath.replace(/\/capture\/?$/, '')
+
+  return `${basePath}${normalizedNextRoute}/`
+}
+
 export default function CapturePage() {
   const router = useRouter()
   const screen = PHOTOBOOTH_SCREEN_STATE_MAP.capture
@@ -240,7 +248,15 @@ export default function CapturePage() {
         setIsInterCaptureLoading(false)
       }
 
-      router.push(screen.nextHref ?? '/preview')
+      const nextRoute = screen.nextHref ?? '/preview'
+      router.push(nextRoute)
+
+      // Fallback for static export on mobile browsers where client router may not transition reliably.
+      window.setTimeout(() => {
+        if (/\/capture\/?$/.test(window.location.pathname)) {
+          window.location.assign(buildStaticRouteHrefFromCapture(nextRoute))
+        }
+      }, 420)
     } finally {
       setCountdownValue(null)
       setIsInterCaptureLoading(false)
