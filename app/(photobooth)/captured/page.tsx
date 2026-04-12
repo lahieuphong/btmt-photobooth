@@ -90,8 +90,8 @@ export default function CapturedPage() {
             className="mx-auto grid h-full min-h-0 w-full max-w-[920px] flex-1 grid-rows-[minmax(0,1fr)_auto]"
             style={{ containerType: 'inline-size' }}
           >
-            <div className="flex min-h-0 flex-1 flex-col items-center overflow-y-auto overflow-x-visible">
-              <div className="w-full max-w-[min(430px,92vw)] px-[clamp(6px,1.2cqw,12px)] pt-[clamp(8px,1.6cqw,16px)]">
+            <div className="flex min-h-0 flex-1 items-center justify-center overflow-visible">
+              <div className="w-full max-w-[min(430px,92vw)] px-[clamp(6px,1.2cqw,12px)]">
                 <PhotoboothFrameSwipePreview
                   modes={visibleCapturedModes}
                   currentIndex={currentImageIndex}

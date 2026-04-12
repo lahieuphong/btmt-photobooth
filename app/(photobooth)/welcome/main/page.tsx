@@ -31,6 +31,7 @@ export default function WelcomeMainPage() {
               width={84}
               height={84}
               priority
+              style={{ width: 'auto' }}
             />
           </div>
 

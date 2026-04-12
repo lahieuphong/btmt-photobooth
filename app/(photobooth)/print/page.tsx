@@ -71,7 +71,7 @@ export default function PrintPage() {
             style={{ containerType: 'inline-size' }}
           >
             <div className="w-full min-h-0 flex-1 overflow-hidden">
-              <div className="flex w-full flex-col items-center gap-[clamp(4px,0.8svh,10px)]">
+              <div className="flex h-full w-full flex-col items-center justify-center gap-[clamp(4px,0.8svh,10px)]">
                 <div className="max-w-full shrink-0 whitespace-nowrap text-center text-[clamp(11px,1.95cqw,18px)] font-medium leading-[1.3] text-[#2E2A26]">
                   Hình ảnh đang được in, vui lòng chờ giây lát
                 </div>

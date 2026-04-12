@@ -137,83 +137,85 @@ export default function PaymentPage() {
         />
 
         <PhotoboothPageBody className="flex flex-1 flex-col items-center overflow-x-hidden pt-0 pb-0">
-          <div className="relative mt-0 w-full max-w-[340px] pt-[clamp(1px,0.2vh,3px)]">
-            <div className="relative mx-auto w-[min(78vw,320px)] rounded-[24px] border border-[#F2B39B] bg-white/90 px-[8px] pt-[8px] pb-[26px]">
-              <div className="p-0">
-                <div className="relative aspect-square w-full overflow-hidden rounded-[10px] bg-white">
-                  <div className="absolute left-[14.2%] right-[14.2%] top-[18.8%] bottom-[14.2%] z-[1] overflow-hidden bg-white">
+          <div className="flex w-full flex-1 flex-col items-center justify-center">
+            <div className="relative mt-0 w-full max-w-[340px] pt-[clamp(1px,0.2vh,3px)]">
+              <div className="relative mx-auto w-[min(78vw,320px)] rounded-[24px] border border-[#F2B39B] bg-white/90 px-[8px] pt-[8px] pb-[26px]">
+                <div className="p-0">
+                  <div className="relative aspect-square w-full overflow-hidden rounded-[10px] bg-white">
+                    <div className="absolute left-[14.2%] right-[14.2%] top-[18.8%] bottom-[14.2%] z-[1] overflow-hidden bg-white">
+                      <Image
+                        src={paymentQrSrc}
+                        alt="QR thanh toán MB"
+                        fill
+                        unoptimized
+                        sizes="(max-width: 768px) 210px, 260px"
+                        className="object-cover"
+                        onLoad={() => setLoadedQrSrc(paymentQrSrc)}
+                        onError={() => setLoadedQrSrc(paymentQrSrc)}
+                      />
+
+                      {isQrLoading ? (
+                        <div className="absolute inset-0 z-[9] flex flex-col items-center justify-center bg-white/92">
+                          <div className="relative h-[46px] w-[46px]">
+                            <div className="absolute inset-0 rounded-full border-[6px] border-[#F3CBAF]/70" />
+                            <div
+                              aria-hidden="true"
+                              className="absolute inset-0 animate-spin rounded-full border-[6px] border-transparent border-r-[#FF5A2A] border-t-[#FF7A5F]"
+                            />
+                          </div>
+                          <span className="mt-1 text-[12px] font-medium text-[#FF5A2A]">
+                            Đang tạo mã QR...
+                          </span>
+                        </div>
+                      ) : null}
+                    </div>
+
                     <Image
-                      src={paymentQrSrc}
-                      alt="QR thanh toán MB"
+                      src={getAssetPath(PAYMENT_QR_FRAME_SRC)}
+                      alt="Khung mã QR"
                       fill
-                      unoptimized
-                      sizes="(max-width: 768px) 210px, 260px"
-                      className="object-cover"
-                      onLoad={() => setLoadedQrSrc(paymentQrSrc)}
-                      onError={() => setLoadedQrSrc(paymentQrSrc)}
+                      sizes="(max-width: 768px) 240px, 320px"
+                      className="pointer-events-none absolute inset-0 z-[2] object-contain"
                     />
 
-                    {isQrLoading ? (
-                      <div className="absolute inset-0 z-[9] flex flex-col items-center justify-center bg-white/92">
-                        <div className="relative h-[46px] w-[46px]">
-                          <div className="absolute inset-0 rounded-full border-[6px] border-[#F3CBAF]/70" />
-                          <div
-                            aria-hidden="true"
-                            className="absolute inset-0 animate-spin rounded-full border-[6px] border-transparent border-r-[#FF5A2A] border-t-[#FF7A5F]"
-                          />
-                        </div>
-                        <span className="mt-1 text-[12px] font-medium text-[#FF5A2A]">
-                          Đang tạo mã QR...
-                        </span>
+                    {isQrExpired ? (
+                      <div className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-4 bg-white/80 px-4 text-center">
+                        <p className="text-[20px] font-medium leading-none text-[#1E1E1E]">
+                          Mã QR hết hạn
+                        </p>
+                        <button
+                          type="button"
+                          onClick={handleRefreshQrCode}
+                          className="inline-flex h-[42px] min-w-[160px] items-center justify-center rounded-full bg-[#FF5A2A] px-6 text-[13px] font-semibold text-white transition-all duration-200 hover:brightness-95 active:scale-[0.98]"
+                        >
+                          Lấy mã QR mới
+                        </button>
                       </div>
                     ) : null}
                   </div>
+                </div>
 
-                  <Image
-                    src={getAssetPath(PAYMENT_QR_FRAME_SRC)}
-                    alt="Khung mã QR"
-                    fill
-                    sizes="(max-width: 768px) 240px, 320px"
-                    className="pointer-events-none absolute inset-0 z-[2] object-contain"
-                  />
-
-                  {isQrExpired ? (
-                    <div className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-4 bg-white/80 px-4 text-center">
-                      <p className="text-[20px] font-medium leading-none text-[#1E1E1E]">
-                        Mã QR hết hạn
-                      </p>
-                      <button
-                        type="button"
-                        onClick={handleRefreshQrCode}
-                        className="inline-flex h-[42px] min-w-[160px] items-center justify-center rounded-full bg-[#FF5A2A] px-6 text-[13px] font-semibold text-white transition-all duration-200 hover:brightness-95 active:scale-[0.98]"
-                      >
-                        Lấy mã QR mới
-                      </button>
-                    </div>
-                  ) : null}
+                <div className="absolute left-1/2 top-full -translate-x-1/2 -translate-y-[65%] whitespace-nowrap rounded-[8px] bg-[#1F2024] px-[26px] py-[11px] text-[14px] font-medium lowercase leading-none tracking-[0.02em] text-white">
+                  {priceTagText}
                 </div>
               </div>
+            </div>
 
-              <div className="absolute left-1/2 top-full -translate-x-1/2 -translate-y-[65%] whitespace-nowrap rounded-[8px] bg-[#1F2024] px-[26px] py-[11px] text-[14px] font-medium lowercase leading-none tracking-[0.02em] text-white">
-                {priceTagText}
-              </div>
+            <div className="mt-[clamp(12px,2.2vh,18px)] text-center text-[13px] font-medium text-[#2E2A26]">
+              Quét mã để thanh toán
+            </div>
+
+            <div
+              className={[
+                'mt-1 text-center text-[18px] font-medium',
+                isQrExpired ? 'text-[#FF5A2A]' : 'text-[#2E2A26]',
+              ].join(' ')}
+            >
+              {timeText}
             </div>
           </div>
 
-          <div className="mt-[clamp(12px,2.2vh,18px)] text-center text-[13px] font-medium text-[#2E2A26]">
-            Quét mã để thanh toán
-          </div>
-
-          <div
-            className={[
-              'mt-1 text-center text-[18px] font-medium',
-              isQrExpired ? 'text-[#FF5A2A]' : 'text-[#2E2A26]',
-            ].join(' ')}
-          >
-            {timeText}
-          </div>
-
-          <div className="mt-auto flex w-full justify-center pb-0 pt-4">
+          <div className="flex w-full justify-center pb-0 pt-4">
             <PrimaryButton
               onClick={handleMockPaymentComplete}
               disabled={isPaymentSuccess}

@@ -278,54 +278,56 @@ export default function CapturePage() {
 
         <PhotoboothPageBody className="flex min-h-0 flex-1 flex-col overflow-y-auto px-[5.278%] pt-[2.2%] pb-[calc(10px+env(safe-area-inset-bottom))]">
           <div className="mx-auto flex min-h-full w-full max-w-[900px] flex-col">
-            <div className="relative mx-auto w-full max-w-[820px] overflow-hidden rounded-[8px] bg-[linear-gradient(180deg,#9CC0E9_0%,#E7C95F_45%,#D9B54D_100%)] sm:rounded-[10px]">
-              <video
-                ref={videoRef}
-                autoPlay
-                muted
-                playsInline
-                aria-label="Camera preview"
-                className={[
-                  'absolute inset-0 z-0 h-full w-full object-cover transition-opacity duration-300',
-                  isCameraReady ? 'opacity-100' : 'opacity-0',
-                ].join(' ')}
-              />
+            <div className="flex flex-1 items-center">
+              <div className="relative mx-auto w-full max-w-[820px] overflow-hidden rounded-[8px] bg-[linear-gradient(180deg,#9CC0E9_0%,#E7C95F_45%,#D9B54D_100%)] sm:rounded-[10px]">
+                <video
+                  ref={videoRef}
+                  autoPlay
+                  muted
+                  playsInline
+                  aria-label="Camera preview"
+                  className={[
+                    'absolute inset-0 z-0 h-full w-full object-cover transition-opacity duration-300',
+                    isCameraReady ? 'opacity-100' : 'opacity-0',
+                  ].join(' ')}
+                />
 
-              <div className="aspect-[0.74] w-full bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.15),transparent_45%)] sm:aspect-[0.82]" />
+                <div className="aspect-[0.74] w-full bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.15),transparent_45%)] sm:aspect-[0.82]" />
 
-              {isCameraReady ? (
-                <>
-                  <div className="absolute left-1/2 top-4 z-40 w-fit -translate-x-1/2 whitespace-nowrap rounded-full bg-white/90 px-3 py-1 text-center text-[11px] text-[#2E2A26] shadow-sm">
-                    {PHOTOBOOTH_CAPTURE_GUIDE_TEXT}
+                {isCameraReady ? (
+                  <>
+                    <div className="absolute left-1/2 top-4 z-40 w-fit -translate-x-1/2 whitespace-nowrap rounded-full bg-white/90 px-3 py-1 text-center text-[11px] text-[#2E2A26] shadow-sm">
+                      {PHOTOBOOTH_CAPTURE_GUIDE_TEXT}
+                    </div>
+
+                    <div className="pointer-events-none absolute inset-x-0 top-[24%] bottom-[24%] z-30 border-2 border-[#FF8A3D]" />
+
+                    <div className="pointer-events-none absolute inset-x-0 top-0 z-20 h-[24%] bg-black/22 backdrop-blur-[0.6px]" />
+                    <div className="pointer-events-none absolute inset-x-0 bottom-0 z-20 h-[24%] bg-black/22 backdrop-blur-[0.6px]" />
+                  </>
+                ) : null}
+
+                {!isCameraReady || isInterCaptureLoading ? <CaptureCameraLoadingFrame /> : null}
+
+                {countdownValue !== null && isCameraReady && !isInterCaptureLoading ? (
+                  <div className="pointer-events-none absolute inset-0 z-[45] flex items-center justify-center">
+                    <span className="text-[94px] font-bold leading-none text-white drop-shadow-[0_6px_16px_rgba(0,0,0,0.4)] sm:text-[108px]">
+                      {countdownValue}
+                    </span>
                   </div>
+                ) : null}
 
-                  <div className="pointer-events-none absolute inset-x-0 top-[24%] bottom-[24%] z-30 border-2 border-[#FF8A3D]" />
+                {resolvedCameraError ? (
+                  <div className="absolute inset-0 z-50 flex items-center justify-center px-5 text-center text-[11px] text-white sm:text-[12px]">
+                    <p className="rounded-md bg-black/45 px-3 py-2">{resolvedCameraError}</p>
+                  </div>
+                ) : null}
 
-                  <div className="pointer-events-none absolute inset-x-0 top-0 z-20 h-[24%] bg-black/22 backdrop-blur-[0.6px]" />
-                  <div className="pointer-events-none absolute inset-x-0 bottom-0 z-20 h-[24%] bg-black/22 backdrop-blur-[0.6px]" />
-                </>
-              ) : null}
-
-              {!isCameraReady || isInterCaptureLoading ? <CaptureCameraLoadingFrame /> : null}
-
-              {countdownValue !== null && isCameraReady && !isInterCaptureLoading ? (
-                <div className="pointer-events-none absolute inset-0 z-[45] flex items-center justify-center">
-                  <span className="text-[94px] font-bold leading-none text-white drop-shadow-[0_6px_16px_rgba(0,0,0,0.4)] sm:text-[108px]">
-                    {countdownValue}
-                  </span>
-                </div>
-              ) : null}
-
-              {resolvedCameraError ? (
-                <div className="absolute inset-0 z-50 flex items-center justify-center px-5 text-center text-[11px] text-white sm:text-[12px]">
-                  <p className="rounded-md bg-black/45 px-3 py-2">{resolvedCameraError}</p>
-                </div>
-              ) : null}
-
-              <div className="pointer-events-none absolute inset-0 z-10 bg-black/6" />
+                <div className="pointer-events-none absolute inset-0 z-10 bg-black/6" />
+              </div>
             </div>
 
-            <div className="mt-auto pt-[clamp(16px,2.6vh,34px)]">
+            <div className="pt-[clamp(16px,2.6vh,34px)]">
               <div className="flex items-center justify-center gap-1.5 sm:gap-2">
                 {PHOTOBOOTH_COUNTDOWN_OPTIONS.map((value) => {
                   const isSelected = value === selectedCountdown

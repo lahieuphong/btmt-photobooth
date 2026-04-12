@@ -38,20 +38,22 @@ export default function PackagesPage() {
         />
 
         <PhotoboothPageBody className="flex flex-1 flex-col px-[14px] pt-[20px] pb-0">
-          <div className="mx-auto w-[60%] space-y-3">
-            {PHOTOBOOTH_PACKAGE_OPTIONS.map((item) => (
-              <PackageCard
-                key={item.id}
-                badge={item.badge}
-                lines={item.lines}
-                price={item.price}
-                selected={item.id === selectedPackageId}
-                onClick={() => setSelectedPackageId(item.id)}
-              />
-            ))}
+          <div className="flex flex-1 items-center justify-center">
+            <div className="mx-auto w-[60%] space-y-3">
+              {PHOTOBOOTH_PACKAGE_OPTIONS.map((item) => (
+                <PackageCard
+                  key={item.id}
+                  badge={item.badge}
+                  lines={item.lines}
+                  price={item.price}
+                  selected={item.id === selectedPackageId}
+                  onClick={() => setSelectedPackageId(item.id)}
+                />
+              ))}
+            </div>
           </div>
 
-          <div className="mt-auto flex justify-center pb-0 pt-4">
+          <div className="flex justify-center pb-0 pt-4">
             <PrimaryButton onClick={handleConfirmPackage} className="min-w-[142px]">
               {screen.primaryActionLabel}
             </PrimaryButton>

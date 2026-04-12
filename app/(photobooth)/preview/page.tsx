@@ -168,7 +168,12 @@ export default function PreviewPage() {
             style={{ containerType: 'inline-size' }}
           >
             <div className="flex min-h-0 flex-1 flex-col">
-              <div className="mt-3 min-h-0 flex-1 overflow-hidden pt-1 sm:pt-2 pb-2">
+              <div
+                className={[
+                  'flex min-h-0 flex-1 items-center justify-center overflow-hidden',
+                  isRetakeReviewMode ? '' : 'pt-1 sm:pt-2',
+                ].join(' ')}
+              >
                 {isRetakeReviewMode ? (
                   <div className="mx-auto flex h-full items-center justify-center">
                     <div className="relative aspect-[3/4] w-[min(78vw,320px)] overflow-hidden rounded-[12px] bg-[#E8E5CC] shadow-[0_10px_26px_rgba(34,30,4,0.12)]">
@@ -202,6 +207,7 @@ export default function PreviewPage() {
                 secondaryIconSrc={getAssetPath('/icons/arrow-rotate-left.svg')}
                 primaryIconSrc={getAssetPath('/icons/arrow-right.svg')}
                 hideSecondary={isRetakeReviewMode}
+                className="mt-auto"
               />
             </div>
           </div>

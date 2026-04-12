@@ -143,67 +143,69 @@ export default function FramePage() {
             className="mx-auto grid h-full min-h-0 w-full max-w-[920px] flex-1 grid-rows-[minmax(0,1fr)_auto]"
             style={{ containerType: 'inline-size' }}
           >
-            <div className="grid min-h-0 flex-1 grid-cols-[minmax(0,1fr)_clamp(64px,15%,112px)] items-stretch gap-[clamp(12px,2.6cqw,28px)] overflow-hidden">
-              <div className="min-w-0 flex min-h-0 flex-col items-center">
-                <PhotoboothFrameSwipePreview
-                  modes={stagePreviewModes}
-                  currentIndex={selectedImageIndex}
-                  label={activeImage?.label ?? 'Hình 1'}
-                  canGoPrev={canGoPrev}
-                  canGoNext={canGoNext}
-                  onPrev={handlePrevImage}
-                  onNext={handleNextImage}
-                  renderCard={(mode, options) => (
-                    <div className="relative h-full w-full overflow-hidden rounded-[clamp(6px,1cqw,9px)] border border-[#CFC8B3] bg-[#E1DCC8] shadow-[0_10px_24px_rgba(34,30,4,0.10)]">
-                      <FrameArtwork
-                        mode={mode}
-                        photoSrcs={
-                          frameImages[options.originalIndex]?.captureImageSrcs ?? []
-                        }
-                      />
+            <div className="flex min-h-0 flex-1 items-center">
+              <div className="grid min-h-0 w-full grid-cols-[minmax(0,1fr)_clamp(64px,15%,112px)] items-stretch gap-[clamp(12px,2.6cqw,28px)] overflow-hidden">
+                <div className="min-w-0 flex min-h-0 flex-col items-center">
+                  <PhotoboothFrameSwipePreview
+                    modes={stagePreviewModes}
+                    currentIndex={selectedImageIndex}
+                    label={activeImage?.label ?? 'Hình 1'}
+                    canGoPrev={canGoPrev}
+                    canGoNext={canGoNext}
+                    onPrev={handlePrevImage}
+                    onNext={handleNextImage}
+                    renderCard={(mode, options) => (
+                      <div className="relative h-full w-full overflow-hidden rounded-[clamp(6px,1cqw,9px)] border border-[#CFC8B3] bg-[#E1DCC8] shadow-[0_10px_24px_rgba(34,30,4,0.10)]">
+                        <FrameArtwork
+                          mode={mode}
+                          photoSrcs={
+                            frameImages[options.originalIndex]?.captureImageSrcs ?? []
+                          }
+                        />
+                      </div>
+                    )}
+                  />
+                </div>
+
+                <div className="min-w-0 min-h-0 h-full">
+                  <div className="h-full max-h-[clamp(320px,58vh,680px)] overflow-y-scroll overscroll-contain pr-[8px] [scrollbar-gutter:stable] [scrollbar-width:auto] [scrollbar-color:#CFC8B8_#ECE8DE] [&::-webkit-scrollbar]:w-[8px] [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:border-[2px] [&::-webkit-scrollbar-thumb]:border-[#ECE8DE] [&::-webkit-scrollbar-thumb]:bg-[#CFC8B8] [&::-webkit-scrollbar-track]:rounded-full [&::-webkit-scrollbar-track]:bg-[#ECE8DE]">
+                    <div className="space-y-[clamp(14px,2.2cqw,22px)] pb-[8px]">
+                      {frameOptions.map((item) => {
+                        const isSelected = item.id === selectedFrameId
+
+                        return (
+                          <button
+                            key={item.id}
+                            type="button"
+                            onClick={() => setSelectedFrameId(item.id)}
+                            className="group flex w-full flex-col items-center text-center transition-transform duration-200 ease-out hover:-translate-y-[1px] active:translate-y-[1px] active:scale-[0.985]"
+                          >
+                            <div
+                              className={[
+                                'w-full rounded-[clamp(5px,0.9cqw,8px)] border bg-white/70 p-[3px] transition-all duration-200 ease-out',
+                                isSelected
+                                  ? 'border-[#F15A29] shadow-[0_0_0_1px_rgba(241,90,41,0.14),0_6px_14px_rgba(0,0,0,0.06)]'
+                                  : 'border-[#E4DDCB] group-hover:border-[#D2C9AF] group-hover:shadow-[0_4px_10px_rgba(34,30,4,0.08)]',
+                              ].join(' ')}
+                            >
+                              <FrameOptionPreview
+                                mode={activePreviewMode}
+                                photoSrcs={activeImage?.captureImageSrcs ?? []}
+                              />
+                            </div>
+
+                            <div
+                              className={[
+                                'mt-[6px] text-[clamp(12px,1.3cqw,14px)] leading-none transition-colors duration-200',
+                                isSelected ? 'text-[#F15A29]' : 'text-[#2E2A26]',
+                              ].join(' ')}
+                            >
+                              {item.name}
+                            </div>
+                          </button>
+                        )
+                      })}
                     </div>
-                  )}
-                />
-              </div>
-
-              <div className="min-w-0 min-h-0 h-full">
-                <div className="h-full max-h-[clamp(320px,58vh,680px)] overflow-y-scroll overscroll-contain pr-[8px] [scrollbar-gutter:stable] [scrollbar-width:auto] [scrollbar-color:#CFC8B8_#ECE8DE] [&::-webkit-scrollbar]:w-[8px] [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:border-[2px] [&::-webkit-scrollbar-thumb]:border-[#ECE8DE] [&::-webkit-scrollbar-thumb]:bg-[#CFC8B8] [&::-webkit-scrollbar-track]:rounded-full [&::-webkit-scrollbar-track]:bg-[#ECE8DE]">
-                  <div className="space-y-[clamp(14px,2.2cqw,22px)] pb-[8px]">
-                    {frameOptions.map((item) => {
-                      const isSelected = item.id === selectedFrameId
-
-                      return (
-                        <button
-                          key={item.id}
-                          type="button"
-                          onClick={() => setSelectedFrameId(item.id)}
-                          className="group flex w-full flex-col items-center text-center transition-transform duration-200 ease-out hover:-translate-y-[1px] active:translate-y-[1px] active:scale-[0.985]"
-                        >
-                          <div
-                            className={[
-                              'w-full rounded-[clamp(5px,0.9cqw,8px)] border bg-white/70 p-[3px] transition-all duration-200 ease-out',
-                              isSelected
-                                ? 'border-[#F15A29] shadow-[0_0_0_1px_rgba(241,90,41,0.14),0_6px_14px_rgba(0,0,0,0.06)]'
-                                : 'border-[#E4DDCB] group-hover:border-[#D2C9AF] group-hover:shadow-[0_4px_10px_rgba(34,30,4,0.08)]',
-                            ].join(' ')}
-                          >
-                            <FrameOptionPreview
-                              mode={activePreviewMode}
-                              photoSrcs={activeImage?.captureImageSrcs ?? []}
-                            />
-                          </div>
-
-                          <div
-                            className={[
-                              'mt-[6px] text-[clamp(12px,1.3cqw,14px)] leading-none transition-colors duration-200',
-                              isSelected ? 'text-[#F15A29]' : 'text-[#2E2A26]',
-                            ].join(' ')}
-                          >
-                            {item.name}
-                          </div>
-                        </button>
-                      )
-                    })}
                   </div>
                 </div>
               </div>
