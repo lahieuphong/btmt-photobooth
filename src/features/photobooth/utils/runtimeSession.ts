@@ -5,6 +5,7 @@ import { PHOTOBOOTH_DEFAULT_SESSION } from '@/src/features/photobooth/constants/
 export type PhotoboothRuntimeSession = {
   selectedPackageId: string
   selectedLayoutId: string
+  selectedFilterId: string
   captureRoundsRequired: number
   captureRoundsCompleted: number
   completedRoundLayoutIds: string[]
@@ -86,6 +87,7 @@ export function getDefaultPhotoboothRuntimeSession(): PhotoboothRuntimeSession {
   return {
     selectedPackageId,
     selectedLayoutId,
+    selectedFilterId: PHOTOBOOTH_DEFAULT_SESSION.selectedFilterId,
     captureRoundsRequired: getPackageCaptureRounds(selectedPackageId),
     captureRoundsCompleted: 0,
     completedRoundLayoutIds: [],
@@ -122,6 +124,10 @@ export function readPhotoboothRuntimeSession(): PhotoboothRuntimeSession {
       typeof parsedValue.selectedLayoutId === 'string'
         ? parsedValue.selectedLayoutId
         : fallback.selectedLayoutId
+    const selectedFilterId =
+      typeof parsedValue.selectedFilterId === 'string'
+        ? parsedValue.selectedFilterId
+        : fallback.selectedFilterId
 
     const captureRoundsRequired =
       typeof parsedValue.captureRoundsRequired === 'number' &&
@@ -166,6 +172,7 @@ export function readPhotoboothRuntimeSession(): PhotoboothRuntimeSession {
     return {
       selectedPackageId,
       selectedLayoutId,
+      selectedFilterId,
       captureRoundsRequired,
       captureRoundsCompleted,
       completedRoundLayoutIds,
@@ -195,6 +202,7 @@ export function startPhotoboothRuntimeSession(selectedPackageId: string) {
   const nextValue: PhotoboothRuntimeSession = {
     selectedPackageId,
     selectedLayoutId: PHOTOBOOTH_DEFAULT_SESSION.selectedLayoutId,
+    selectedFilterId: PHOTOBOOTH_DEFAULT_SESSION.selectedFilterId,
     captureRoundsRequired: getPackageCaptureRounds(selectedPackageId),
     captureRoundsCompleted: 0,
     completedRoundLayoutIds: [],
@@ -216,6 +224,19 @@ export function setPhotoboothSelectedLayoutId(selectedLayoutId: string) {
   const nextValue: PhotoboothRuntimeSession = {
     ...currentValue,
     selectedLayoutId,
+  }
+
+  writePhotoboothRuntimeSession(nextValue)
+
+  return nextValue
+}
+
+export function setPhotoboothSelectedFilterId(selectedFilterId: string) {
+  const currentValue = readPhotoboothRuntimeSession()
+
+  const nextValue: PhotoboothRuntimeSession = {
+    ...currentValue,
+    selectedFilterId,
   }
 
   writePhotoboothRuntimeSession(nextValue)

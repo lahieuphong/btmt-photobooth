@@ -15,6 +15,7 @@ import {
   PHOTOBOOTH_COUNTDOWN_OPTIONS,
   type PhotoboothCountdownOption,
 } from '@/src/features/photobooth/constants/capture'
+import { getPhotoboothFilterCssValue } from '@/src/features/photobooth/constants/filterStyle'
 import { PHOTOBOOTH_DEFAULT_SESSION } from '@/src/features/photobooth/constants/session'
 import { PHOTOBOOTH_LAYOUT_OPTIONS } from '@/src/features/photobooth/constants/layouts'
 import { getAssetPath } from '@/src/features/photobooth/utils/assetPath'
@@ -48,6 +49,9 @@ export default function CapturePage() {
   const [selectedCountdown, setSelectedCountdown] = useState<PhotoboothCountdownOption>(
     PHOTOBOOTH_DEFAULT_SESSION.selectedCountdown
   )
+  const [selectedFilterId, setSelectedFilterId] = useState(
+    PHOTOBOOTH_DEFAULT_SESSION.selectedFilterId
+  )
   const [cameraError, setCameraError] = useState<string | null>(null)
   const [isCameraReady, setIsCameraReady] = useState(false)
   const [isSingleRetakeMode, setIsSingleRetakeMode] = useState(false)
@@ -67,9 +71,11 @@ export default function CapturePage() {
 
     return mobileUaRegex.test(navigator.userAgent) || hasTouch
   }, [])
+  const selectedFilterStyle = getPhotoboothFilterCssValue(selectedFilterId)
 
   useEffect(() => {
     const session = readPhotoboothRuntimeSession()
+    setSelectedFilterId(session.selectedFilterId)
     setIsSingleRetakeMode(
       session.retakeTargetRoundIndex !== null && session.retakeTargetSlotIndex !== null
     )
@@ -173,6 +179,7 @@ export default function CapturePage() {
       return null
     }
 
+    context.filter = selectedFilterStyle
     context.drawImage(video, 0, 0, canvas.width, canvas.height)
     return canvas.toDataURL('image/jpeg', 0.92)
   }
@@ -286,11 +293,12 @@ export default function CapturePage() {
                   muted
                   playsInline
                   aria-label="Camera preview"
-                  className={[
-                    'absolute inset-0 z-0 h-full w-full object-cover transition-opacity duration-300',
-                    isCameraReady ? 'opacity-100' : 'opacity-0',
-                  ].join(' ')}
-                />
+                className={[
+                  'absolute inset-0 z-0 h-full w-full object-cover transition-opacity duration-300',
+                  isCameraReady ? 'opacity-100' : 'opacity-0',
+                ].join(' ')}
+                style={{ filter: selectedFilterStyle }}
+              />
 
                 <div className="aspect-[0.74] w-full bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.15),transparent_45%)] sm:aspect-[0.82]" />
 

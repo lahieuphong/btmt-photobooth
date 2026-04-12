@@ -15,24 +15,17 @@ import {
 } from '@/src/features/photobooth/constants/customize'
 import { PHOTOBOOTH_SCREEN_STATE_MAP } from '@/src/features/photobooth/config/screenState'
 import { PHOTOBOOTH_DEFAULT_SESSION } from '@/src/features/photobooth/constants/session'
+import { getPhotoboothFilterCssValue } from '@/src/features/photobooth/constants/filterStyle'
 import { getAssetPath } from '@/src/features/photobooth/utils/assetPath'
 import {
   getCurrentPhotoboothCaptureRound,
   readPhotoboothRuntimeSession,
+  setPhotoboothSelectedFilterId,
 } from '@/src/features/photobooth/utils/runtimeSession'
 
 const CUSTOMIZE_PREVIEW_CHARACTER_IMAGE =
   '/images/photobooth/customize/bg_removed.png'
 
-const FILTER_STYLE_MAP: Record<string, string> = {
-  original: 'none',
-  bright: 'brightness(1.08) saturate(1.2) contrast(1.04)',
-  classic: 'sepia(0.28) contrast(0.95) saturate(0.82)',
-  nature: 'saturate(1.18) hue-rotate(-8deg) contrast(1.02)',
-  bw: 'grayscale(1) contrast(1.06)',
-  sunset: 'saturate(1.2) hue-rotate(-12deg) brightness(1.02)',
-  cool: 'saturate(1.08) hue-rotate(14deg) contrast(1.02)',
-}
 const FALLBACK_BACKGROUND_CLASS_NAME =
   'bg-[linear-gradient(180deg,#9CC0E9_0%,#D5D2B2_28%,#E7C95F_62%,#D9B54D_100%)]'
 
@@ -55,12 +48,13 @@ export default function CustomizePage() {
     PHOTOBOOTH_BACKGROUND_OPTIONS.find((item) => item.id === selectedBackgroundId)
       ?.previewClassName ?? FALLBACK_BACKGROUND_CLASS_NAME
 
-  const selectedFilterStyle = FILTER_STYLE_MAP[selectedFilterId] ?? 'none'
+  const selectedFilterStyle = getPhotoboothFilterCssValue(selectedFilterId)
 
   useEffect(() => {
     const timerId = window.setTimeout(() => {
       const session = readPhotoboothRuntimeSession()
       setSelectedLayoutId(session.selectedLayoutId)
+      setSelectedFilterId(session.selectedFilterId)
       setCurrentRound(getCurrentPhotoboothCaptureRound(session))
     }, 0)
 
@@ -143,7 +137,10 @@ export default function CustomizePage() {
                           name={item.name}
                           previewClassName={item.previewClassName}
                           isSelected={item.id === selectedFilterId}
-                          onClick={() => setSelectedFilterId(item.id)}
+                          onClick={() => {
+                            setSelectedFilterId(item.id)
+                            setPhotoboothSelectedFilterId(item.id)
+                          }}
                         />
                       </div>
                     ))}
