@@ -87,7 +87,7 @@ export default function WelcomeLoadingGate({
                 width={150}
                 height={150}
                 priority
-                className="h-auto w-full"
+                style={{ width: '100%', height: 'auto' }}
               />
             </div>
 
