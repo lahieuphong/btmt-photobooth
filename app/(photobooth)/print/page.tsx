@@ -16,7 +16,7 @@ import {
 import { getAssetPath } from '@/src/features/photobooth/utils/assetPath'
 import { type PhotoboothLayoutPreviewMode } from '@/src/features/photobooth/utils/layoutPreview'
 
-const PRINT_QR_CODE_SRC = '/images/photobooth/print/qr_code.png'
+const PRINT_QR_CODE_SRC = '/images/illustrations/qr_code.svg'
 const FALLBACK_PRINT_MODES: PhotoboothLayoutPreviewMode[] = ['grid-4']
 
 export default function PrintPage() {

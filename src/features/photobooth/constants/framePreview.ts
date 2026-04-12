@@ -14,7 +14,7 @@ export const PHOTOBOOTH_FRAME_OVERLAY_BY_MODE: Record<PhotoboothLayoutPreviewMod
   'grid-6': '/images/photobooth/frame/frame_3.png',
 }
 
-export const PHOTOBOOTH_FRAME_ARROW_SRC = '/images/photobooth/frame/angle-right.png'
+export const PHOTOBOOTH_FRAME_ARROW_SRC = '/icons/angle-right.svg'
 
 export type PhotoboothPreviewRoundItem = {
   index: number

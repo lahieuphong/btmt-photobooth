@@ -3,7 +3,7 @@ import type { ReactNode } from 'react'
 import { getAssetPath } from '@/src/features/photobooth/utils/assetPath'
 import type { PhotoboothLayoutPreviewMode } from '@/src/features/photobooth/utils/layoutPreview'
 
-const LAYOUT_PLACEHOLDER_IMAGE = '/images/photobooth/layouts/vector.png'
+const LAYOUT_PLACEHOLDER_IMAGE = '/images/illustrations/vector.svg'
 
 function LayoutPreviewCard({
   className = '',

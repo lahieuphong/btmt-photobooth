@@ -356,7 +356,7 @@ export default function CapturePage() {
                       ].join(' ')}
                     >
                       <Image
-                        src={getAssetPath('/images/photobooth/capture/stopwatch.svg')}
+                        src={getAssetPath('/images/illustrations/stopwatch.svg')}
                         alt=""
                         aria-hidden="true"
                         width={11}
@@ -396,7 +396,7 @@ export default function CapturePage() {
                   ].join(' ')}
                 >
                   <Image
-                    src={getAssetPath('/images/photobooth/capture/camera-sparkles.svg')}
+                    src={getAssetPath('/images/illustrations/camera-sparkles.svg')}
                     alt=""
                     aria-hidden="true"
                     width={22}

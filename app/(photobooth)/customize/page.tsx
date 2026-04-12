@@ -24,7 +24,7 @@ import {
 } from '@/src/features/photobooth/utils/runtimeSession'
 
 const CUSTOMIZE_PREVIEW_CHARACTER_IMAGE =
-  '/images/photobooth/customize/bg_removed.png'
+  '/images/illustrations/bg_removed.svg'
 
 const FALLBACK_BACKGROUND_CLASS_NAME =
   'bg-[linear-gradient(180deg,#9CC0E9_0%,#D5D2B2_28%,#E7C95F_62%,#D9B54D_100%)]'
