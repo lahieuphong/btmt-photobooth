@@ -60,3 +60,93 @@ a {
   color: inherit;
   text-decoration: none;
 }
+
+@media (max-height: 760px) {
+  .welcome-main-screen .welcome-main-content {
+    padding-top: clamp(4px, 1.2vh, 12px);
+  }
+
+  .welcome-main-screen .welcome-main-logo {
+    width: clamp(50px, 12vw, 70px);
+  }
+
+  .welcome-main-screen .welcome-main-subtitle {
+    margin-top: clamp(6px, 1vh, 10px);
+    font-size: clamp(10px, 1.9vw, 16px);
+    line-height: 1.2;
+  }
+
+  .welcome-main-screen .welcome-main-title {
+    margin-top: clamp(8px, 1.5vh, 16px);
+    font-size: clamp(30px, 8vw, 56px);
+  }
+
+  .welcome-main-screen .welcome-main-cta-wrap {
+    margin-top: clamp(8px, 1.8vh, 16px);
+  }
+
+  .welcome-main-screen .welcome-main-cta {
+    width: clamp(100px, 26vw, 180px);
+    height: clamp(100px, 26vw, 180px);
+  }
+
+  .welcome-main-screen .welcome-main-cta-icon {
+    width: clamp(20px, 5.4vw, 34px);
+    height: clamp(20px, 5.4vw, 34px);
+  }
+
+  .welcome-main-screen .welcome-main-cta-label {
+    margin-top: clamp(4px, 1vw, 8px);
+    font-size: clamp(16px, 3.2vw, 28px);
+  }
+
+  .welcome-main-screen .welcome-main-stack {
+    width: min(84%, 680px);
+    margin-top: clamp(6px, 1vh, 14px);
+  }
+
+  .welcome-main-screen .welcome-main-footer .photobooth-footer-inner {
+    aspect-ratio: 1080 / 170;
+  }
+}
+
+@media (max-height: 670px) {
+  .welcome-main-screen .welcome-main-header {
+    padding-top: calc(env(safe-area-inset-top) + 6px);
+  }
+
+  .welcome-main-screen .welcome-main-content {
+    padding-bottom: calc(4px + env(safe-area-inset-bottom));
+  }
+
+  .welcome-main-screen .welcome-main-title {
+    margin-top: 6px;
+    font-size: clamp(26px, 7.2vw, 46px);
+  }
+
+  .welcome-main-screen .welcome-main-cta {
+    width: clamp(88px, 24vw, 148px);
+    height: clamp(88px, 24vw, 148px);
+  }
+
+  .welcome-main-screen .welcome-main-cta-label {
+    font-size: clamp(14px, 2.8vw, 22px);
+  }
+
+  .welcome-main-screen .welcome-main-stack {
+    width: min(74%, 520px);
+    margin-top: 6px;
+  }
+
+  .welcome-main-screen .welcome-main-footer .photobooth-footer-inner {
+    aspect-ratio: 1080 / 150;
+  }
+
+  .welcome-main-screen .welcome-main-footer .photobooth-footer-title {
+    font-size: clamp(14px, 2.6vw, 24px);
+  }
+
+  .welcome-main-screen .welcome-main-footer .photobooth-footer-subtitle {
+    font-size: clamp(12px, 2vw, 18px);
+  }
+}
