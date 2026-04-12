@@ -2,19 +2,20 @@
 
 import { useEffect, useState } from 'react'
 import type { CSSProperties } from 'react'
+import { useRouter } from 'next/navigation'
 import Image from 'next/image'
 import { getAssetPath } from '@/src/features/photobooth/utils/assetPath'
 
-type WelcomeLoadingGateProps = {
-  children: React.ReactNode
+type WelcomeLoadingScreenProps = {
+  redirectTo: string
 }
 
 const MIN_LOADING_TIME_MS = 1200
 
-export default function WelcomeLoadingGate({
-  children,
-}: WelcomeLoadingGateProps) {
-  const [isLoading, setIsLoading] = useState(true)
+export default function WelcomeLoadingScreen({
+  redirectTo,
+}: WelcomeLoadingScreenProps) {
+  const router = useRouter()
   const [progress, setProgress] = useState(8)
 
   useEffect(() => {
@@ -47,7 +48,7 @@ export default function WelcomeLoadingGate({
         setProgress(100)
         window.setTimeout(() => {
           if (!isCancelled) {
-            setIsLoading(false)
+            router.replace(redirectTo)
           }
         }, 180)
       }
@@ -57,9 +58,9 @@ export default function WelcomeLoadingGate({
       isCancelled = true
       window.clearInterval(progressTicker)
     }
-  }, [])
+  }, [redirectTo, router])
 
-  const overlayStyle: CSSProperties = {
+  const screenStyle: CSSProperties = {
     background: '#ffffff',
   }
 
@@ -69,40 +70,30 @@ export default function WelcomeLoadingGate({
   }
 
   return (
-    <>
-      {children}
-
-      {isLoading ? (
-        <div
-          className="fixed inset-0 z-[999] flex items-center justify-center"
-          style={overlayStyle}
-          role="status"
-          aria-live="polite"
-        >
-          <div className="flex w-[min(84vw,420px)] flex-col items-center gap-6 px-6">
-            <div className="w-[150px]">
-              <Image
-                src={getAssetPath('/images/logo/logo.svg')}
-                alt="BTMT Photobooth"
-                width={150}
-                height={150}
-                priority
-                style={{ width: '100%', height: 'auto' }}
-              />
-            </div>
-
-            <div
-              className="relative h-[6px] w-full rounded-full bg-[#E6E6E6]"
-              aria-hidden="true"
-            >
-              <div
-                className="h-full rounded-full transition-[width] duration-150 ease-out"
-                style={progressFillStyle}
-              />
-            </div>
-          </div>
+    <main
+      className="fixed inset-0 z-[999] flex items-center justify-center"
+      style={screenStyle}
+      role="status"
+      aria-live="polite"
+    >
+      <div className="flex w-[min(84vw,420px)] flex-col items-center gap-6 px-6">
+        <div className="w-[150px]">
+          <Image
+            src={getAssetPath('/images/logos/logo.svg')}
+            alt="BTMT Photobooth"
+            width={150}
+            height={150}
+            priority
+          />
         </div>
-      ) : null}
-    </>
+
+        <div className="relative h-[6px] w-full rounded-full bg-[#E6E6E6]" aria-hidden="true">
+          <div
+            className="h-full rounded-full transition-[width] duration-150 ease-out"
+            style={progressFillStyle}
+          />
+        </div>
+      </div>
+    </main>
   )
 }

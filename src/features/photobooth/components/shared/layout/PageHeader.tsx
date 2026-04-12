@@ -1,5 +1,6 @@
 import { ReactNode } from 'react'
 import HeaderControls from './HeaderControls'
+import { PHOTOBOOTH_ROUTES } from '@/src/features/photobooth/config/routes'
 
 type PhotoboothPageHeaderProps = {
   title: string
@@ -14,7 +15,7 @@ type PhotoboothPageHeaderProps = {
 
 export default function PhotoboothPageHeader({
   title,
-  backHref = '/welcome',
+  backHref = PHOTOBOOTH_ROUTES.WELCOME,
   showBackButton = true,
   showLanguageDropdown = true,
   languageLabel = 'VI',

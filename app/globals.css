@@ -40,7 +40,7 @@ body {
   }
 }
 
-img,
+img:not([data-nimg]),
 picture,
 video,
 canvas,

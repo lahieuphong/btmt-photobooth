@@ -3,6 +3,7 @@ import Image from 'next/image'
 import { ReactNode } from 'react'
 import LanguageDropdown from '../controls/LanguageDropdown'
 import { getAssetPath } from '@/src/features/photobooth/utils/assetPath'
+import { PHOTOBOOTH_ROUTES } from '@/src/features/photobooth/config/routes'
 
 type HeaderControlsProps = {
   backHref?: string
@@ -13,7 +14,7 @@ type HeaderControlsProps = {
 }
 
 export default function HeaderControls({
-  backHref = '/welcome',
+  backHref = PHOTOBOOTH_ROUTES.WELCOME,
   showBackButton = true,
   showLanguageDropdown = true,
   languageLabel = 'VI',
