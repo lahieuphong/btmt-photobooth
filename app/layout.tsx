@@ -18,6 +18,28 @@ export const metadata: Metadata = {
   title: 'BTMT Photobooth',
   description: 'Photobooth trải nghiệm chụp ảnh tại Bảo tàng Mỹ thuật Thành phố Hồ Chí Minh',
   manifest: getAssetPath('/manifest.webmanifest'),
+  icons: {
+    icon: [
+      {
+        url: getAssetPath('/pwa-icons/icon-192.png'),
+        type: 'image/png',
+        sizes: '192x192',
+      },
+      {
+        url: getAssetPath('/pwa-icons/icon-512.png'),
+        type: 'image/png',
+        sizes: '512x512',
+      },
+    ],
+    apple: [
+      {
+        url: getAssetPath('/pwa-icons/apple-touch-icon.png'),
+        sizes: '180x180',
+        type: 'image/png',
+      },
+    ],
+    shortcut: [getAssetPath('/pwa-icons/icon-192.png')],
+  },
   appleWebApp: {
     capable: true,
     statusBarStyle: 'black-translucent',
