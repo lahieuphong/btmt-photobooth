@@ -9,7 +9,9 @@ export default function PhotoboothFooter({
   className = '',
 }: PhotoboothFooterProps) {
   return (
-    <footer className={`photobooth-footer mt-auto w-full bg-black ${className}`}>
+    <footer
+      className={`photobooth-footer mt-auto w-full bg-black pb-[env(safe-area-inset-bottom)] ${className}`}
+    >
       <div className="photobooth-footer-inner relative w-full aspect-[1080/209]">
         <div
           className="photobooth-footer-content absolute inset-0 flex items-center justify-center"
