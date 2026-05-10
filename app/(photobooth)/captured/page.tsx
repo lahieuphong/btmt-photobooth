@@ -272,7 +272,7 @@ export default function CapturedPage() {
                   onClick={() => {
                     void handleDownloadCurrentImage()
                   }}
-                  className="inline-flex h-[42px] min-w-[132px] items-center justify-center rounded-full bg-[#171717] px-6 text-[clamp(16px,4.1vw,20px)] font-semibold text-white shadow-[0_8px_20px_rgba(0,0,0,0.14)] transition-all duration-200 hover:brightness-110 active:scale-[0.98] sm:text-[20px]"
+                  className="inline-flex h-[42px] min-w-[132px] items-center justify-center rounded-full bg-[#171717] px-6 text-[clamp(16px,4.1vw,20px)] font-bold text-white shadow-[0_8px_20px_rgba(0,0,0,0.14)] transition-all duration-200 hover:brightness-110 active:scale-[0.98] sm:text-[20px]"
                 >
                   Tải hình
                 </button>

@@ -179,7 +179,7 @@ export default function CustomizePage() {
               <div className="flex justify-center">
                 <PrimaryButton
                   href={screen.nextHref}
-                  className="min-w-[142px] shrink-0 text-[clamp(16px,4.1vw,20px)] sm:text-[20px]"
+                  className="min-w-[142px] shrink-0"
                 >
                   {screen.primaryActionLabel}
                 </PrimaryButton>

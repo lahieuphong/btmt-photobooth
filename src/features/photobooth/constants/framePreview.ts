@@ -9,9 +9,9 @@ import {
 } from '@/src/features/photobooth/utils/runtimeSession'
 
 export const PHOTOBOOTH_FRAME_OVERLAY_BY_MODE: Record<PhotoboothLayoutPreviewMode, string> = {
-  'grid-4': '/images/photobooth/frame/frame_1.png',
-  'vertical-4': '/images/photobooth/frame/frame_2.png',
-  'grid-6': '/images/photobooth/frame/frame_3.png',
+  'grid-4': '/images/frames/grid-2x2/frame_1.svg',
+  'vertical-4': '/images/frames/stack-4/frame_1.svg',
+  'grid-6': '/images/frames/grid-2x3/frame_1.svg',
 }
 
 export const PHOTOBOOTH_FRAME_ARROW_SRC = '/icons/angle-right.svg'

@@ -215,7 +215,7 @@ export default function FramePage() {
               <div className="flex justify-center">
                 <PrimaryButton
                   href={screen.nextHref}
-                  className="h-[48px] rounded-full px-8 text-[clamp(16px,4.1vw,20px)] font-semibold shadow-[0_7px_18px_rgba(34,30,4,0.16)] sm:h-[52px] sm:px-10 sm:text-[20px]"
+                  className="min-w-[142px]"
                 >
                   {screen.primaryActionLabel}
                 </PrimaryButton>

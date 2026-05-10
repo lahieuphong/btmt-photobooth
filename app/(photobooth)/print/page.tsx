@@ -103,7 +103,7 @@ export default function PrintPage() {
             <div className="mt-auto flex w-full shrink-0 justify-center pt-[clamp(10px,1.8svh,18px)] pb-[calc(clamp(24px,4svh,44px)+env(safe-area-inset-bottom))]">
               <PrimaryButton
                 href={screen.nextHref}
-                className="h-[48px] rounded-full px-8 text-[clamp(16px,4.1vw,20px)] font-semibold sm:h-[52px] sm:px-10 sm:text-[20px]"
+                className="min-w-[142px]"
               >
                 {screen.primaryActionLabel === 'Tiếp tục' ? (
                   <span className="inline-flex items-center gap-2 whitespace-nowrap">

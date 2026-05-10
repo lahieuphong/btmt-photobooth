@@ -95,7 +95,7 @@ export default function LayoutPage() {
             <div className="mt-2 shrink-0 flex justify-center pb-[calc(2px+env(safe-area-inset-bottom))]">
               <PrimaryButton
                 href={screen.nextHref}
-                className="min-w-[142px] text-[clamp(16px,4.1vw,20px)] sm:text-[20px]"
+                className="min-w-[142px]"
               >
                 {screen.primaryActionLabel === 'Tiếp tục' ? (
                   <span className="inline-flex items-center gap-2 whitespace-nowrap">
