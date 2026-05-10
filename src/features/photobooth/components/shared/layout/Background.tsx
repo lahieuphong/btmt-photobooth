@@ -10,7 +10,7 @@ type PhotoboothBackgroundProps = {
   variant?: PhotoboothBackgroundVariant
 }
 
-const DEFAULT_MUSEUM_BACKGROUND_SRC = '/images/backgrounds/bg_removal.svg'
+const DEFAULT_MUSEUM_BACKGROUND_SRC = '/images/backgrounds/optimized/bg_removal.svg'
 
 function MuseumBackground({
   children,

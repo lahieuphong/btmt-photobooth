@@ -103,7 +103,7 @@ export default function PaymentPage() {
 
   return (
     <PhotoboothScreenShell backgroundVariant="museum">
-      <div className="relative flex h-full flex-col">
+      <div className="relative flex h-[100svh] max-h-full min-h-0 flex-col">
         <div
           className={[
             'pointer-events-none absolute left-1/2 top-[clamp(56px,7.5vh,84px)] z-30 h-[66px] w-[min(78vw,320px)] -translate-x-1/2 rounded-[12px] bg-[#DFF5E8]/90 px-3 text-center transition-opacity duration-200',

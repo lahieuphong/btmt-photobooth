@@ -28,7 +28,7 @@ export default function PackagesPage() {
 
   return (
     <PhotoboothScreenShell backgroundVariant="museum">
-      <div className="flex h-full flex-col">
+      <div className="flex h-[100svh] max-h-full min-h-0 flex-col">
         <PhotoboothPageHeader
           title={screen.title}
           backHref={screen.backHref}
