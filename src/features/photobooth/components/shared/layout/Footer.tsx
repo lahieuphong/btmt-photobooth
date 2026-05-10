@@ -10,7 +10,8 @@ export default function PhotoboothFooter({
 }: PhotoboothFooterProps) {
   return (
     <footer
-      className={`photobooth-footer mt-auto w-full bg-black pb-[env(safe-area-inset-bottom)] ${className}`}
+      className={`photobooth-footer mt-auto w-full bg-black ${className}`}
+      style={{ paddingBottom: 'clamp(0px, env(safe-area-inset-bottom), 20px)' }}
     >
       <div className="photobooth-footer-inner relative w-full aspect-[1080/209]">
         <div
