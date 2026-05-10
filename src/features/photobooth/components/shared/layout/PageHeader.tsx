@@ -25,7 +25,7 @@ export default function PhotoboothPageHeader({
 }: PhotoboothPageHeaderProps) {
   return (
     <div
-      className="w-full px-[3.704%] pt-[4.259%]"
+      className="w-full px-[3.704%] pt-[calc(env(safe-area-inset-top)+clamp(48px,7svh,72px))]"
       style={{ containerType: 'inline-size' }}
     >
       <HeaderControls
@@ -36,7 +36,7 @@ export default function PhotoboothPageHeader({
         rightSlot={rightSlot}
       />
 
-      <div className="mt-[4.6%]">
+      <div className="mt-[2.8%]">
         <h1
           className={[
             'text-center font-serif font-medium uppercase text-[#212121]',
