@@ -68,7 +68,7 @@ export default function LanguageDropdown({
   }
 
   return (
-    <div ref={rootRef} className="relative z-30 w-[23.5%] min-w-0">
+    <div ref={rootRef} className="relative z-[80] w-[23.5%] min-w-0">
       <button
         type="button"
         onClick={() => setIsOpen((prev) => !prev)}
@@ -101,7 +101,7 @@ export default function LanguageDropdown({
       </button>
 
       {isOpen ? (
-        <div className="absolute right-0 top-[calc(100%+1px)] w-full overflow-hidden rounded-[10px] border border-[#B6B6B6] bg-white shadow-[0_12px_24px_rgba(0,0,0,0.14)]">
+        <div className="absolute right-0 top-[calc(100%+1px)] z-[90] w-full overflow-hidden rounded-[10px] border border-[#B6B6B6] bg-white shadow-[0_12px_24px_rgba(0,0,0,0.14)]">
           {LANGUAGE_OPTIONS.map((item) => {
             const isSelected = item.code === selected
 

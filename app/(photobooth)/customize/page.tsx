@@ -96,12 +96,12 @@ export default function CustomizePage() {
           titleClassName="text-[clamp(20px,5.93cqw,64px)] leading-[1.546875] tracking-[0.03em] text-[#212121]"
         />
 
-        <PhotoboothPageBody className="flex min-h-0 flex-1 flex-col overflow-y-auto px-[5.278%] pt-[2.2%] pb-[calc(10px+env(safe-area-inset-bottom))]">
-          <div className="mx-auto flex min-h-full w-full max-w-[900px] flex-col">
-            <div className="flex flex-1 flex-col justify-center">
+        <PhotoboothPageBody className="flex min-h-0 flex-1 flex-col overflow-hidden px-[5.278%] pt-[1.4%] pb-0">
+          <div className="mx-auto flex h-full min-h-0 w-full max-w-[900px] flex-col">
+            <div className="flex min-h-0 flex-1 flex-col justify-center">
               <div className="mx-auto w-full max-w-[820px] overflow-hidden rounded-[8px]">
                 <div
-                  className={`relative aspect-[900/655] w-full overflow-hidden ${selectedBackgroundClassName} [@media(min-height:980px)]:aspect-[900/715]`}
+                  className={`relative aspect-[900/520] w-full overflow-hidden ${selectedBackgroundClassName} [@media(min-height:760px)]:aspect-[900/560] [@media(min-height:900px)]:aspect-[900/620]`}
                   style={{
                     filter: selectedFilterStyle,
                     transition: 'filter 260ms ease-out, transform 260ms ease-out, opacity 260ms ease-out',
@@ -118,18 +118,18 @@ export default function CustomizePage() {
                       width={1046}
                       height={1569}
                       priority
-                      className="h-[clamp(585px,126%,980px)] w-auto max-w-[75%] translate-y-[28%] object-contain drop-shadow-[0_12px_28px_rgba(0,0,0,0.22)]"
+                      className="h-[clamp(360px,92%,760px)] w-auto max-w-[58%] translate-y-[36%] object-contain drop-shadow-[0_12px_28px_rgba(0,0,0,0.22)]"
                     />
                   </div>
                 </div>
               </div>
 
-              <div className="mt-[clamp(10px,1.5vw,16px)]">
+              <div className="mt-[clamp(6px,1.1svh,12px)]">
                 <div className="text-[clamp(13px,1.4vw,14px)] font-semibold text-[#2E2A26]">
                   Bộ lọc màu
                 </div>
 
-                <div className="mt-2 overflow-x-auto overflow-y-hidden pb-2 [scrollbar-width:thin] [&::-webkit-scrollbar]:h-[6px] [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-[#C8C8C8]">
+                <div className="mt-1.5 overflow-x-auto overflow-y-hidden pb-1.5 [scrollbar-width:thin] [&::-webkit-scrollbar]:h-[6px] [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-[#C8C8C8]">
                   <div className="grid min-w-max grid-flow-col auto-cols-[56px] gap-2 pr-1 sm:auto-cols-[62px] sm:gap-2.5">
                     {PHOTOBOOTH_FILTER_OPTIONS.map((item) => (
                       <div key={item.id} className="shrink-0">
@@ -148,12 +148,12 @@ export default function CustomizePage() {
                 </div>
               </div>
 
-              <div className="mt-[clamp(10px,1.5vw,16px)]">
+              <div className="mt-[clamp(6px,1.1svh,12px)]">
                 <div className="text-[clamp(13px,1.4vw,14px)] font-semibold text-[#2E2A26]">
                   Phông nền
                 </div>
 
-                <div className="mt-2 overflow-x-auto overflow-y-hidden pb-2 [scrollbar-width:thin] [&::-webkit-scrollbar]:h-[6px] [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-[#C8C8C8]">
+                <div className="mt-1.5 overflow-x-auto overflow-y-hidden pb-1.5 [scrollbar-width:thin] [&::-webkit-scrollbar]:h-[6px] [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-[#C8C8C8]">
                   <div className="grid min-w-max grid-flow-col auto-cols-[56px] gap-2 pr-1 sm:auto-cols-[62px] sm:gap-2.5">
                     {PHOTOBOOTH_BACKGROUND_OPTIONS.map((item) => (
                       <div key={item.id} className="shrink-0">
@@ -170,14 +170,17 @@ export default function CustomizePage() {
               </div>
             </div>
 
-            <div className="pt-[clamp(12px,1.6vw,18px)] grid grid-cols-[auto_1fr] items-center gap-[12px] sm:grid-cols-[auto_1fr_auto] sm:gap-[16px]">
+            <div className="grid grid-cols-[auto_1fr] items-center gap-[12px] pt-[clamp(8px,1.2svh,14px)] pb-[calc(clamp(18px,3svh,34px)+env(safe-area-inset-bottom))] sm:grid-cols-[auto_1fr_auto] sm:gap-[16px]">
               <CustomizeLayoutStackPreview
                 selectedLayoutId={selectedLayoutId}
                 currentRound={currentRound}
               />
 
               <div className="flex justify-center">
-                <PrimaryButton href={screen.nextHref} className="min-w-[142px] shrink-0">
+                <PrimaryButton
+                  href={screen.nextHref}
+                  className="min-w-[142px] shrink-0 text-[clamp(16px,4.1vw,20px)] sm:text-[20px]"
+                >
                   {screen.primaryActionLabel}
                 </PrimaryButton>
               </div>

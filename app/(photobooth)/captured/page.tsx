@@ -10,7 +10,9 @@ import PhotoboothScreenShell from '@/src/features/photobooth/components/shared/l
 import { PHOTOBOOTH_SCREEN_STATE_MAP } from '@/src/features/photobooth/config/screenState'
 import {
   buildPhotoboothPreviewRoundItemsFromSession,
+  getPhotoboothFrameOverlaySrc,
 } from '@/src/features/photobooth/constants/framePreview'
+import { getAssetPath } from '@/src/features/photobooth/utils/assetPath'
 import {
   getDefaultPhotoboothRuntimeSession,
   getPhotoboothRoundImageDataUrls,
@@ -22,6 +24,100 @@ import {
 } from '@/src/features/photobooth/utils/layoutPreview'
 
 const FALLBACK_CAPTURED_MODES: PhotoboothLayoutPreviewMode[] = ['grid-4']
+const CAPTURED_EXPORT_WIDTH = 1080
+
+function loadExportImage(src: string) {
+  return new Promise<HTMLImageElement>((resolve, reject) => {
+    const image = new Image()
+    image.crossOrigin = 'anonymous'
+    image.onload = () => resolve(image)
+    image.onerror = reject
+    image.src = src
+  })
+}
+
+function drawCoverImage(
+  context: CanvasRenderingContext2D,
+  image: HTMLImageElement,
+  x: number,
+  y: number,
+  width: number,
+  height: number
+) {
+  const sourceRatio = image.naturalWidth / image.naturalHeight
+  const targetRatio = width / height
+  const sourceWidth =
+    sourceRatio > targetRatio ? image.naturalHeight * targetRatio : image.naturalWidth
+  const sourceHeight =
+    sourceRatio > targetRatio ? image.naturalHeight : image.naturalWidth / targetRatio
+  const sourceX = (image.naturalWidth - sourceWidth) / 2
+  const sourceY = (image.naturalHeight - sourceHeight) / 2
+
+  context.drawImage(
+    image,
+    sourceX,
+    sourceY,
+    sourceWidth,
+    sourceHeight,
+    x,
+    y,
+    width,
+    height
+  )
+}
+
+function getExportPhotoBounds(mode: PhotoboothLayoutPreviewMode) {
+  if (mode === 'vertical-4') {
+    return { left: 0.23, right: 0.23, top: 0.088, bottom: 0.122 }
+  }
+
+  if (mode === 'grid-6') {
+    return { left: 0.095, right: 0.095, top: 0.092, bottom: 0.118 }
+  }
+
+  return { left: 0.09, right: 0.09, top: 0.08, bottom: 0.12 }
+}
+
+function getExportSlots(
+  mode: PhotoboothLayoutPreviewMode,
+  x: number,
+  y: number,
+  width: number,
+  height: number
+) {
+  if (mode === 'vertical-4') {
+    const gap = height * 0.014
+    const slotHeight = (height - gap * 3) / 4
+
+    return Array.from({ length: 4 }).map((_, index) => ({
+      x,
+      y: y + index * (slotHeight + gap),
+      width,
+      height: slotHeight,
+    }))
+  }
+
+  const slotCount = mode === 'grid-6' ? 6 : 4
+  const rows = mode === 'grid-6' ? 3 : 2
+  const gapX = width * (mode === 'grid-6' ? 0.035 : 0.04)
+  const gapY = height * (mode === 'grid-6' ? 0.02 : 0.035)
+  const slotWidth = (width - gapX) / 2
+  const slotHeight = mode === 'grid-6' ? slotWidth * (150 / 175) : slotWidth * (240 / 182)
+
+  return Array.from({ length: slotCount }).map((_, index) => {
+    const row = Math.floor(index / 2)
+    const column = index % 2
+    const usedHeight = rows * slotHeight + (rows - 1) * gapY
+    const startY = y + Math.max((height - usedHeight) / 2, 0)
+
+    return {
+      x: x + column * (slotWidth + gapX),
+      y: startY + row * (slotHeight + gapY),
+      width: slotWidth,
+      height: slotHeight,
+    }
+  })
+}
 
 export default function CapturedPage() {
   const screen = PHOTOBOOTH_SCREEN_STATE_MAP.captured
@@ -74,6 +170,62 @@ export default function CapturedPage() {
     setCurrentImageIndex((prev) => prev + 1)
   }
 
+  async function handleDownloadCurrentImage() {
+    const mode = visibleCapturedModes[currentImageIndex] ?? FALLBACK_CAPTURED_MODES[0]
+    const photoSrcs = capturedRoundImageSrcs[currentImageIndex] ?? []
+    const overlay = await loadExportImage(getAssetPath(getPhotoboothFrameOverlaySrc(mode)))
+    const canvas = document.createElement('canvas')
+    const scale = CAPTURED_EXPORT_WIDTH / overlay.naturalWidth
+    canvas.width = CAPTURED_EXPORT_WIDTH
+    canvas.height = Math.round(overlay.naturalHeight * scale)
+
+    const context = canvas.getContext('2d')
+    if (!context) return
+
+    context.fillStyle = '#E1DCC8'
+    context.fillRect(0, 0, canvas.width, canvas.height)
+
+    const bounds = getExportPhotoBounds(mode)
+    const photoX = canvas.width * bounds.left
+    const photoY = canvas.height * bounds.top
+    const photoWidth = canvas.width * (1 - bounds.left - bounds.right)
+    const photoHeight = canvas.height * (1 - bounds.top - bounds.bottom)
+    const slots = getExportSlots(mode, photoX, photoY, photoWidth, photoHeight)
+
+    context.fillStyle = '#E7E1C9'
+    slots.forEach((slot) => {
+      context.fillRect(slot.x, slot.y, slot.width, slot.height)
+    })
+
+    await Promise.all(
+      slots.map(async (slot, index) => {
+        const photoSrc = photoSrcs[index]
+        if (!photoSrc) return
+
+        const image = await loadExportImage(photoSrc)
+        drawCoverImage(context, image, slot.x, slot.y, slot.width, slot.height)
+      })
+    )
+
+    context.drawImage(overlay, 0, 0, canvas.width, canvas.height)
+
+    canvas.toBlob((blob) => {
+      if (!blob) return
+
+      const url = URL.createObjectURL(blob)
+      const link = document.createElement('a')
+      link.href = url
+      link.download = `btmt-photobooth-hinh-${currentImageIndex + 1}.png`
+      document.body.appendChild(link)
+      link.click()
+      link.remove()
+
+      window.setTimeout(() => {
+        URL.revokeObjectURL(url)
+      }, 1000)
+    }, 'image/png')
+  }
+
   return (
     <PhotoboothScreenShell>
       <div className="flex h-full min-h-0 flex-col">
@@ -100,6 +252,7 @@ export default function CapturedPage() {
                   canGoNext={canGoNext}
                   onPrev={handlePrevImage}
                   onNext={handleNextImage}
+                  showNavigation={false}
                   stackRootClassName="relative mx-auto"
                   renderCard={(mode, options) => (
                     <CapturedFrameCard
@@ -108,20 +261,38 @@ export default function CapturedPage() {
                     />
                   )}
                 />
+
               </div>
             </div>
 
-            <div className="z-10 mt-2 shrink-0 pt-3 pb-[calc(4px+env(safe-area-inset-bottom))]">
+            <div className="z-10 mt-[clamp(8px,1.2svh,14px)] shrink-0 pb-[calc(clamp(18px,3svh,34px)+env(safe-area-inset-bottom))]">
+              <div className="mb-[clamp(8px,1.4svh,14px)] flex justify-center">
+                <button
+                  type="button"
+                  onClick={() => {
+                    void handleDownloadCurrentImage()
+                  }}
+                  className="inline-flex h-[42px] min-w-[132px] items-center justify-center rounded-full bg-[#171717] px-6 text-[clamp(16px,4.1vw,20px)] font-semibold text-white shadow-[0_8px_20px_rgba(0,0,0,0.14)] transition-all duration-200 hover:brightness-110 active:scale-[0.98] sm:text-[20px]"
+                >
+                  Tải hình
+                </button>
+              </div>
+
               <div className="grid grid-cols-2 gap-[clamp(12px,2cqw,16px)]">
                 <PrimaryButton
                   href={screen.secondaryActionHref}
                   variant="secondary"
                   fullWidth
+                  className="text-[clamp(16px,4.1vw,20px)] sm:text-[20px]"
                 >
                   {screen.secondaryActionLabel}
                 </PrimaryButton>
 
-                <PrimaryButton href={screen.nextHref} fullWidth>
+                <PrimaryButton
+                  href={screen.nextHref}
+                  fullWidth
+                  className="text-[clamp(16px,4.1vw,20px)] sm:text-[20px]"
+                >
                   {screen.primaryActionLabel}
                 </PrimaryButton>
               </div>

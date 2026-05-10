@@ -283,10 +283,10 @@ export default function CapturePage() {
           titleBottomSlot={<PhotoboothCaptureRoundHint />}
         />
 
-        <PhotoboothPageBody className="flex min-h-0 flex-1 flex-col overflow-y-auto px-[5.278%] pt-[2.2%] pb-[calc(10px+env(safe-area-inset-bottom))]">
-          <div className="mx-auto flex min-h-full w-full max-w-[900px] flex-col">
-            <div className="flex flex-1 items-center">
-              <div className="relative mx-auto w-full max-w-[820px] overflow-hidden rounded-[8px] bg-[linear-gradient(180deg,#9CC0E9_0%,#E7C95F_45%,#D9B54D_100%)] sm:rounded-[10px]">
+        <PhotoboothPageBody className="flex min-h-0 flex-1 flex-col overflow-hidden px-[5.278%] pt-[1.4%] pb-0">
+          <div className="mx-auto flex h-full min-h-0 w-full max-w-[900px] flex-col">
+            <div className="flex min-h-0 flex-1 items-center">
+              <div className="relative mx-auto max-h-[min(54svh,560px)] w-full max-w-[820px] overflow-hidden rounded-[8px] bg-[linear-gradient(180deg,#9CC0E9_0%,#E7C95F_45%,#D9B54D_100%)] [@media(min-height:760px)]:max-h-[min(58svh,620px)] [@media(min-height:900px)]:max-h-[min(62svh,700px)] sm:rounded-[10px]">
                 <video
                   ref={videoRef}
                   autoPlay
@@ -300,7 +300,7 @@ export default function CapturePage() {
                 style={{ filter: selectedFilterStyle }}
               />
 
-                <div className="aspect-[0.74] w-full bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.15),transparent_45%)] sm:aspect-[0.82]" />
+                <div className="aspect-[0.52] max-h-[inherit] w-full bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.15),transparent_45%)] [@media(min-height:760px)]:aspect-[0.58] [@media(min-height:900px)]:aspect-[0.68] sm:aspect-[0.76]" />
 
                 {isCameraReady ? (
                   <>
@@ -335,7 +335,7 @@ export default function CapturePage() {
               </div>
             </div>
 
-            <div className="pt-[clamp(16px,2.6vh,34px)]">
+            <div className="pt-[clamp(8px,1.4svh,18px)] pb-[calc(clamp(18px,3svh,34px)+env(safe-area-inset-bottom))]">
               <div className="flex items-center justify-center gap-1.5 sm:gap-2">
                 {PHOTOBOOTH_COUNTDOWN_OPTIONS.map((value) => {
                   const isSelected = value === selectedCountdown
@@ -381,7 +381,7 @@ export default function CapturePage() {
                 })}
               </div>
 
-              <div className="mt-4 flex justify-center">
+              <div className="mt-[clamp(8px,1.4svh,14px)] flex justify-center">
                 <button
                   type="button"
                   onClick={() => {

@@ -16,7 +16,6 @@ import {
 import { getAssetPath } from '@/src/features/photobooth/utils/assetPath'
 import { type PhotoboothLayoutPreviewMode } from '@/src/features/photobooth/utils/layoutPreview'
 
-const PRINT_QR_CODE_SRC = '/images/illustrations/qr_code.svg'
 const FALLBACK_PRINT_MODES: PhotoboothLayoutPreviewMode[] = ['grid-4']
 
 export default function PrintPage() {
@@ -98,26 +97,13 @@ export default function PrintPage() {
                   />
                 </div>
 
-                <div className="relative mt-[clamp(8px,1.2svh,14px)] h-[clamp(56px,8svh,88px)] w-[clamp(56px,8svh,88px)] shrink-0 overflow-hidden rounded-[10px] bg-white">
-                  <Image
-                    src={getAssetPath(PRINT_QR_CODE_SRC)}
-                    alt="QR code nhận file online"
-                    fill
-                    sizes="90px"
-                    className="object-contain p-[6px]"
-                  />
-                </div>
-
-                <div className="shrink-0 text-center text-[clamp(10px,1.4cqw,14px)] text-[#2E2A26]">
-                  Quét mã QR để nhận file online
-                </div>
               </div>
             </div>
 
-            <div className="mt-auto flex w-full shrink-0 justify-center pt-[clamp(4px,0.6svh,8px)] pb-[calc(4px+env(safe-area-inset-bottom))]">
+            <div className="mt-auto flex w-full shrink-0 justify-center pt-[clamp(10px,1.8svh,18px)] pb-[calc(clamp(24px,4svh,44px)+env(safe-area-inset-bottom))]">
               <PrimaryButton
                 href={screen.nextHref}
-                className="h-[48px] rounded-full px-8 sm:h-[52px] sm:px-10 text-[13px] sm:text-[16px] font-semibold"
+                className="h-[48px] rounded-full px-8 text-[clamp(16px,4.1vw,20px)] font-semibold sm:h-[52px] sm:px-10 sm:text-[20px]"
               >
                 {screen.primaryActionLabel === 'Tiếp tục' ? (
                   <span className="inline-flex items-center gap-2 whitespace-nowrap">

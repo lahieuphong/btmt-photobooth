@@ -23,7 +23,7 @@ export default function WelcomeMainPage() {
           />
         </div>
 
-        <div className="welcome-main-content relative z-20 flex min-h-0 flex-1 flex-col items-center px-[8%] pb-[calc(8px+env(safe-area-inset-bottom))] pt-[clamp(8px,2.1vh,24px)] text-center">
+        <div className="welcome-main-content relative z-20 flex min-h-0 flex-1 flex-col items-center px-[8%] pb-0 pt-[clamp(8px,2.1vh,24px)] text-center">
           <div className="welcome-main-logo w-[clamp(58px,16vw,84px)]">
             <Image
               src={getAssetPath('/images/logos/logo.svg')}
@@ -49,7 +49,7 @@ export default function WelcomeMainPage() {
           <div className="welcome-main-cta-wrap mt-[clamp(12px,3vh,28px)] flex w-full flex-1 items-center justify-center">
             <Link
               href={screen.nextHref ?? '/packages'}
-              className="welcome-main-cta inline-flex h-[clamp(116px,31vw,260px)] w-[clamp(116px,31vw,260px)] flex-col items-center justify-center rounded-full bg-[#FF5A2A] text-white shadow-[0_8px_16px_rgba(255,90,42,0.28)] transition-all duration-200 hover:brightness-95 active:scale-[0.98]"
+              className="welcome-main-cta inline-flex h-[clamp(116px,31vw,260px)] w-[clamp(116px,31vw,260px)] flex-col items-center justify-center rounded-full bg-[#FF5A2A] pt-[clamp(2px,0.6vw,8px)] text-white shadow-[0_8px_16px_rgba(255,90,42,0.28)] transition-all duration-200 hover:brightness-95 active:scale-[0.98]"
             >
               <Image
                 src={getAssetPath('/images/illustrations/camera.svg')}
@@ -57,9 +57,9 @@ export default function WelcomeMainPage() {
                 width={44}
                 height={44}
                 aria-hidden="true"
-                className="welcome-main-cta-icon h-[clamp(24px,6.8vw,44px)] w-[clamp(24px,6.8vw,44px)]"
+                className="welcome-main-cta-icon h-[clamp(22px,6vw,40px)] w-[clamp(22px,6vw,40px)]"
               />
-              <span className="welcome-main-cta-label mt-[clamp(5px,1.4vw,14px)] text-[clamp(20px,4.1vw,42px)] font-medium leading-none !text-white">
+              <span className="welcome-main-cta-label mt-[clamp(8px,2vw,18px)] text-[clamp(20px,4.1vw,42px)] font-medium leading-none !text-white">
                 {screen.primaryActionLabel}
               </span>
             </Link>
@@ -77,23 +77,23 @@ export default function WelcomeMainPage() {
                 />
               </div>
 
-              <div className="absolute bottom-[0] left-[32.5%] z-20 w-[40%]">
-                <Image
-                  src={getAssetPath('/images/layouts/photo-grid-2x3.svg')}
-                  alt=""
-                  width={500}
-                  height={750}
-                  className="h-auto w-full drop-shadow-[0_12px_20px_rgba(0,0,0,0.2)]"
-                />
-              </div>
-
-              <div className="absolute bottom-[0] left-[52%] z-30 w-[47%]">
+              <div className="absolute bottom-[0] left-[32%] z-20 w-[50%]">
                 <Image
                   src={getAssetPath('/images/layouts/photo-stack-4.svg')}
                   alt=""
                   width={620}
                   height={930}
                   className="h-auto w-full drop-shadow-[0_12px_20px_rgba(0,0,0,0.22)]"
+                />
+              </div>
+
+              <div className="absolute bottom-[0] left-[52%] z-30 w-[50%]">
+                <Image
+                  src={getAssetPath('/images/layouts/photo-grid-2x3.svg')}
+                  alt=""
+                  width={500}
+                  height={750}
+                  className="h-auto w-full drop-shadow-[0_12px_20px_rgba(0,0,0,0.2)]"
                 />
               </div>
             </div>

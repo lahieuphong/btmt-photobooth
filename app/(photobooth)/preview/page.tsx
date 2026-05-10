@@ -5,6 +5,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import PhotoboothCaptureRoundHint from '@/src/features/photobooth/components/flow/round/CaptureRoundHint'
 import PhotoboothDualActionBar from '@/src/features/photobooth/components/flow/actions/DualActionBar'
+import CaptureCameraLoadingFrame from '@/src/features/photobooth/components/screens/capture/CaptureCameraLoadingFrame'
 import PreviewLayoutBlock from '@/src/features/photobooth/components/screens/preview/PreviewLayoutBlock'
 import { PHOTOBOOTH_LAYOUT_OPTIONS } from '@/src/features/photobooth/constants/layouts'
 import PhotoboothPageBody from '@/src/features/photobooth/components/shared/layout/PageBody'
@@ -40,6 +41,7 @@ export default function PreviewPage() {
   const [retakeTargetRoundIndex, setRetakeTargetRoundIndex] = useState<number | null>(null)
   const [retakeTargetSlotIndex, setRetakeTargetSlotIndex] = useState<number | null>(null)
   const [retakeDraftImageDataUrl, setRetakeDraftImageDataUrl] = useState<string | null>(null)
+  const [isPreviewSessionReady, setIsPreviewSessionReady] = useState(false)
 
   useEffect(() => {
     const timerId = window.setTimeout(() => {
@@ -51,6 +53,7 @@ export default function PreviewPage() {
       setRetakeTargetRoundIndex(session.retakeTargetRoundIndex)
       setRetakeTargetSlotIndex(session.retakeTargetSlotIndex)
       setRetakeDraftImageDataUrl(session.retakeDraftImageDataUrl)
+      setIsPreviewSessionReady(true)
     }, 0)
     return () => {
       window.clearTimeout(timerId)
@@ -174,7 +177,11 @@ export default function PreviewPage() {
                   isRetakeReviewMode ? '' : 'pt-1 sm:pt-2',
                 ].join(' ')}
               >
-                {isRetakeReviewMode ? (
+                {!isPreviewSessionReady ? (
+                  <div className="relative mx-auto aspect-[1/1.22] w-[min(84vw,540px)] overflow-hidden rounded-[12px] bg-[#E8E5CC]">
+                    <CaptureCameraLoadingFrame className="rounded-[12px]" />
+                  </div>
+                ) : isRetakeReviewMode ? (
                   <div className="mx-auto flex h-full items-center justify-center">
                     <div className="relative aspect-[3/4] w-[min(78vw,320px)] overflow-hidden rounded-[12px] bg-[#E8E5CC] shadow-[0_10px_26px_rgba(34,30,4,0.12)]">
                       {retakeDraftImageDataUrl ? (
@@ -199,16 +206,18 @@ export default function PreviewPage() {
                 )}
               </div>
 
-              <PhotoboothDualActionBar
-                secondaryLabel={resolvedSecondaryLabel}
-                primaryLabel={resolvedPrimaryLabel}
-                onSecondaryClick={handleRetakeAll}
-                onPrimaryClick={handleConfirmPreview}
-                secondaryIconSrc={getAssetPath('/icons/arrow-rotate-left.svg')}
-                primaryIconSrc={getAssetPath('/icons/arrow-right.svg')}
-                hideSecondary={isRetakeReviewMode}
-                className="mt-auto"
-              />
+              {isPreviewSessionReady ? (
+                <PhotoboothDualActionBar
+                  secondaryLabel={resolvedSecondaryLabel}
+                  primaryLabel={resolvedPrimaryLabel}
+                  onSecondaryClick={handleRetakeAll}
+                  onPrimaryClick={handleConfirmPreview}
+                  secondaryIconSrc={getAssetPath('/icons/arrow-rotate-left.svg')}
+                  primaryIconSrc={getAssetPath('/icons/arrow-right.svg')}
+                  hideSecondary={isRetakeReviewMode}
+                  className="mt-auto"
+                />
+              ) : null}
             </div>
           </div>
         </PhotoboothPageBody>

@@ -105,9 +105,6 @@ a {
     margin-top: clamp(6px, 1vh, 14px);
   }
 
-  .welcome-main-screen .welcome-main-footer .photobooth-footer-inner {
-    aspect-ratio: 1080 / 170;
-  }
 }
 
 @media (max-height: 670px) {
@@ -116,7 +113,7 @@ a {
   }
 
   .welcome-main-screen .welcome-main-content {
-    padding-bottom: calc(4px + env(safe-area-inset-bottom));
+    padding-bottom: 0;
   }
 
   .welcome-main-screen .welcome-main-title {
@@ -138,15 +135,4 @@ a {
     margin-top: 6px;
   }
 
-  .welcome-main-screen .welcome-main-footer .photobooth-footer-inner {
-    aspect-ratio: 1080 / 150;
-  }
-
-  .welcome-main-screen .welcome-main-footer .photobooth-footer-title {
-    font-size: clamp(14px, 2.6vw, 24px);
-  }
-
-  .welcome-main-screen .welcome-main-footer .photobooth-footer-subtitle {
-    font-size: clamp(12px, 2vw, 18px);
-  }
 }

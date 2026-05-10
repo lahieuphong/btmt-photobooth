@@ -25,7 +25,7 @@ export default function PhotoboothPageHeader({
 }: PhotoboothPageHeaderProps) {
   return (
     <div
-      className="w-full px-[3.704%] pt-[calc(env(safe-area-inset-top)+clamp(8px,1.8vh,24px))]"
+      className="relative z-50 w-full px-[3.704%] pt-[calc(env(safe-area-inset-top)+clamp(8px,1.8vh,24px))]"
       style={{ containerType: 'inline-size' }}
     >
       <HeaderControls
