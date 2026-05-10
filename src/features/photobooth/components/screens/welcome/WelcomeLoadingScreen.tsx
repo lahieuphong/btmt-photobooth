@@ -85,6 +85,7 @@ export default function WelcomeLoadingScreen({
             height={150}
             priority
             className="h-auto w-full"
+            style={{ width: '100%', height: 'auto' }}
           />
         </div>
 

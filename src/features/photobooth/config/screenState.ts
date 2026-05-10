@@ -21,7 +21,7 @@ export const PHOTOBOOTH_SCREEN_STATE_MAP = {
     showBackButton: false,
     showLanguageDropdown: true,
     nextHref: PHOTOBOOTH_ROUTES.PACKAGES,
-    primaryActionLabel: 'Bắt đầu ngay',
+    primaryActionLabel: 'Bắt đầu',
   },
 
   packages: {

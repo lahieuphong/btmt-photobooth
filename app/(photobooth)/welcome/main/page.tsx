@@ -32,6 +32,7 @@ export default function WelcomeMainPage() {
               height={84}
               priority
               className="h-auto w-full"
+              style={{ width: '100%', height: 'auto' }}
             />
           </div>
 
@@ -59,7 +60,7 @@ export default function WelcomeMainPage() {
                 className="welcome-main-cta-icon h-[clamp(24px,6.8vw,44px)] w-[clamp(24px,6.8vw,44px)]"
               />
               <span className="welcome-main-cta-label mt-[clamp(5px,1.4vw,14px)] text-[clamp(20px,4.1vw,42px)] font-medium leading-none !text-white">
-                Bắt đầu ngay
+                {screen.primaryActionLabel}
               </span>
             </Link>
           </div>
