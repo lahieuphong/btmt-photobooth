@@ -27,6 +27,7 @@ export default function PhotoboothFooter({
           </div>
         </div>
       </div>
+      <div className="h-[env(safe-area-inset-bottom)]" aria-hidden="true" />
     </footer>
   )
 }
