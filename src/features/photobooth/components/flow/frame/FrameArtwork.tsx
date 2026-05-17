@@ -1,5 +1,4 @@
 import Image from 'next/image'
-import type { CSSProperties } from 'react'
 import { getAssetPath } from '@/src/features/photobooth/utils/assetPath'
 import type { PhotoboothLayoutPreviewMode } from '@/src/features/photobooth/utils/layoutPreview'
 import { getPhotoboothFrameOverlaySrc } from '@/src/features/photobooth/constants/framePreview'
@@ -14,13 +13,6 @@ type PhotoboothFrameArtworkProps = {
   photoSrc?: string | null
   photoSrcs?: Array<string | null>
 }
-
-const GRID_4_FRAME_PHOTO_SLOT_STYLES: CSSProperties[] = [
-  { left: '8.7%', top: '6.7%', width: '37.6%', height: '39.2%' },
-  { left: '53.7%', top: '6.7%', width: '37.6%', height: '39.2%' },
-  { left: '8.7%', top: '51.6%', width: '37.6%', height: '39.2%' },
-  { left: '53.7%', top: '51.6%', width: '37.6%', height: '39.2%' },
-]
 
 function getFramePhotoBounds(
   mode: PhotoboothLayoutPreviewMode,
@@ -49,12 +41,10 @@ function getFramePhotoBounds(
 
 function FramePhotoSlot({
   className = '',
-  style,
   slotBackground = 'solid',
   photoSrc,
 }: {
   className?: string
-  style?: CSSProperties
   slotBackground?: 'solid' | 'gradient'
   photoSrc?: string | null
 }) {
@@ -67,7 +57,6 @@ function FramePhotoSlot({
           : 'bg-[#E7E1C9]',
         className,
       ].join(' ')}
-      style={style}
     >
       {photoSrc ? (
         <Image
@@ -102,17 +91,23 @@ function FramePhotoLayout({
 
   if (mode === 'grid-4') {
     return (
-      <>
-        {GRID_4_FRAME_PHOTO_SLOT_STYLES.map((style, index) => (
-          <FramePhotoSlot
-            key={index}
-            className="absolute"
-            style={style}
-            slotBackground={slotBackground}
-            photoSrc={resolveSlotPhotoSrc(index)}
-          />
-        ))}
-      </>
+      <div className="flex h-full w-full items-start justify-center p-[clamp(6px,2.2cqw,18px)]">
+        <div
+          className={[
+            'grid w-full grid-cols-2',
+            compact ? 'gap-[clamp(2px,0.5cqw,5px)]' : 'gap-[clamp(8px,1.4cqw,16px)]',
+          ].join(' ')}
+        >
+          {Array.from({ length: 4 }).map((_, index) => (
+            <FramePhotoSlot
+              key={index}
+              className="aspect-[430/578] border-transparent bg-white/75"
+              slotBackground={slotBackground}
+              photoSrc={resolveSlotPhotoSrc(index)}
+            />
+          ))}
+        </div>
+      </div>
     )
   }
 
