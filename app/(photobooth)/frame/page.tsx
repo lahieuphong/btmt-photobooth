@@ -1,5 +1,6 @@
 'use client'
 
+import Image from 'next/image'
 import { useEffect, useMemo, useState } from 'react'
 import PhotoboothFrameArtwork from '@/src/features/photobooth/components/flow/frame/FrameArtwork'
 import PhotoboothFrameSwipePreview from '@/src/features/photobooth/components/flow/frame/FrameSwipePreview'
@@ -47,11 +48,23 @@ function FrameArtwork({
   mode,
   compact = false,
   photoSrcs = [],
+  hasFrame = true,
 }: {
   mode: PhotoboothLayoutPreviewMode
   compact?: boolean
   photoSrcs?: Array<string | null>
+  hasFrame?: boolean
 }) {
+  if (!hasFrame) {
+    return (
+      <NoFrameArtwork
+        mode={mode}
+        compact={compact}
+        photoSrcs={photoSrcs}
+      />
+    )
+  }
+
   return (
     <PhotoboothFrameArtwork
       mode={mode}
@@ -62,6 +75,61 @@ function FrameArtwork({
       slotBackground="gradient"
       photoSrcs={photoSrcs}
     />
+  )
+}
+
+function NoFrameArtwork({
+  mode,
+  compact = false,
+  photoSrcs = [],
+}: {
+  mode: PhotoboothLayoutPreviewMode
+  compact?: boolean
+  photoSrcs?: Array<string | null>
+}) {
+  const slotCount = mode === 'grid-6' ? 6 : 4
+  const gridClassName =
+    mode === 'vertical-4'
+      ? 'grid-cols-1 grid-rows-4'
+      : 'grid-cols-2'
+  const slotAspectClassName =
+    mode === 'vertical-4'
+      ? 'aspect-[430/260]'
+      : mode === 'grid-6'
+        ? 'aspect-[430/372]'
+        : 'aspect-[430/578]'
+
+  return (
+    <div className="flex h-full w-full items-start justify-center rounded-[inherit] bg-[#E7E1C9] p-[clamp(6px,2.2cqw,18px)]">
+      <div
+        className={[
+          'grid w-full',
+          gridClassName,
+          compact ? 'gap-[clamp(2px,0.5cqw,5px)]' : 'gap-[clamp(8px,1.4cqw,16px)]',
+        ].join(' ')}
+      >
+        {Array.from({ length: slotCount }).map((_, index) => (
+          <div
+            key={index}
+            className={[
+              'relative overflow-hidden rounded-[clamp(3px,0.55cqw,6px)] bg-white/75',
+              slotAspectClassName,
+            ].join(' ')}
+          >
+            {photoSrcs[index] ? (
+              <Image
+                src={photoSrcs[index]}
+                alt="Ảnh đã chụp"
+                fill
+                unoptimized
+                sizes={compact ? '48px' : '(max-width: 768px) 34vw, 220px'}
+                className="object-cover"
+              />
+            ) : null}
+          </div>
+        ))}
+      </div>
+    </div>
   )
 }
 
@@ -158,6 +226,7 @@ export default function FramePage() {
                       <div className="relative h-full w-full overflow-hidden rounded-[clamp(6px,1cqw,9px)] border border-[#CFC8B3] bg-[#E1DCC8] shadow-[0_10px_24px_rgba(34,30,4,0.10)]">
                         <FrameArtwork
                           mode={mode}
+                          hasFrame={selectedFrameId !== 'no-frame'}
                           photoSrcs={
                             frameImages[options.originalIndex]?.captureImageSrcs ?? []
                           }
@@ -190,6 +259,7 @@ export default function FramePage() {
                             >
                               <FrameOptionPreview
                                 mode={activePreviewMode}
+                                hasFrame={item.hasFrame !== false}
                                 photoSrcs={activeImage?.captureImageSrcs ?? []}
                               />
                             </div>

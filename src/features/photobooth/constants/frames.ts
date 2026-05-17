@@ -2,9 +2,16 @@ export type PhotoboothFrameOption = {
   id: string
   name: string
   previewMode: 'grid-4' | 'vertical-4' | 'grid-6'
+  hasFrame?: boolean
 }
 
 export const PHOTOBOOTH_FRAME_OPTIONS: PhotoboothFrameOption[] = [
+  {
+    id: 'no-frame',
+    name: 'Không chọn khung',
+    previewMode: 'grid-4',
+    hasFrame: false,
+  },
   {
     id: 'new-year',
     name: 'Năm mới',

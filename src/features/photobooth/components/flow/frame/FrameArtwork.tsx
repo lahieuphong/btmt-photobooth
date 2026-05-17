@@ -1,4 +1,5 @@
 import Image from 'next/image'
+import type { CSSProperties } from 'react'
 import { getAssetPath } from '@/src/features/photobooth/utils/assetPath'
 import type { PhotoboothLayoutPreviewMode } from '@/src/features/photobooth/utils/layoutPreview'
 import { getPhotoboothFrameOverlaySrc } from '@/src/features/photobooth/constants/framePreview'
@@ -14,10 +15,21 @@ type PhotoboothFrameArtworkProps = {
   photoSrcs?: Array<string | null>
 }
 
+const GRID_4_FRAME_PHOTO_SLOT_STYLES: CSSProperties[] = [
+  { left: '8.7%', top: '6.7%', width: '37.6%', height: '39.2%' },
+  { left: '53.7%', top: '6.7%', width: '37.6%', height: '39.2%' },
+  { left: '8.7%', top: '51.6%', width: '37.6%', height: '39.2%' },
+  { left: '53.7%', top: '51.6%', width: '37.6%', height: '39.2%' },
+]
+
 function getFramePhotoBounds(
   mode: PhotoboothLayoutPreviewMode,
   compact: boolean
 ) {
+  if (mode === 'grid-4') {
+    return 'absolute inset-0'
+  }
+
   if (mode === 'vertical-4') {
     return compact
       ? 'absolute left-[26%] right-[26%] top-[11%] bottom-[16%]'
@@ -37,10 +49,12 @@ function getFramePhotoBounds(
 
 function FramePhotoSlot({
   className = '',
+  style,
   slotBackground = 'solid',
   photoSrc,
 }: {
   className?: string
+  style?: CSSProperties
   slotBackground?: 'solid' | 'gradient'
   photoSrc?: string | null
 }) {
@@ -53,6 +67,7 @@ function FramePhotoSlot({
           : 'bg-[#E7E1C9]',
         className,
       ].join(' ')}
+      style={style}
     >
       {photoSrc ? (
         <Image
@@ -83,6 +98,22 @@ function FramePhotoLayout({
 }) {
   function resolveSlotPhotoSrc(slotIndex: number) {
     return photoSrcs[slotIndex] ?? photoSrc ?? null
+  }
+
+  if (mode === 'grid-4') {
+    return (
+      <>
+        {GRID_4_FRAME_PHOTO_SLOT_STYLES.map((style, index) => (
+          <FramePhotoSlot
+            key={index}
+            className="absolute"
+            style={style}
+            slotBackground={slotBackground}
+            photoSrc={resolveSlotPhotoSrc(index)}
+          />
+        ))}
+      </>
+    )
   }
 
   if (mode === 'vertical-4') {
@@ -164,29 +195,38 @@ export default function PhotoboothFrameArtwork({
 }: PhotoboothFrameArtworkProps) {
   const overlaySrc = getPhotoboothFrameOverlaySrc(mode)
   const photoBoundsClass = getFramePhotoBounds(mode, compact)
+  const isGrid4Frame = mode === 'grid-4'
 
   return (
     <div className="relative h-full w-full overflow-hidden rounded-[inherit]">
-      <div className={`${photoBoundsClass} z-0`}>
-        <FramePhotoLayout
-          mode={mode}
-          compact={compact}
-          slotBackground={slotBackground}
-          photoSrc={photoSrc}
-          photoSrcs={photoSrcs}
-        />
-      </div>
+      <div
+        className={
+          isGrid4Frame
+            ? 'absolute left-0 top-0 w-full aspect-[1200/1566]'
+            : 'absolute inset-0'
+        }
+      >
+        <div className={`${photoBoundsClass} z-0`}>
+          <FramePhotoLayout
+            mode={mode}
+            compact={compact}
+            slotBackground={slotBackground}
+            photoSrc={photoSrc}
+            photoSrcs={photoSrcs}
+          />
+        </div>
 
-      <div className="pointer-events-none absolute inset-0 z-10">
-        <Image
-          src={getAssetPath(overlaySrc)}
-          alt={overlayAlt}
-          fill
-          sizes={imageSizes}
-          className="object-contain"
-          priority={imagePriority}
-          loading={imagePriority ? 'eager' : 'lazy'}
-        />
+        <div className="pointer-events-none absolute inset-0 z-10">
+          <Image
+            src={getAssetPath(overlaySrc)}
+            alt={overlayAlt}
+            fill
+            sizes={imageSizes}
+            className={isGrid4Frame ? 'object-fill' : 'object-contain'}
+            priority={imagePriority}
+            loading={imagePriority ? 'eager' : 'lazy'}
+          />
+        </div>
       </div>
     </div>
   )
