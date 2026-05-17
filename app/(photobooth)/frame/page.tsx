@@ -100,12 +100,12 @@ function NoFrameArtwork({
         : 'aspect-[430/578]'
 
   return (
-    <div className="flex h-full w-full items-start justify-center rounded-[inherit] bg-[#E7E1C9] p-[clamp(6px,2.2cqw,18px)]">
+    <div className="flex h-full w-full items-start justify-center rounded-[inherit] bg-[#E7E1C9] px-[clamp(4px,1.45cqw,12px)] pt-[clamp(6px,1cqw,12px)] pb-[clamp(5px,1.75cqw,14px)]">
       <div
         className={[
           'grid w-full',
           gridClassName,
-          compact ? 'gap-[clamp(2px,0.5cqw,5px)]' : 'gap-[clamp(8px,1.4cqw,16px)]',
+          compact ? 'gap-[clamp(2px,0.4cqw,4px)]' : 'gap-[clamp(6px,1cqw,12px)]',
         ].join(' ')}
       >
         {Array.from({ length: slotCount }).map((_, index) => (

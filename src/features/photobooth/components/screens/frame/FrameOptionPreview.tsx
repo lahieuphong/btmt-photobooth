@@ -15,8 +15,8 @@ export default function FrameOptionPreview({
 }: FrameOptionPreviewProps) {
   if (!hasFrame) {
     return (
-      <div className="flex aspect-[110/148] w-full items-start justify-center rounded-[12px] bg-[#E7E1C9] p-[6px]">
-        <div className="grid w-full grid-cols-2 gap-[3px]">
+      <div className="flex aspect-[110/148] w-full items-start justify-center rounded-[12px] bg-[#E7E1C9] px-[5px] pt-[6px] pb-[5px]">
+        <div className="grid w-full grid-cols-2 gap-[2px]">
           {Array.from({ length: mode === 'grid-6' ? 6 : 4 }).map((_, index) => (
             <div
               key={index}

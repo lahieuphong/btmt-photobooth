@@ -41,10 +41,12 @@ function getFramePhotoBounds(
 
 function FramePhotoSlot({
   className = '',
+  imageClassName = '',
   slotBackground = 'solid',
   photoSrc,
 }: {
   className?: string
+  imageClassName?: string
   slotBackground?: 'solid' | 'gradient'
   photoSrc?: string | null
 }) {
@@ -65,7 +67,7 @@ function FramePhotoSlot({
           fill
           unoptimized
           sizes="(max-width: 768px) 40vw, 220px"
-          className="object-cover"
+          className={['object-cover', imageClassName].join(' ')}
         />
       ) : null}
     </div>
@@ -91,17 +93,17 @@ function FramePhotoLayout({
 
   if (mode === 'grid-4') {
     return (
-      <div className="flex h-full w-full items-start justify-center p-[clamp(6px,2.2cqw,18px)]">
-        <div
-          className={[
-            'grid w-full grid-cols-2',
-            compact ? 'gap-[clamp(2px,0.5cqw,5px)]' : 'gap-[clamp(8px,1.4cqw,16px)]',
-          ].join(' ')}
-        >
+      <div className="flex h-full w-full items-start justify-center px-[clamp(4px,1.45cqw,12px)] pt-[clamp(7px,2.05cqw,17px)] pb-[clamp(5px,1.75cqw,14px)]">
+        <div className="grid w-full grid-cols-2 gap-0">
           {Array.from({ length: 4 }).map((_, index) => (
             <FramePhotoSlot
               key={index}
-              className="aspect-[430/578] border-transparent bg-white/75"
+              className={[
+                'aspect-[430/578] rounded-none border-0 bg-white/75',
+                index % 2 === 0 ? 'mr-[-1px]' : 'ml-[-1px]',
+                index >= 2 ? 'z-10 mt-[-10px]' : '',
+              ].join(' ')}
+              imageClassName="object-center scale-[1.04]"
               slotBackground={slotBackground}
               photoSrc={resolveSlotPhotoSrc(index)}
             />
