@@ -25,6 +25,7 @@ import {
 
 const FALLBACK_CAPTURED_MODES: PhotoboothLayoutPreviewMode[] = ['grid-4']
 const CAPTURED_EXPORT_WIDTH = 1080
+const GRID_4_EXPORT_CARD_ASPECT = 1018 / 678
 
 function loadExportImage(src: string) {
   return new Promise<HTMLImageElement>((resolve, reject) => {
@@ -42,7 +43,8 @@ function drawCoverImage(
   x: number,
   y: number,
   width: number,
-  height: number
+  height: number,
+  scale = 1
 ) {
   const sourceRatio = image.naturalWidth / image.naturalHeight
   const targetRatio = width / height
@@ -52,6 +54,29 @@ function drawCoverImage(
     sourceRatio > targetRatio ? image.naturalHeight : image.naturalWidth / targetRatio
   const sourceX = (image.naturalWidth - sourceWidth) / 2
   const sourceY = (image.naturalHeight - sourceHeight) / 2
+
+  if (scale !== 1) {
+    const scaledWidth = width * scale
+    const scaledHeight = height * scale
+
+    context.save()
+    context.beginPath()
+    context.rect(x, y, width, height)
+    context.clip()
+    context.drawImage(
+      image,
+      sourceX,
+      sourceY,
+      sourceWidth,
+      sourceHeight,
+      x - (scaledWidth - width) / 2,
+      y - (scaledHeight - height) / 2,
+      scaledWidth,
+      scaledHeight
+    )
+    context.restore()
+    return
+  }
 
   context.drawImage(
     image,
@@ -64,6 +89,14 @@ function drawCoverImage(
     width,
     height
   )
+}
+
+type ExportPhotoSlot = {
+  x: number
+  y: number
+  width: number
+  height: number
+  scale?: number
 }
 
 function getExportPhotoBounds(mode: PhotoboothLayoutPreviewMode) {
@@ -80,11 +113,37 @@ function getExportPhotoBounds(mode: PhotoboothLayoutPreviewMode) {
 
 function getExportSlots(
   mode: PhotoboothLayoutPreviewMode,
-  x: number,
-  y: number,
-  width: number,
-  height: number
-) {
+  canvasWidth: number,
+  canvasHeight: number
+): ExportPhotoSlot[] {
+  if (mode === 'grid-4') {
+    const slotWidth = canvasWidth * (477 / 1200)
+    const slotHeight = canvasWidth * (650 / 1200)
+    const gapX = canvasWidth * (66 / 1200)
+    const gapY = canvasWidth * (62 / 1200)
+    const startX = canvasWidth * (90 / 1200)
+    const startY = canvasWidth * (88 / 1200)
+
+    return Array.from({ length: 4 }).map((_, index) => {
+      const row = Math.floor(index / 2)
+      const column = index % 2
+
+      return {
+        x: startX + column * (slotWidth + gapX),
+        y: startY + row * (slotHeight + gapY),
+        width: slotWidth,
+        height: slotHeight,
+        scale: 1.04,
+      }
+    })
+  }
+
+  const bounds = getExportPhotoBounds(mode)
+  const x = canvasWidth * bounds.left
+  const y = canvasHeight * bounds.top
+  const width = canvasWidth * (1 - bounds.left - bounds.right)
+  const height = canvasHeight * (1 - bounds.top - bounds.bottom)
+
   if (mode === 'vertical-4') {
     const gap = height * 0.014
     const slotHeight = (height - gap * 3) / 4
@@ -176,8 +235,12 @@ export default function CapturedPage() {
     const overlay = await loadExportImage(getAssetPath(getPhotoboothFrameOverlaySrc(mode)))
     const canvas = document.createElement('canvas')
     const scale = CAPTURED_EXPORT_WIDTH / overlay.naturalWidth
+    const overlayHeight = Math.round(overlay.naturalHeight * scale)
     canvas.width = CAPTURED_EXPORT_WIDTH
-    canvas.height = Math.round(overlay.naturalHeight * scale)
+    canvas.height =
+      mode === 'grid-4'
+        ? Math.round(CAPTURED_EXPORT_WIDTH * GRID_4_EXPORT_CARD_ASPECT)
+        : overlayHeight
 
     const context = canvas.getContext('2d')
     if (!context) return
@@ -185,12 +248,7 @@ export default function CapturedPage() {
     context.fillStyle = '#E1DCC8'
     context.fillRect(0, 0, canvas.width, canvas.height)
 
-    const bounds = getExportPhotoBounds(mode)
-    const photoX = canvas.width * bounds.left
-    const photoY = canvas.height * bounds.top
-    const photoWidth = canvas.width * (1 - bounds.left - bounds.right)
-    const photoHeight = canvas.height * (1 - bounds.top - bounds.bottom)
-    const slots = getExportSlots(mode, photoX, photoY, photoWidth, photoHeight)
+    const slots = getExportSlots(mode, canvas.width, canvas.height)
 
     context.fillStyle = '#E7E1C9'
     slots.forEach((slot) => {
@@ -203,11 +261,19 @@ export default function CapturedPage() {
         if (!photoSrc) return
 
         const image = await loadExportImage(photoSrc)
-        drawCoverImage(context, image, slot.x, slot.y, slot.width, slot.height)
+        drawCoverImage(
+          context,
+          image,
+          slot.x,
+          slot.y,
+          slot.width,
+          slot.height,
+          slot.scale
+        )
       })
     )
 
-    context.drawImage(overlay, 0, 0, canvas.width, canvas.height)
+    context.drawImage(overlay, 0, 0, canvas.width, overlayHeight)
 
     canvas.toBlob((blob) => {
       if (!blob) return
