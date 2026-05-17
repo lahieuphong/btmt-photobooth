@@ -6,7 +6,7 @@ const repoName = 'btmt-photobooth'
 const nextConfig: NextConfig = {
   output: 'export',
   trailingSlash: true,
-  allowedDevOrigins: ['172.26.208.140'],
+  allowedDevOrigins: ['172.26.208.127', '*.trycloudflare.com'],
   images: {
     unoptimized: true,
     remotePatterns: [
