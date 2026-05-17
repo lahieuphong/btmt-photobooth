@@ -28,6 +28,25 @@ body {
   font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
 }
 
+.photobooth-screen-shell {
+  height: 100vh;
+  min-height: 100vh;
+}
+
+@supports (height: 100svh) {
+  .photobooth-screen-shell {
+    height: 100svh;
+    min-height: 100svh;
+  }
+}
+
+@supports (height: 100dvh) {
+  .photobooth-screen-shell {
+    height: 100dvh;
+    min-height: 100dvh;
+  }
+}
+
 @media (max-width: 767px) {
   html,
   body {

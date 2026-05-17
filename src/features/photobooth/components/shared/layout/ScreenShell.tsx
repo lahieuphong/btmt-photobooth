@@ -15,7 +15,7 @@ export default function PhotoboothScreenShell({
   backgroundVariant = 'plain',
 }: PhotoboothScreenShellProps) {
   return (
-    <main className="fixed inset-0 isolate h-[100lvh] min-h-[100dvh] w-full max-w-full overflow-hidden bg-white">
+    <main className="photobooth-screen-shell fixed inset-0 isolate w-full max-w-full overflow-hidden bg-white">
       <section className="absolute inset-0 overflow-hidden bg-white">
         <div className="h-full w-full">
           <PhotoboothBackground
