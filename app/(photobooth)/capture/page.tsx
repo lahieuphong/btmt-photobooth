@@ -273,7 +273,7 @@ export default function CapturePage() {
 
   return (
     <PhotoboothScreenShell>
-      <div className="flex h-full min-h-0 flex-col">
+      <div className="capture-screen flex h-full min-h-0 flex-col">
         <PhotoboothPageHeader
           title={screen.title}
           backHref={screen.backHref}
@@ -283,10 +283,10 @@ export default function CapturePage() {
           titleBottomSlot={<PhotoboothCaptureRoundHint />}
         />
 
-        <PhotoboothPageBody className="flex min-h-0 flex-1 flex-col overflow-hidden px-[5.278%] pt-[1.4%] pb-0">
-          <div className="mx-auto flex h-full min-h-0 w-full max-w-[900px] flex-col">
-            <div className="flex min-h-0 flex-1 items-center">
-              <div className="relative mx-auto max-h-[min(54svh,560px)] w-full max-w-[820px] overflow-hidden rounded-[8px] bg-[linear-gradient(180deg,#9CC0E9_0%,#E7C95F_45%,#D9B54D_100%)] [@media(min-height:760px)]:max-h-[min(58svh,620px)] [@media(min-height:900px)]:max-h-[min(62svh,700px)] sm:rounded-[10px]">
+        <PhotoboothPageBody className="capture-body flex min-h-0 flex-1 flex-col overflow-hidden px-[5.278%] pt-[1.4%] pb-0">
+          <div className="capture-content mx-auto flex h-full min-h-0 w-full max-w-[900px] flex-col">
+            <div className="capture-camera-area flex min-h-0 flex-1 items-center">
+              <div className="capture-camera-frame relative mx-auto w-full max-w-[820px] overflow-hidden rounded-[8px] bg-[linear-gradient(180deg,#9CC0E9_0%,#E7C95F_45%,#D9B54D_100%)] sm:rounded-[10px]">
                 <video
                   ref={videoRef}
                   autoPlay
@@ -300,7 +300,7 @@ export default function CapturePage() {
                 style={{ filter: selectedFilterStyle }}
               />
 
-                <div className="aspect-[0.52] max-h-[inherit] w-full bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.15),transparent_45%)] [@media(min-height:760px)]:aspect-[0.58] [@media(min-height:900px)]:aspect-[0.68] sm:aspect-[0.76]" />
+                <div className="capture-camera-spacer w-full bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.15),transparent_45%)]" />
 
                 {isCameraReady ? (
                   <>
@@ -335,7 +335,7 @@ export default function CapturePage() {
               </div>
             </div>
 
-            <div className="pt-[clamp(8px,1.4svh,18px)] pb-[calc(clamp(18px,3svh,34px)+env(safe-area-inset-bottom))]">
+            <div className="capture-actions shrink-0 pt-[clamp(8px,1.4svh,18px)] pb-[calc(clamp(18px,3svh,34px)+env(safe-area-inset-bottom))]">
               <div className="flex items-center justify-center gap-1.5 sm:gap-2">
                 {PHOTOBOOTH_COUNTDOWN_OPTIONS.map((value) => {
                   const isSelected = value === selectedCountdown
@@ -389,7 +389,7 @@ export default function CapturePage() {
                   }}
                   disabled={!isCameraReady || isCapturingSequence}
                   className={[
-                    'flex h-[84px] w-[84px] flex-col items-center justify-center rounded-full bg-[#FF5A2A] text-white shadow-[0_12px_28px_rgba(255,90,42,0.38)] sm:h-[92px] sm:w-[92px]',
+                    'capture-shutter flex h-[84px] w-[84px] flex-col items-center justify-center rounded-full bg-[#FF5A2A] text-white shadow-[0_12px_28px_rgba(255,90,42,0.38)] sm:h-[92px] sm:w-[92px]',
                     !isCameraReady || isCapturingSequence
                       ? 'cursor-not-allowed opacity-70'
                       : '',
