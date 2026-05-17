@@ -66,6 +66,7 @@ export default function WelcomeMainPage() {
           <div className="welcome-main-cta-wrap mt-[clamp(12px,3vh,28px)] flex w-full flex-1 items-center justify-center">
             <Link
               href={screen.nextHref ?? '/packages'}
+              scroll={false}
               className="welcome-main-cta inline-flex h-[clamp(116px,31vw,260px)] w-[clamp(116px,31vw,260px)] flex-col items-center justify-center rounded-full bg-[#FF5A2A] pt-[clamp(2px,0.6vw,8px)] text-white shadow-[0_8px_16px_rgba(255,90,42,0.28)] transition-all duration-200 hover:brightness-95 active:scale-[0.98]"
             >
               <Image

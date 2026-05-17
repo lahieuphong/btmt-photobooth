@@ -57,7 +57,7 @@ export default function PaymentPage() {
     }
 
     const timeoutId = window.setTimeout(() => {
-      router.push(screen.nextHref ?? '/layout')
+      router.push(screen.nextHref ?? '/layout', { scroll: false })
     }, 5000)
 
     return () => {

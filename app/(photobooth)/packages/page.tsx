@@ -23,7 +23,7 @@ export default function PackagesPage() {
 
   function handleConfirmPackage() {
     startPhotoboothRuntimeSession(selectedPackageId)
-    router.push(screen.nextHref ?? '/payment')
+    router.push(screen.nextHref ?? '/payment', { scroll: false })
   }
 
   return (

@@ -16,7 +16,7 @@ export default function PrintAutoRedirect({
 
   useEffect(() => {
     const timer = window.setTimeout(() => {
-      router.push(href)
+      router.push(href, { scroll: false })
     }, delayMs)
 
     return () => {

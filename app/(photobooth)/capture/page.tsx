@@ -256,7 +256,7 @@ export default function CapturePage() {
       }
 
       const nextRoute = screen.nextHref ?? '/preview'
-      router.push(nextRoute)
+      router.push(nextRoute, { scroll: false })
 
       // Fallback for static export on mobile browsers where client router may not transition reliably.
       window.setTimeout(() => {
@@ -416,7 +416,7 @@ export default function CapturePage() {
                     onClick={() => {
                       clearPhotoboothSingleRetake()
                       setIsSingleRetakeMode(false)
-                      router.push(PHOTOBOOTH_ROUTES.PREVIEW)
+                      router.push(PHOTOBOOTH_ROUTES.PREVIEW, { scroll: false })
                     }}
                     className="text-[12px] font-medium text-[#6D6D6D] underline underline-offset-2"
                   >

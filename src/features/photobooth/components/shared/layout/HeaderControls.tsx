@@ -25,6 +25,7 @@ export default function HeaderControls({
       {showBackButton ? (
         <Link
           href={backHref}
+          scroll={false}
           className="inline-flex w-[25.8%] min-w-0 aspect-[295/108] items-center justify-center gap-[0.92cqw] rounded-full bg-[rgba(26,26,26,0.46)] px-[1.8cqw] text-[clamp(14px,2.15vw,72px)] font-medium leading-none text-white shadow-[0_8px_18px_rgba(39,39,39,0.17)]"
         >
           <Image

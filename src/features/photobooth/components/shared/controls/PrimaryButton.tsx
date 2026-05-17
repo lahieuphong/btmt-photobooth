@@ -40,7 +40,7 @@ export default function PrimaryButton({
 
   if (href && !disabled) {
     return (
-      <Link href={href} className={classes}>
+      <Link href={href} scroll={false} className={classes}>
         {children}
       </Link>
     )

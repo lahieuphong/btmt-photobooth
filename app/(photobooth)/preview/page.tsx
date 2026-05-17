@@ -91,19 +91,19 @@ export default function PreviewPage() {
     const updatedSession = completePhotoboothCaptureRound()
     const nextRoute = getPreviewNextRoute(updatedSession)
 
-    router.push(nextRoute)
+    router.push(nextRoute, { scroll: false })
   }
 
   function handleRetakeAll() {
     if (retakeTargetRoundIndex !== null && retakeTargetSlotIndex !== null) {
       setPhotoboothRetakeDraftImageDataUrl(null)
       setRetakeDraftImageDataUrl(null)
-      router.push(PHOTOBOOTH_ROUTES.CAPTURE)
+      router.push(PHOTOBOOTH_ROUTES.CAPTURE, { scroll: false })
       return
     }
 
     clearPhotoboothSingleRetake()
-    router.push(screen.secondaryActionHref ?? '/capture')
+    router.push(screen.secondaryActionHref ?? '/capture', { scroll: false })
   }
 
   function handleRetakeSingleImage(slotIndex: number) {
@@ -111,7 +111,7 @@ export default function PreviewPage() {
     setRetakeTargetRoundIndex(currentRoundIndex)
     setRetakeTargetSlotIndex(slotIndex)
     setRetakeDraftImageDataUrl(null)
-    router.push(PHOTOBOOTH_ROUTES.CAPTURE)
+    router.push(PHOTOBOOTH_ROUTES.CAPTURE, { scroll: false })
   }
 
   // Determine slot count for current layout
