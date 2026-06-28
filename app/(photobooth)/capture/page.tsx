@@ -90,8 +90,10 @@ export default function CapturePage() {
   const [countdownValue, setCountdownValue] = useState<number | null>(null)
   const [isCapturingSequence, setIsCapturingSequence] = useState(false)
   const [isInterCaptureLoading, setIsInterCaptureLoading] = useState(false)
+  const [isNavigatingAfterCapture, setIsNavigatingAfterCapture] = useState(false)
   const videoRef = useRef<HTMLVideoElement | null>(null)
   const captureLockRef = useRef(false)
+  const isNavigatingAfterCaptureRef = useRef(false)
 
   const isMobileDevice = useMemo(() => {
     if (typeof window === 'undefined' || typeof navigator === 'undefined') {
@@ -194,6 +196,7 @@ export default function CapturePage() {
   }, [isMobileDevice])
 
   const resolvedCameraError = cameraError
+  const isCaptureActionDisabled = isCapturingSequence || isNavigatingAfterCapture
 
   function captureCurrentFrame() {
     const video = videoRef.current
@@ -266,6 +269,15 @@ export default function CapturePage() {
   }
 
   function navigateToNextCaptureRoute() {
+    if (isNavigatingAfterCaptureRef.current) {
+      return
+    }
+
+    isNavigatingAfterCaptureRef.current = true
+    captureLockRef.current = true
+    setIsNavigatingAfterCapture(true)
+    setIsCapturingSequence(true)
+
     const nextRoute = screen.nextHref ?? '/preview'
     router.push(nextRoute, { scroll: false })
 
@@ -278,7 +290,12 @@ export default function CapturePage() {
   }
 
   async function handleInstantCapture() {
-    if (captureLockRef.current || isCapturingSequence || !isCameraReady) {
+    if (
+      captureLockRef.current ||
+      isCaptureActionDisabled ||
+      isNavigatingAfterCaptureRef.current ||
+      !isCameraReady
+    ) {
       return
     }
 
@@ -369,8 +386,11 @@ export default function CapturePage() {
     } finally {
       setCountdownValue(null)
       setIsInterCaptureLoading(false)
-      setIsCapturingSequence(false)
-      captureLockRef.current = false
+
+      if (!isNavigatingAfterCaptureRef.current) {
+        setIsCapturingSequence(false)
+        captureLockRef.current = false
+      }
     }
   }
 
@@ -380,7 +400,12 @@ export default function CapturePage() {
       return
     }
 
-    if (captureLockRef.current || isCapturingSequence || !isCameraReady) {
+    if (
+      captureLockRef.current ||
+      isCaptureActionDisabled ||
+      isNavigatingAfterCaptureRef.current ||
+      !isCameraReady
+    ) {
       return
     }
 
@@ -454,8 +479,11 @@ export default function CapturePage() {
     } finally {
       setCountdownValue(null)
       setIsInterCaptureLoading(false)
-      setIsCapturingSequence(false)
-      captureLockRef.current = false
+
+      if (!isNavigatingAfterCaptureRef.current) {
+        setIsCapturingSequence(false)
+        captureLockRef.current = false
+      }
     }
   }
 
@@ -534,13 +562,13 @@ export default function CapturePage() {
                       type="button"
                       onClick={() => setSelectedCountdown(value)}
                       aria-pressed={isSelected}
-                      disabled={isCapturingSequence}
+                      disabled={isCaptureActionDisabled}
                       className={[
                         'flex h-[30px] min-w-[58px] transform-gpu items-center justify-center gap-1 rounded-[9px] px-2 text-[10px] font-medium leading-none text-white transition-[transform,background-color,border-color,box-shadow,opacity] duration-220 ease-out active:scale-95 sm:h-[32px] sm:min-w-[64px] sm:text-[11px]',
                         isSelected
                           ? 'scale-105 border-2 border-[#FF5A2A] bg-[#15181F] shadow-[0_0_10px_rgba(255,90,42,0.28)]'
                           : 'scale-90 bg-[#75777B]',
-                        isCapturingSequence ? 'cursor-not-allowed opacity-65' : '',
+                        isCaptureActionDisabled ? 'cursor-not-allowed opacity-65' : '',
                       ].join(' ')}
                     >
                       <Image
@@ -575,10 +603,10 @@ export default function CapturePage() {
                   onClick={() => {
                     void handleCaptureSequence()
                   }}
-                  disabled={!isCameraReady || isCapturingSequence}
+                  disabled={!isCameraReady || isCaptureActionDisabled}
                   className={[
                     'capture-shutter flex h-[84px] w-[84px] flex-col items-center justify-center rounded-full bg-[#FF5A2A] text-white shadow-[0_12px_28px_rgba(255,90,42,0.38)] sm:h-[92px] sm:w-[92px]',
-                    !isCameraReady || isCapturingSequence
+                    !isCameraReady || isCaptureActionDisabled
                       ? 'cursor-not-allowed opacity-70'
                       : '',
                   ].join(' ')}
