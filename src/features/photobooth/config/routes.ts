@@ -1,7 +1,7 @@
 export const PHOTOBOOTH_ROUTES = {
   HOME: '/',
   WELCOME_LOADING: '/welcome',
-  WELCOME: '/welcome/main',
+  WELCOME: '/welcome',
   PACKAGES: '/packages',
   PAYMENT: '/payment',
   LAYOUT: '/layout',

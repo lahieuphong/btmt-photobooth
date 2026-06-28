@@ -7,13 +7,15 @@ import Image from 'next/image'
 import { getAssetPath } from '@/src/features/photobooth/utils/assetPath'
 
 type WelcomeLoadingScreenProps = {
-  redirectTo: string
+  redirectTo?: string
+  onComplete?: () => void
 }
 
 const MIN_LOADING_TIME_MS = 1200
 
 export default function WelcomeLoadingScreen({
   redirectTo,
+  onComplete,
 }: WelcomeLoadingScreenProps) {
   const router = useRouter()
   const [progress, setProgress] = useState(8)
@@ -48,7 +50,12 @@ export default function WelcomeLoadingScreen({
         setProgress(100)
         window.setTimeout(() => {
           if (!isCancelled) {
-            router.replace(redirectTo)
+            if (redirectTo) {
+              router.replace(redirectTo)
+              return
+            }
+
+            onComplete?.()
           }
         }, 180)
       }
@@ -58,7 +65,7 @@ export default function WelcomeLoadingScreen({
       isCancelled = true
       window.clearInterval(progressTicker)
     }
-  }, [redirectTo, router])
+  }, [onComplete, redirectTo, router])
 
   const screenStyle: CSSProperties = {
     background: '#ffffff',
