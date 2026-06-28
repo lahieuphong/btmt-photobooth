@@ -14,13 +14,6 @@ type PhotoboothFrameArtworkProps = {
   photoSrcs?: Array<string | null>
 }
 
-const GRID_6_ROW_GAP_COVER_MASK_STYLE = {
-  WebkitMaskImage:
-    'linear-gradient(to bottom, transparent 0%, transparent 33.078%, #000 33.078%, #000 35.377%, transparent 35.377%, transparent 62.835%, #000 62.835%, #000 65.134%, transparent 65.134%, transparent 100%)',
-  maskImage:
-    'linear-gradient(to bottom, transparent 0%, transparent 33.078%, #000 33.078%, #000 35.377%, transparent 35.377%, transparent 62.835%, #000 62.835%, #000 65.134%, transparent 65.134%, transparent 100%)',
-}
-
 function getFramePhotoBounds(
   mode: PhotoboothLayoutPreviewMode,
   compact: boolean
@@ -227,23 +220,6 @@ export default function PhotoboothFrameArtwork({
             loading={imagePriority ? 'eager' : 'lazy'}
           />
         </div>
-
-        {mode === 'grid-6' ? (
-          <div
-            className="pointer-events-none absolute inset-0 z-20"
-            style={GRID_6_ROW_GAP_COVER_MASK_STYLE}
-          >
-            <div className={`${photoBoundsClass} z-0`}>
-              <FramePhotoLayout
-                mode={mode}
-                compact={compact}
-                slotBackground={slotBackground}
-                photoSrc={photoSrc}
-                photoSrcs={photoSrcs}
-              />
-            </div>
-          </div>
-        ) : null}
       </div>
     </div>
   )
