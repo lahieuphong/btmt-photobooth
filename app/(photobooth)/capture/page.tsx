@@ -28,11 +28,43 @@ import {
 } from '@/src/features/photobooth/utils/runtimeSession'
 
 const INTER_CAPTURE_LOADING_MS = 650
+const CAPTURE_FRAME_RETRY_ATTEMPTS = 8
+const CAPTURE_FRAME_RETRY_DELAY_MS = 120
+const CAPTURE_OUTPUT_MAX_LONG_EDGE = 1280
+const CAPTURE_OUTPUT_JPEG_QUALITY = 0.88
 
 function waitFor(ms: number) {
   return new Promise<void>((resolve) => {
     window.setTimeout(resolve, ms)
   })
+}
+
+function isValidCaptureDataUrl(value: string | null | undefined): value is string {
+  return (
+    typeof value === 'string' &&
+    value.trim().length > 0 &&
+    value.startsWith('data:image/')
+  )
+}
+
+function findNextEmptyCaptureSlot(
+  roundImages: Array<string | null> | undefined,
+  totalCaptures: number
+) {
+  for (let index = 0; index < totalCaptures; index += 1) {
+    if (!isValidCaptureDataUrl(roundImages?.[index])) {
+      return index
+    }
+  }
+
+  return totalCaptures
+}
+
+function hasCompleteCaptureRound(
+  roundImages: Array<string | null> | undefined,
+  totalCaptures: number
+) {
+  return findNextEmptyCaptureSlot(roundImages, totalCaptures) >= totalCaptures
 }
 
 function buildStaticRouteHrefFromCapture(nextRoute: string) {
@@ -59,6 +91,7 @@ export default function CapturePage() {
   const [isCapturingSequence, setIsCapturingSequence] = useState(false)
   const [isInterCaptureLoading, setIsInterCaptureLoading] = useState(false)
   const videoRef = useRef<HTMLVideoElement | null>(null)
+  const captureLockRef = useRef(false)
 
   const isMobileDevice = useMemo(() => {
     if (typeof window === 'undefined' || typeof navigator === 'undefined') {
@@ -165,13 +198,24 @@ export default function CapturePage() {
   function captureCurrentFrame() {
     const video = videoRef.current
 
-    if (!video || video.videoWidth <= 0 || video.videoHeight <= 0) {
+    if (
+      !video ||
+      video.readyState < 2 ||
+      video.videoWidth <= 0 ||
+      video.videoHeight <= 0
+    ) {
       return null
     }
 
     const canvas = document.createElement('canvas')
-    canvas.width = video.videoWidth
-    canvas.height = video.videoHeight
+    const sourceWidth = video.videoWidth
+    const sourceHeight = video.videoHeight
+    const outputScale = Math.min(
+      1,
+      CAPTURE_OUTPUT_MAX_LONG_EDGE / Math.max(sourceWidth, sourceHeight)
+    )
+    canvas.width = Math.max(1, Math.round(sourceWidth * outputScale))
+    canvas.height = Math.max(1, Math.round(sourceHeight * outputScale))
 
     const context = canvas.getContext('2d')
 
@@ -181,7 +225,26 @@ export default function CapturePage() {
 
     context.filter = selectedFilterStyle
     context.drawImage(video, 0, 0, canvas.width, canvas.height)
-    return canvas.toDataURL('image/jpeg', 0.92)
+
+    try {
+      return canvas.toDataURL('image/jpeg', CAPTURE_OUTPUT_JPEG_QUALITY)
+    } catch {
+      return null
+    }
+  }
+
+  async function captureCurrentFrameWithRetry() {
+    for (let attempt = 0; attempt < CAPTURE_FRAME_RETRY_ATTEMPTS; attempt += 1) {
+      const capturedDataUrl = captureCurrentFrame()
+
+      if (isValidCaptureDataUrl(capturedDataUrl)) {
+        return capturedDataUrl
+      }
+
+      await waitFor(CAPTURE_FRAME_RETRY_DELAY_MS)
+    }
+
+    return null
   }
 
   async function runCountdown(seconds: number) {
@@ -215,41 +278,135 @@ export default function CapturePage() {
   }
 
   async function handleInstantCapture() {
-    if (isCapturingSequence || !isCameraReady) {
+    if (captureLockRef.current || isCapturingSequence || !isCameraReady) {
       return
     }
 
-    const currentSession = readPhotoboothRuntimeSession()
-    const resolvedSingleRetakeMode =
-      currentSession.retakeTargetRoundIndex !== null &&
-      currentSession.retakeTargetSlotIndex !== null
-    const totalCaptures = resolvedSingleRetakeMode ? 1 : getCaptureSlotsCount()
-    const currentRoundIndex = Math.min(
-      currentSession.captureRoundsCompleted,
-      Math.max(currentSession.captureRoundsRequired - 1, 0)
-    )
-    let captureIndex = 0
+    captureLockRef.current = true
+    setIsCapturingSequence(true)
+    setCameraError(null)
 
-    if (!resolvedSingleRetakeMode) {
-      const currentRoundImages =
-        currentSession.capturedRoundImageDataUrls[currentRoundIndex]
-      const currentRoundCapturedCount = Array.isArray(currentRoundImages)
-        ? currentRoundImages.length
-        : 0
+    try {
+      const currentSession = readPhotoboothRuntimeSession()
+      const resolvedSingleRetakeMode =
+        currentSession.retakeTargetRoundIndex !== null &&
+        currentSession.retakeTargetSlotIndex !== null
+      const totalCaptures = resolvedSingleRetakeMode ? 1 : getCaptureSlotsCount()
+      const currentRoundIndex = Math.min(
+        currentSession.captureRoundsCompleted,
+        Math.max(currentSession.captureRoundsRequired - 1, 0)
+      )
+      let captureIndex = 0
 
-      captureIndex =
-        currentRoundCapturedCount >= totalCaptures ? 0 : currentRoundCapturedCount
+      if (!resolvedSingleRetakeMode) {
+        const currentRoundImages =
+          currentSession.capturedRoundImageDataUrls[currentRoundIndex]
+        const nextEmptySlotIndex = findNextEmptyCaptureSlot(
+          currentRoundImages,
+          totalCaptures
+        )
+        const shouldStartFreshRound = nextEmptySlotIndex >= totalCaptures
 
-      if (captureIndex === 0) {
+        captureIndex = shouldStartFreshRound ? 0 : nextEmptySlotIndex
+
+        if (shouldStartFreshRound) {
+          const nextCapturedRoundImageDataUrls = Array.from(
+            { length: Math.max(1, currentSession.captureRoundsRequired) },
+            (_, roundIndex) => {
+              if (roundIndex === currentRoundIndex) {
+                return []
+              }
+
+              const persistedRound =
+                currentSession.capturedRoundImageDataUrls[roundIndex]
+              return Array.isArray(persistedRound) ? [...persistedRound] : []
+            }
+          )
+
+          writePhotoboothRuntimeSession({
+            ...currentSession,
+            latestCaptureDataUrl: null,
+            capturedRoundImageDataUrls: nextCapturedRoundImageDataUrls,
+          })
+        }
+      }
+
+      const capturedDataUrl = await captureCurrentFrameWithRetry()
+
+      if (!capturedDataUrl) {
+        setCameraError('Không thể chụp ảnh. Vui lòng giữ camera ổn định rồi thử lại.')
+        return
+      }
+
+      if (resolvedSingleRetakeMode) {
+        setPhotoboothRetakeDraftImageDataUrl(capturedDataUrl)
+      } else {
+        const updatedSession = setPhotoboothCaptureRoundImageDataUrl(
+          capturedDataUrl,
+          captureIndex
+        )
+        const updatedRoundImages =
+          updatedSession.capturedRoundImageDataUrls[currentRoundIndex]
+
+        if (hasCompleteCaptureRound(updatedRoundImages, totalCaptures)) {
+          setIsInterCaptureLoading(true)
+          await waitFor(INTER_CAPTURE_LOADING_MS)
+          setIsInterCaptureLoading(false)
+          navigateToNextCaptureRoute()
+          return
+        }
+      }
+
+      setIsInterCaptureLoading(true)
+      await waitFor(INTER_CAPTURE_LOADING_MS)
+      setIsInterCaptureLoading(false)
+
+      if (resolvedSingleRetakeMode) {
+        navigateToNextCaptureRoute()
+      }
+    } catch {
+      setCameraError('Không thể lưu ảnh vừa chụp. Vui lòng thử lại.')
+    } finally {
+      setCountdownValue(null)
+      setIsInterCaptureLoading(false)
+      setIsCapturingSequence(false)
+      captureLockRef.current = false
+    }
+  }
+
+  async function handleCaptureSequence() {
+    if (selectedCountdown === 0) {
+      await handleInstantCapture()
+      return
+    }
+
+    if (captureLockRef.current || isCapturingSequence || !isCameraReady) {
+      return
+    }
+
+    captureLockRef.current = true
+    setIsCapturingSequence(true)
+    setCameraError(null)
+
+    try {
+      const currentSession = readPhotoboothRuntimeSession()
+      const resolvedSingleRetakeMode =
+        currentSession.retakeTargetRoundIndex !== null &&
+        currentSession.retakeTargetSlotIndex !== null
+      const totalCaptures = resolvedSingleRetakeMode ? 1 : getCaptureSlotsCount()
+      const currentRoundIndex = Math.min(
+        currentSession.captureRoundsCompleted,
+        Math.max(currentSession.captureRoundsRequired - 1, 0)
+      )
+      if (!resolvedSingleRetakeMode) {
         const nextCapturedRoundImageDataUrls = Array.from(
           { length: Math.max(1, currentSession.captureRoundsRequired) },
           (_, roundIndex) => {
             if (roundIndex === currentRoundIndex) {
-              return []
+              return Array.from({ length: totalCaptures }, () => null as string | null)
             }
 
-            const persistedRound =
-              currentSession.capturedRoundImageDataUrls[roundIndex]
+            const persistedRound = currentSession.capturedRoundImageDataUrls[roundIndex]
             return Array.isArray(persistedRound) ? [...persistedRound] : []
           }
         )
@@ -260,80 +417,16 @@ export default function CapturePage() {
           capturedRoundImageDataUrls: nextCapturedRoundImageDataUrls,
         })
       }
-    }
 
-    setIsCapturingSequence(true)
-    setCameraError(null)
-
-    try {
-      const capturedDataUrl = captureCurrentFrame()
-      if (resolvedSingleRetakeMode) {
-        setPhotoboothRetakeDraftImageDataUrl(capturedDataUrl)
-      } else {
-        setPhotoboothCaptureRoundImageDataUrl(capturedDataUrl, captureIndex)
-      }
-
-      setIsInterCaptureLoading(true)
-      await waitFor(INTER_CAPTURE_LOADING_MS)
-      setIsInterCaptureLoading(false)
-
-      if (resolvedSingleRetakeMode || captureIndex >= totalCaptures - 1) {
-        navigateToNextCaptureRoute()
-      }
-    } finally {
-      setCountdownValue(null)
-      setIsInterCaptureLoading(false)
-      setIsCapturingSequence(false)
-    }
-  }
-
-  async function handleCaptureSequence() {
-    if (selectedCountdown === 0) {
-      await handleInstantCapture()
-      return
-    }
-
-    if (isCapturingSequence || !isCameraReady) {
-      return
-    }
-
-    const currentSession = readPhotoboothRuntimeSession()
-    const resolvedSingleRetakeMode =
-      currentSession.retakeTargetRoundIndex !== null &&
-      currentSession.retakeTargetSlotIndex !== null
-    const totalCaptures = resolvedSingleRetakeMode ? 1 : getCaptureSlotsCount()
-    const currentRoundIndex = Math.min(
-      currentSession.captureRoundsCompleted,
-      Math.max(currentSession.captureRoundsRequired - 1, 0)
-    )
-    if (!resolvedSingleRetakeMode) {
-      const nextCapturedRoundImageDataUrls = Array.from(
-        { length: Math.max(1, currentSession.captureRoundsRequired) },
-        (_, roundIndex) => {
-          if (roundIndex === currentRoundIndex) {
-            return Array.from({ length: totalCaptures }, () => null as string | null)
-          }
-
-          const persistedRound = currentSession.capturedRoundImageDataUrls[roundIndex]
-          return Array.isArray(persistedRound) ? [...persistedRound] : []
-        }
-      )
-
-      writePhotoboothRuntimeSession({
-        ...currentSession,
-        latestCaptureDataUrl: null,
-        capturedRoundImageDataUrls: nextCapturedRoundImageDataUrls,
-      })
-    }
-
-    setIsCapturingSequence(true)
-    setCameraError(null)
-
-    try {
       for (let captureIndex = 0; captureIndex < totalCaptures; captureIndex += 1) {
         await runCountdown(selectedCountdown)
 
-        const capturedDataUrl = captureCurrentFrame()
+        const capturedDataUrl = await captureCurrentFrameWithRetry()
+
+        if (!capturedDataUrl) {
+          throw new Error('CAPTURE_FRAME_FAILED')
+        }
+
         if (resolvedSingleRetakeMode) {
           setPhotoboothRetakeDraftImageDataUrl(capturedDataUrl)
         } else {
@@ -345,11 +438,24 @@ export default function CapturePage() {
         setIsInterCaptureLoading(false)
       }
 
+      if (!resolvedSingleRetakeMode) {
+        const updatedSession = readPhotoboothRuntimeSession()
+        const updatedRoundImages =
+          updatedSession.capturedRoundImageDataUrls[currentRoundIndex]
+
+        if (!hasCompleteCaptureRound(updatedRoundImages, totalCaptures)) {
+          throw new Error('CAPTURE_ROUND_INCOMPLETE')
+        }
+      }
+
       navigateToNextCaptureRoute()
+    } catch {
+      setCameraError('Không thể chụp đủ ảnh. Vui lòng thử lại.')
     } finally {
       setCountdownValue(null)
       setIsInterCaptureLoading(false)
       setIsCapturingSequence(false)
+      captureLockRef.current = false
     }
   }
 
