@@ -14,6 +14,13 @@ type PhotoboothFrameArtworkProps = {
   photoSrcs?: Array<string | null>
 }
 
+const GRID_6_ROW_GAP_COVER_MASK_STYLE = {
+  WebkitMaskImage:
+    'linear-gradient(to bottom, transparent 0%, transparent 33.078%, #000 33.078%, #000 35.377%, transparent 35.377%, transparent 62.835%, #000 62.835%, #000 65.134%, transparent 65.134%, transparent 100%)',
+  maskImage:
+    'linear-gradient(to bottom, transparent 0%, transparent 33.078%, #000 33.078%, #000 35.377%, transparent 35.377%, transparent 62.835%, #000 62.835%, #000 65.134%, transparent 65.134%, transparent 100%)',
+}
+
 function getFramePhotoBounds(
   mode: PhotoboothLayoutPreviewMode,
   compact: boolean
@@ -29,9 +36,7 @@ function getFramePhotoBounds(
   }
 
   if (mode === 'grid-6') {
-    return compact
-      ? 'absolute left-[12%] right-[12%] top-[11.5%] bottom-[15.5%]'
-      : 'absolute left-[9.5%] right-[9.5%] top-[9.2%] bottom-[11.8%]'
+    return 'absolute left-[7.667%] right-[7.667%] top-[5.62%] bottom-[7.407%]'
   }
 
   return compact
@@ -140,17 +145,15 @@ function FramePhotoLayout({
   if (mode === 'grid-6') {
     return (
       <div
-        className={[
-          'grid h-full grid-cols-2 content-start',
-          compact
-            ? 'gap-x-[clamp(2px,0.4cqw,4px)] gap-y-[clamp(2px,0.4cqw,4px)]'
-            : 'gap-x-[clamp(8px,1.1cqw,14px)] gap-y-[clamp(8px,1.1cqw,14px)]',
-        ].join(' ')}
+        className="grid h-full grid-cols-2 grid-rows-[466fr_466fr_430fr] content-stretch gap-x-[6.496%] gap-y-0"
       >
         {Array.from({ length: 6 }).map((_, index) => (
           <FramePhotoSlot
             key={index}
-            className="aspect-[175/150]"
+            className="h-full rounded-none border-0"
+            imageClassName={
+              index >= 4 ? 'scale-[1.08] -translate-y-[2%]' : 'scale-[1.04]'
+            }
             slotBackground={slotBackground}
             photoSrc={resolveSlotPhotoSrc(index)}
           />
@@ -192,13 +195,13 @@ export default function PhotoboothFrameArtwork({
 }: PhotoboothFrameArtworkProps) {
   const overlaySrc = getPhotoboothFrameOverlaySrc(mode)
   const photoBoundsClass = getFramePhotoBounds(mode, compact)
-  const isGrid4Frame = mode === 'grid-4'
+  const isTopAlignedFrame = mode === 'grid-4' || mode === 'grid-6'
 
   return (
     <div className="relative h-full w-full overflow-hidden rounded-[inherit]">
       <div
         className={
-          isGrid4Frame
+          isTopAlignedFrame
             ? 'absolute left-0 top-0 w-full aspect-[1200/1566]'
             : 'absolute inset-0'
         }
@@ -219,11 +222,28 @@ export default function PhotoboothFrameArtwork({
             alt={overlayAlt}
             fill
             sizes={imageSizes}
-            className={isGrid4Frame ? 'object-fill' : 'object-contain'}
+            className={isTopAlignedFrame ? 'object-fill' : 'object-contain'}
             priority={imagePriority}
             loading={imagePriority ? 'eager' : 'lazy'}
           />
         </div>
+
+        {mode === 'grid-6' ? (
+          <div
+            className="pointer-events-none absolute inset-0 z-20"
+            style={GRID_6_ROW_GAP_COVER_MASK_STYLE}
+          >
+            <div className={`${photoBoundsClass} z-0`}>
+              <FramePhotoLayout
+                mode={mode}
+                compact={compact}
+                slotBackground={slotBackground}
+                photoSrc={photoSrc}
+                photoSrcs={photoSrcs}
+              />
+            </div>
+          </div>
+        ) : null}
       </div>
     </div>
   )
