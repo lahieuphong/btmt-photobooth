@@ -97,13 +97,10 @@ type ExportPhotoSlot = {
   width: number
   height: number
   scale?: number
+  sourceIndex?: number
 }
 
 function getExportPhotoBounds(mode: PhotoboothLayoutPreviewMode) {
-  if (mode === 'vertical-4') {
-    return { left: 0.23, right: 0.23, top: 0.088, bottom: 0.122 }
-  }
-
   if (mode === 'grid-6') {
     return { left: 0.095, right: 0.095, top: 0.092, bottom: 0.118 }
   }
@@ -134,6 +131,27 @@ function getExportSlots(
         width: slotWidth,
         height: slotHeight,
         scale: 1.04,
+      }
+    })
+  }
+
+  if (mode === 'vertical-4') {
+    const scale = canvasWidth / 1200
+    const slotWidth = 477 * scale
+    const slotHeight = 320 * scale
+    const rowStarts = [88, 435, 783, 1130].map((value) => value * scale)
+    const columnStarts = [61, 662].map((value) => value * scale)
+
+    return Array.from({ length: 8 }).map((_, index) => {
+      const row = Math.floor(index / 2)
+      const column = index % 2
+
+      return {
+        x: columnStarts[column],
+        y: rowStarts[row],
+        width: slotWidth,
+        height: slotHeight,
+        sourceIndex: row,
       }
     })
   }
@@ -170,18 +188,6 @@ function getExportSlots(
   const y = canvasHeight * bounds.top
   const width = canvasWidth * (1 - bounds.left - bounds.right)
   const height = canvasHeight * (1 - bounds.top - bounds.bottom)
-
-  if (mode === 'vertical-4') {
-    const gap = height * 0.014
-    const slotHeight = (height - gap * 3) / 4
-
-    return Array.from({ length: 4 }).map((_, index) => ({
-      x,
-      y: y + index * (slotHeight + gap),
-      width,
-      height: slotHeight,
-    }))
-  }
 
   const slotCount = mode === 'grid-6' ? 6 : 4
   const rows = mode === 'grid-6' ? 3 : 2
@@ -324,7 +330,7 @@ export default function CapturedPage() {
 
     await Promise.all(
       slots.map(async (slot, index) => {
-        const photoSrc = photoSrcs[index]
+        const photoSrc = photoSrcs[slot.sourceIndex ?? index]
         if (!photoSrc) return
 
         const image = await loadExportImage(photoSrc)

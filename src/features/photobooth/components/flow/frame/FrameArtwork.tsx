@@ -24,8 +24,8 @@ function getFramePhotoBounds(
 
   if (mode === 'vertical-4') {
     return compact
-      ? 'absolute left-[26%] right-[26%] top-[11%] bottom-[16%]'
-      : 'absolute left-[23%] right-[23%] top-[8.8%] bottom-[12.2%]'
+      ? 'absolute left-[5.083%] right-[5.167%] top-[11%] bottom-[16%]'
+      : 'absolute left-[5.083%] right-[5.167%] top-[8.8%] bottom-[12.2%]'
   }
 
   if (mode === 'grid-6') {
@@ -112,25 +112,22 @@ function FramePhotoLayout({
   }
 
   if (mode === 'vertical-4') {
-    const containerClass = compact
-      ? 'h-[82%] gap-[clamp(2px,0.4cqw,4px)]'
-      : 'h-[86%] gap-[clamp(8px,1.1cqw,14px)]'
-
     return (
       <div
-        className={[
-          'grid w-full grid-cols-1 grid-rows-4',
-          containerClass,
-        ].join(' ')}
+        className="grid h-full w-full grid-cols-2 grid-rows-4 gap-x-[11.513%] gap-y-[1.982%]"
       >
-        {Array.from({ length: 4 }).map((_, index) => (
-          <FramePhotoSlot
-            key={index}
-            className="h-full"
-            slotBackground={slotBackground}
-            photoSrc={resolveSlotPhotoSrc(index)}
-          />
-        ))}
+        {Array.from({ length: 8 }).map((_, index) => {
+          const sourceSlotIndex = Math.floor(index / 2)
+
+          return (
+            <FramePhotoSlot
+              key={index}
+              className="h-full"
+              slotBackground={slotBackground}
+              photoSrc={resolveSlotPhotoSrc(sourceSlotIndex)}
+            />
+          )
+        })}
       </div>
     )
   }

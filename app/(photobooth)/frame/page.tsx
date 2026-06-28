@@ -87,10 +87,10 @@ function NoFrameArtwork({
   compact?: boolean
   photoSrcs?: Array<string | null>
 }) {
-  const slotCount = mode === 'grid-6' ? 6 : 4
+  const slotCount = mode === 'vertical-4' ? 8 : mode === 'grid-6' ? 6 : 4
   const gridClassName =
     mode === 'vertical-4'
-      ? 'grid-cols-1 grid-rows-4'
+      ? 'grid-cols-2 grid-rows-4'
       : 'grid-cols-2'
   const slotAspectClassName =
     mode === 'vertical-4'
@@ -108,26 +108,31 @@ function NoFrameArtwork({
           compact ? 'gap-[clamp(2px,0.4cqw,4px)]' : 'gap-[clamp(6px,1cqw,12px)]',
         ].join(' ')}
       >
-        {Array.from({ length: slotCount }).map((_, index) => (
-          <div
-            key={index}
-            className={[
-              'relative overflow-hidden rounded-[clamp(3px,0.55cqw,6px)] bg-white/75',
-              slotAspectClassName,
-            ].join(' ')}
-          >
-            {photoSrcs[index] ? (
-              <Image
-                src={photoSrcs[index]}
-                alt="Ảnh đã chụp"
-                fill
-                unoptimized
-                sizes={compact ? '48px' : '(max-width: 768px) 34vw, 220px'}
-                className="object-cover"
-              />
-            ) : null}
-          </div>
-        ))}
+        {Array.from({ length: slotCount }).map((_, index) => {
+          const sourceSlotIndex = mode === 'vertical-4' ? Math.floor(index / 2) : index
+          const photoSrc = photoSrcs[sourceSlotIndex]
+
+          return (
+            <div
+              key={index}
+              className={[
+                'relative overflow-hidden rounded-[clamp(3px,0.55cqw,6px)] bg-white/75',
+                slotAspectClassName,
+              ].join(' ')}
+            >
+              {photoSrc ? (
+                <Image
+                  src={photoSrc}
+                  alt="Ảnh đã chụp"
+                  fill
+                  unoptimized
+                  sizes={compact ? '48px' : '(max-width: 768px) 34vw, 220px'}
+                  className="object-cover"
+                />
+              ) : null}
+            </div>
+          )
+        })}
       </div>
     </div>
   )
