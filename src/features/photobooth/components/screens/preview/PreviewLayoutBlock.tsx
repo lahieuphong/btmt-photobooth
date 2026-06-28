@@ -80,17 +80,21 @@ export default function PreviewLayoutBlock({
       <div className={frameClassName}>
         <div className={frameContentClassName}>
           <div className={frameInnerClassName}>
-            <div className="mx-auto grid w-[48%] grid-cols-1 gap-3.5">
-              {Array.from({ length: 4 }).map((_, index) => (
-                <PreviewPhotoCard
-                  key={index}
-                  className="aspect-430/260"
-                  imageSrc={previewImages[index] || null}
-                  slotIndex={index}
-                  onRetakeImage={onRetakeImage}
-                  canRetake={enableRetake}
-                />
-              ))}
+            <div className="mx-auto grid w-[86%] grid-cols-2 gap-x-3.5 gap-y-3.5">
+              {Array.from({ length: 8 }).map((_, index) => {
+                const sourceSlotIndex = Math.floor(index / 2)
+
+                return (
+                  <PreviewPhotoCard
+                    key={index}
+                    className="aspect-[430/260]"
+                    imageSrc={previewImages[sourceSlotIndex] || null}
+                    slotIndex={sourceSlotIndex}
+                    onRetakeImage={onRetakeImage}
+                    canRetake={enableRetake}
+                  />
+                )
+              })}
             </div>
           </div>
         </div>
