@@ -23,9 +23,7 @@ function getFramePhotoBounds(
   }
 
   if (mode === 'vertical-4') {
-    return compact
-      ? 'absolute left-[5.083%] right-[5.167%] top-[11%] bottom-[16%]'
-      : 'absolute left-[5.083%] right-[5.167%] top-[8.8%] bottom-[12.2%]'
+    return 'absolute left-[5.083%] right-[5.167%] top-[5.62%] bottom-[7.407%]'
   }
 
   if (mode === 'grid-6') {
@@ -114,7 +112,7 @@ function FramePhotoLayout({
   if (mode === 'vertical-4') {
     return (
       <div
-        className="grid h-full w-full grid-cols-2 grid-rows-4 gap-x-[11.513%] gap-y-[1.982%]"
+        className="grid h-full w-full grid-cols-2 grid-rows-[320fr_320fr_320fr_320fr] gap-x-[11.513%] gap-y-[2.007%]"
       >
         {Array.from({ length: 8 }).map((_, index) => {
           const sourceSlotIndex = Math.floor(index / 2)
@@ -122,7 +120,7 @@ function FramePhotoLayout({
           return (
             <FramePhotoSlot
               key={index}
-              className="h-full"
+              className="h-full rounded-none border-0"
               slotBackground={slotBackground}
               photoSrc={resolveSlotPhotoSrc(sourceSlotIndex)}
             />
@@ -185,7 +183,8 @@ export default function PhotoboothFrameArtwork({
 }: PhotoboothFrameArtworkProps) {
   const overlaySrc = getPhotoboothFrameOverlaySrc(mode)
   const photoBoundsClass = getFramePhotoBounds(mode, compact)
-  const isTopAlignedFrame = mode === 'grid-4' || mode === 'grid-6'
+  const isTopAlignedFrame =
+    mode === 'grid-4' || mode === 'vertical-4' || mode === 'grid-6'
 
   return (
     <div className="relative h-full w-full overflow-hidden rounded-[inherit]">
