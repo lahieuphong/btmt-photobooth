@@ -4,7 +4,7 @@ export type PhotoboothSessionState = {
   selectedFilterId: string
   selectedBackgroundId: string
   selectedFrameId: string
-  selectedCountdown: 5 | 10 | 15
+  selectedCountdown: 0 | 5 | 10 | 15
   capturedPhotoIds: string[]
 }
 

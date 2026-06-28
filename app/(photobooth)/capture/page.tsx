@@ -202,7 +202,97 @@ export default function CapturePage() {
     return Math.max(1, slotCount)
   }
 
+  function navigateToNextCaptureRoute() {
+    const nextRoute = screen.nextHref ?? '/preview'
+    router.push(nextRoute, { scroll: false })
+
+    // Fallback for static export on mobile browsers where client router may not transition reliably.
+    window.setTimeout(() => {
+      if (/\/capture\/?$/.test(window.location.pathname)) {
+        window.location.assign(buildStaticRouteHrefFromCapture(nextRoute))
+      }
+    }, 420)
+  }
+
+  async function handleInstantCapture() {
+    if (isCapturingSequence || !isCameraReady) {
+      return
+    }
+
+    const currentSession = readPhotoboothRuntimeSession()
+    const resolvedSingleRetakeMode =
+      currentSession.retakeTargetRoundIndex !== null &&
+      currentSession.retakeTargetSlotIndex !== null
+    const totalCaptures = resolvedSingleRetakeMode ? 1 : getCaptureSlotsCount()
+    const currentRoundIndex = Math.min(
+      currentSession.captureRoundsCompleted,
+      Math.max(currentSession.captureRoundsRequired - 1, 0)
+    )
+    let captureIndex = 0
+
+    if (!resolvedSingleRetakeMode) {
+      const currentRoundImages =
+        currentSession.capturedRoundImageDataUrls[currentRoundIndex]
+      const currentRoundCapturedCount = Array.isArray(currentRoundImages)
+        ? currentRoundImages.length
+        : 0
+
+      captureIndex =
+        currentRoundCapturedCount >= totalCaptures ? 0 : currentRoundCapturedCount
+
+      if (captureIndex === 0) {
+        const nextCapturedRoundImageDataUrls = Array.from(
+          { length: Math.max(1, currentSession.captureRoundsRequired) },
+          (_, roundIndex) => {
+            if (roundIndex === currentRoundIndex) {
+              return []
+            }
+
+            const persistedRound =
+              currentSession.capturedRoundImageDataUrls[roundIndex]
+            return Array.isArray(persistedRound) ? [...persistedRound] : []
+          }
+        )
+
+        writePhotoboothRuntimeSession({
+          ...currentSession,
+          latestCaptureDataUrl: null,
+          capturedRoundImageDataUrls: nextCapturedRoundImageDataUrls,
+        })
+      }
+    }
+
+    setIsCapturingSequence(true)
+    setCameraError(null)
+
+    try {
+      const capturedDataUrl = captureCurrentFrame()
+      if (resolvedSingleRetakeMode) {
+        setPhotoboothRetakeDraftImageDataUrl(capturedDataUrl)
+      } else {
+        setPhotoboothCaptureRoundImageDataUrl(capturedDataUrl, captureIndex)
+      }
+
+      setIsInterCaptureLoading(true)
+      await waitFor(INTER_CAPTURE_LOADING_MS)
+      setIsInterCaptureLoading(false)
+
+      if (resolvedSingleRetakeMode || captureIndex >= totalCaptures - 1) {
+        navigateToNextCaptureRoute()
+      }
+    } finally {
+      setCountdownValue(null)
+      setIsInterCaptureLoading(false)
+      setIsCapturingSequence(false)
+    }
+  }
+
   async function handleCaptureSequence() {
+    if (selectedCountdown === 0) {
+      await handleInstantCapture()
+      return
+    }
+
     if (isCapturingSequence || !isCameraReady) {
       return
     }
@@ -255,15 +345,7 @@ export default function CapturePage() {
         setIsInterCaptureLoading(false)
       }
 
-      const nextRoute = screen.nextHref ?? '/preview'
-      router.push(nextRoute, { scroll: false })
-
-      // Fallback for static export on mobile browsers where client router may not transition reliably.
-      window.setTimeout(() => {
-        if (/\/capture\/?$/.test(window.location.pathname)) {
-          window.location.assign(buildStaticRouteHrefFromCapture(nextRoute))
-        }
-      }, 420)
+      navigateToNextCaptureRoute()
     } finally {
       setCountdownValue(null)
       setIsInterCaptureLoading(false)

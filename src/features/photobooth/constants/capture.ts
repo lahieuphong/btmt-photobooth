@@ -1,7 +1,7 @@
-export type PhotoboothCountdownOption = 5 | 10 | 15
+export type PhotoboothCountdownOption = 0 | 5 | 10 | 15
 
 export const PHOTOBOOTH_COUNTDOWN_OPTIONS: PhotoboothCountdownOption[] = [
-  5, 10, 15,
+  0, 5, 10, 15,
 ]
 
 export const PHOTOBOOTH_CAPTURE_GUIDE_TEXT =

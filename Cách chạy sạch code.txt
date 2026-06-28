@@ -1,0 +1,4 @@
+yarn cache clean
+rm -rf node_modules .next
+yarn install
+yarn dev
